@@ -80,6 +80,7 @@
 #' about the forecasts generated using all available observations.
 #'
 #' @seealso \code{\link[ggdist]{weighted_quantile}}
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
@@ -227,7 +228,32 @@ extract_final <- function(x, nrow, ncol, bench) {
       sapply(ncol:1 - 1, function(h) as.numeric(x[[xx]][nrow-h, ncol-h]))
     , simplify = FALSE)
   x <- do.call(cbind, x)
-  forecast:::copy_msts(bench, x)
+  copy_msts(bench, x)
+}
+
+## Copied from forecast:::copy_msts
+copy_msts <- function(x, y) {
+  if(NROW(x) > NROW(y)) {
+    # Pad y with initial NAs
+    if(NCOL(y) == 1) {
+      y <- c(rep(NA, NROW(x) - NROW(y)), y)
+    } else {
+      y <- rbind(matrix(NA, ncol=NCOL(y), nrow = NROW(x) - NROW(y)), y)
+    }
+  } else if(NROW(x) != NROW(y)) {
+    stop("x and y should have the same number of observations")
+  }
+  if(NCOL(y) > 1) {
+    class(y) <- c("mts", "ts", "matrix")
+  } else {
+    class(y) <- "ts"
+  }
+  if("msts" %in% class(x))
+    class(y) <- c("msts", class(y))
+  attr <- attributes(x)
+  attributes(y)$tsp <- attr$tsp
+  attributes(y)$msts <- attr$msts
+  return(y)
 }
 
 #' @export
@@ -236,7 +262,7 @@ print.scp <- function(x, ...) {
 }
 
 #' @export
-summary.scp <- function(x, ...) {
+summary.scp <- function(object, ...) {
   NextMethod()
 }
 
@@ -276,6 +302,7 @@ print.summary.cpforecast <- function(x, ...) {
   NextMethod()
   cat("\nCross-validation error measures:\n")
   print(round(
-    accuracy(x, measures = c(point_measures, interval_measures), byhorizon = FALSE),
+    accuracy.default(x, measures = c(point_measures, interval_measures),
+                     byhorizon = FALSE),
     digits = 3))
 }

@@ -8,6 +8,12 @@ Description: Methods and tools for performing multistep-ahead time series foreca
              using conformal prediction methods including classical conformal prediction,
              adaptive conformal prediction, conformal PID control, and
              Multistep-ahead conformal prediction.
+Imports:
+    forecast,
+    ggdist,
+    zoo,
+    stats,
+    rlang
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

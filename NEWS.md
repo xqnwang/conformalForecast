@@ -1,3 +1,3 @@
 # conformalForecast (development version)
 
-* Initial CRAN submission.
+* Main functions for conformal prediction methods

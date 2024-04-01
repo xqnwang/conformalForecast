@@ -12,7 +12,7 @@
 #' to capture the relationship between the \eqn{h}-step ahead forecast error and
 #' past errors.
 #'
-#' @aliases print.pid summary.pid print.summary.pid
+#' @aliases print.mcp summary.mcp print.summary.mcp
 #'
 #' @param object An object of class "\code{cvforecast}". It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
@@ -31,10 +31,7 @@
 #' @param integrate If \code{TRUE}, error integration will be included in the
 #' update process.
 #' @param scorecast If \code{TRUE}, scorecasting will be included in the update
-#' process, and \code{scorecastfun} should be given.
-#' @param scorecastfun A scorecaster function to return an object of class
-#' \code{forecast}. Its first argument must be a univariate time series, and
-#' it must have an argument \code{h} for the forecast horizon.
+#' process.
 #' @param lr Initial learning rate used for quantile tracking.
 #' @param Tg The time that is set to achieve the target absolute coverage
 #' guarantee before this.
@@ -294,4 +291,20 @@ mcp <- function(object, alpha = 1 - 0.01 * object$level,
     out$model$scorecaster <- list(lower = scorecaster_lower, upper = scorecaster_upper)
 
   return(structure(out, class = c("mcp", "cpforecast", "forecast")))
+}
+
+
+#' @export
+print.mcp <- function(x, ...) {
+  NextMethod()
+}
+
+#' @export
+summary.mcp <- function(object, ...) {
+  NextMethod()
+}
+
+#' @export
+print.summary.mcp <- function(x, ...) {
+  NextMethod()
 }

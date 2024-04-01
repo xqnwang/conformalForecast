@@ -364,7 +364,7 @@ print.pid <- function(x, ...) {
 }
 
 #' @export
-summary.pid <- function(x, ...) {
+summary.pid <- function(object, ...) {
   NextMethod()
 }
 

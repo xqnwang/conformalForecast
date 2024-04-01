@@ -2,9 +2,9 @@
 % Please edit documentation in R/mcp.R
 \name{mcp}
 \alias{mcp}
-\alias{print.pid}
-\alias{summary.pid}
-\alias{print.summary.pid}
+\alias{print.mcp}
+\alias{summary.mcp}
+\alias{print.summary.mcp}
 \title{Multistep-ahead conformal prediction method}
 \usage{
 mcp(
@@ -45,7 +45,7 @@ for scorecaster if applicable. Otherwise, expanding window strategy will be used
 update process.}
 
 \item{scorecast}{If \code{TRUE}, scorecasting will be included in the update
-process, and \code{scorecastfun} should be given.}
+process.}
 
 \item{lr}{Initial learning rate used for quantile tracking.}
 
@@ -60,10 +60,6 @@ guarantee is of at least \eqn{1-\alpha-\delta} coverage.}
 \item{KI}{A positive constant to place the integrator on the same scale as the scores.}
 
 \item{...}{Other arguments are passed to the \code{scorecastfun} function.}
-
-\item{scorecastfun}{A scorecaster function to return an object of class
-\code{forecast}. Its first argument must be a univariate time series, and
-it must have an argument \code{h} for the forecast horizon.}
 }
 \value{
 A list of class \code{c("mcp", "cpforecast", "forecast")}

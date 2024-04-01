@@ -265,7 +265,7 @@ print.acp <- function(x, ...) {
 }
 
 #' @export
-summary.acp <- function(x, ...) {
+summary.acp <- function(object, ...) {
   NextMethod()
 }
 
