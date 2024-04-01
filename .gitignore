@@ -1,0 +1,10 @@
+symbols.rds
+.directory
+.Rhistory
+.Rproj.user
+.Rbuildignore
+.travis.yml
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
