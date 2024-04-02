@@ -1,9 +1,9 @@
 #' Adaptive conformal prediction method
 #'
-#' Compute prediction intervals and other information obtained by
-#' applying the adaptive conformal prediction method.
+#' Compute prediction intervals and other information by
+#' applying the adaptive conformal prediction (ACP) method.
 #'
-#' The adaptive conformal prediction (ACP) method considers the online update:
+#' The ACP method considers the online update:
 #' \deqn{\alpha_{t+h|t}:=\alpha_{t+h-1|t-1}+\gamma(\alpha-\mathrm{err}_{t|t-h}),}
 #' for each individual forecast horizon \code{h}, respectively,
 #' where \eqn{\mathrm{err}_{t|t-h}=1} if \eqn{s_{t|t-h}>q_{t|t-h}}, and
@@ -11,10 +11,10 @@
 #'
 #' @aliases print.acp summary.acp print.summary.acp
 #'
-#' @param object An object of class "\code{cvforecast}". It must have an argument
+#' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors. See the results of a call
-#' to \code{\link{cvforecast}}.
+#' point forecasts and \code{ERROR} for forecast errors on validation set.
+#' See the results of a call to \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #' coverage level \eqn{1-\alpha}.
 #' @param gamma The step size parameter \eqn{\gamma>0} for \eqn{\alpha} updating.
@@ -56,8 +56,8 @@
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
 #' \item{model}{A list containing information abouth the conformal prediction model.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean}, \code{lower},
-#' \code{upper}, and \code{model} will also be returned, showing the information
+#' If \code{mean} is included in the \code{object}, the components \code{mean},
+#' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the forecasts generated using all available observations.
 #'
 #' @references Gibbs, I., and Candes, E. (2021). "Adaptive conformal inference under
@@ -67,7 +67,6 @@
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
 #' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-#' series <- as.numeric(series)
 #'
 #' # Cross-validation forecasting
 #' far2 <- function(x, h, level) {

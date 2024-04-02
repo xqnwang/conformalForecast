@@ -8,8 +8,21 @@
 \description{
 Methods and tools for performing multistep-ahead time series forecasting using conformal prediction methods including classical conformal prediction, adaptive conformal prediction, conformal PID control, and Multistep-ahead conformal prediction.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/xqnwang/conformalForecast}
+  \item Report bugs at \url{https://github.com/xqnwang/conformalForecast/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Xiaoqian Wang \email{Xiaoqian.Wang@monash.edu} (\href{https://orcid.org/0000-0003-4827-496X}{ORCID})
+
+Authors:
+\itemize{
+  \item Rob Hyndman \email{Rob.Hyndman@monash.edu} (\href{https://orcid.org/0000-0002-2140-5352}{ORCID})
+}
 
 }
 \keyword{package}

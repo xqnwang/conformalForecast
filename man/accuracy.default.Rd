@@ -15,30 +15,31 @@
 )
 }
 \arguments{
-\item{object}{An object of class \code{cvforecast} or \code{cpforecast}.}
+\item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
 
 \item{x}{An optional numerical vector containing actual values of the same
-length as object$mean.}
+length as \code{mean} in \code{object}.}
 
 \item{CV}{If \code{TRUE}, the cross-validation forecast accuracy will be returned.}
 
 \item{period}{The seasonal period of the data.}
 
-\item{measures}{A list of accuracy measure functions to compute (such as \link{point_measures} or \link{interval_measures}).}
+\item{measures}{A list of accuracy measure functions to compute (such as
+\link{point_measures} or \link{interval_measures}).}
 
-\item{byhorizon}{If \code{TRUE}, forecast accuracy will be calculated for each
+\item{byhorizon}{If \code{TRUE}, accuracy measures will be calculated for each
 individual forecast horizon \code{h} separately.}
 
-\item{...}{Additional arguments depending on the specific method.}
+\item{...}{Additional arguments depending on the specific measure.}
 }
 \value{
-Matrix giving mean out-of-sample forecast accuracy measures.
+A matrix giving mean out-of-sample forecast accuracy measures.
 }
 \description{
 Return range of summary measures of the out-of-sample forecast accuracy.
 If \code{x} is given, the function also measures test set forecast accuracy.
-If \code{x} is not given, the function only produces validation set forecast
-accuracy.
+If \code{x} is not given, the function only produces accuracy measures on
+validation set.
 }
 \details{
 The measures calculated are:
@@ -59,7 +60,6 @@ The measures calculated are:
 # Simulate time series from an AR(2) model
 library(forecast)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-series <- as.numeric(series)
 
 # Cross-validation forecasting with a rolling window of length 100
 far2 <- function(x, h, level) {

@@ -15,7 +15,7 @@ width(
 )
 }
 \arguments{
-\item{object}{An object of class \code{cvforecast} or \code{cpforecast}.}
+\item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
 
 \item{...}{Additional inputs if \code{object} is missing.}
 
@@ -23,37 +23,34 @@ width(
 
 \item{includemedian}{If \code{TRUE}, the median interval width will also be returned.}
 
-\item{window}{If not \code{NULL}, the rolling mean (and median if applicable)
-matrix for interval width is also returned.}
+\item{window}{If not \code{NULL}, the rolling mean (and rolling median if applicable)
+matrix for interval width will also be returned.}
 
 \item{na.rm}{A logical indicating whether \code{NA} values should be stripped
-before the mean or rolling mean computation proceeds.}
+before the mean, median, rolling mean, and rolling median computation proceeds.}
 }
 \value{
 A list of class \code{"width"} with the following components:
 \item{width}{Forecast interval width as a multivariate time series, where the \eqn{h}th
-column holds the interval width for forecast horizon \eqn{h}. The time index
+column holds the interval width for the forecast horizon \eqn{h}. The time index
 corresponds to the period for which the forecast is produced.}
-\item{mean}{The mean interval width across the validation set (and test set
-if applicable).}
-\item{rollmean}{If \code{window} is not NULL, a rolling mean interval width
-will be returned.}
-\item{median}{The median interval width across the validation set (and test set
-if applicable).}
-\item{rollmedian}{If \code{window} is not NULL, a rolling median interval width
-will be returned.}
+\item{mean}{Mean interval width across the validation set.}
+\item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means
+of interval width will be returned.}
+\item{median}{Median interval width across the validation set.}
+\item{rollmedian}{If \code{window} is not NULL, a matrix of the rolling medians
+of interval width will be returned.}
 }
 \description{
-Calculate the mean width of prediction intervals on validation set (and test
-set if applicable). If \code{window} is not \code{NULL}, the rolling mean
-matrix for interval width is also returned. If \code{includemedian} is \code{TRUE},
-the median interval width information will also be returned.
+Calculate the mean width of prediction intervals on the validation set.
+If \code{window} is not \code{NULL}, a matrix of the rolling means of interval
+width is also returned. If \code{includemedian} is \code{TRUE},
+the information of the median interval width will be returned.
 }
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-series <- as.numeric(series)
 
 # Cross-validation forecasting with a rolling window of length 100
 far2 <- function(x, h, level) {
@@ -63,7 +60,7 @@ far2 <- function(x, h, level) {
 fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
                  forward = TRUE, initial = 1, window = 100)
 
-# Mean and rolling mean width for interval forecasts on validation and test sets
+# Mean and rolling mean width for interval forecasts on validation set
 wid_fc <- width(fc, level = 95, window = 100)
 str(wid_fc)
 

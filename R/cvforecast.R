@@ -1,6 +1,6 @@
 #' Time series cross-validation forecasting
 #'
-#' Compute forecasts and other information obtained by applying
+#' Compute forecasts and other information by applying
 #' \code{forecastfun} to subsets of the time series \code{y} using a
 #' rolling forecast origin.
 #'
@@ -15,12 +15,13 @@
 #' successively to the subset time series \eqn{y_{t-t_w+1},\dots,y_{t}}{y[(t-t_w+1):t)]},
 #' for \eqn{t=\max(t_0, t_w),\dots,T}.
 #'
-#' If \code{forward = FALSE}, the last observation used for training is \eqn{y_{T-1}}.
+#' If \code{forward} is \code{FALSE}, the last observation used for training will
+#' be \eqn{y_{T-1}}.
 #'
 #' @aliases print.cvforecast summary.cvforecast print.summary.cvforecast
 #'
 #' @param y Univariate time series.
-#' @param forecastfun Function to return an object of class \code{forecast}.
+#' @param forecastfun Function to return an object of class \code{"forecast"}.
 #' Its first argument must be a univariate time series, and it must have an
 #' argument \code{h} for the forecast horizon and an argument \code{level} for
 #' the confidence level for prediction intervals. If exogenous predictors are used,
@@ -66,7 +67,6 @@
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
 #' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-#' series <- as.numeric(series)
 #'
 #' # Example with a rolling window of length 100
 #' far2 <- function(x, h, level) {

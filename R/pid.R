@@ -1,6 +1,6 @@
 #' Conformal PID control method
 #'
-#' Compute prediction intervals and other information obtained by
+#' Compute prediction intervals and other information by
 #' applying the conformal PID control method.
 #'
 #' The PID method combines three modules to make the final iteration:
@@ -14,19 +14,19 @@
 #'
 #' @aliases print.pid summary.pid print.summary.pid
 #'
-#' @param object An object of class "\code{cvforecast}". It must have an argument
+#' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors. See the results of a call
-#' to \code{\link{cvforecast}}.
+#' point forecasts and \code{ERROR} for forecast errors on validation set.
+#' See the results of a call to \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #' coverage level \eqn{1-\alpha}.
 #' @param symmetric If \code{TRUE}, symmetric conformity scores (i.e. \eqn{|e_{t+h|t}|})
 #' are used. If \code{FALSE}, asymmetric conformity scores (i.e. \eqn{e_{t+h|t}})
 #' are used, and then upper bounds and lower bounds are produced separately.
 #' @param ncal Length of the burn-in period for training the scorecaster.
-#' If \code{rolling = FALSE}, it also denotes the length of the trailing windows
+#' If \code{rolling = TRUE}, it is also used as the length of the trailing windows
 #' for learning rate calculation and the windows for the calibration set.
-#' If \code{rolling = FALSE}, it denotes the initial period of calibration sets
+#' If \code{rolling = FALSE}, it is used as initial period of calibration sets
 #' and trailing windows for learning rate calculation.
 #' @param rolling If \code{TRUE}, a rolling window strategy will be adopted to
 #' form the trailing window for learning rate calculation and the calibration set
@@ -68,8 +68,8 @@
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
 #' \item{model}{A list containing information abouth the conformal prediction model.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean}, \code{lower},
-#' \code{upper}, and \code{model} will also be returned, showing the information
+#' If \code{mean} is included in the \code{object}, the components \code{mean},
+#' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the forecasts generated using all available observations.
 #'
 #' @references Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024).
@@ -79,7 +79,6 @@
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
 #' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-#' series <- as.numeric(series)
 #'
 #' # Cross-validation forecasting
 #' far2 <- function(x, h, level) {

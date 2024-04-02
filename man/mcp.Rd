@@ -23,18 +23,18 @@ mcp(
 )
 }
 \arguments{
-\item{object}{An object of class "\code{cvforecast}". It must have an argument
+\item{object}{An object of class \code{"cvforecast"}. It must have an argument
 \code{x} for original univariate time series, an argument \code{MEAN} for
-point forecasts and \code{ERROR} for forecast errors. See the results of a call
-to \code{\link{cvforecast}}.}
+point forecasts and \code{ERROR} for forecast errors on validation set.
+See the results of a call to \code{\link{cvforecast}}.}
 
 \item{alpha}{A numeric vector of significance levels to achieve a desired
 coverage level \eqn{1-\alpha}.}
 
 \item{ncal}{Length of the burn-in period for training the scorecaster.
-If \code{rolling = FALSE}, it also denotes the length of the trailing windows
+If \code{rolling = TRUE}, it is also used as the length of the trailing windows
 for learning rate calculation and the windows for the calibration set.
-If \code{rolling = FALSE}, it denotes the initial period of calibration sets
+If \code{rolling = FALSE}, it is used as the initial period of calibration sets
 and trailing windows for learning rate calculation.}
 
 \item{rolling}{If \code{TRUE}, a rolling window strategy will be adopted to
@@ -59,7 +59,7 @@ guarantee is of at least \eqn{1-\alpha-\delta} coverage.}
 
 \item{KI}{A positive constant to place the integrator on the same scale as the scores.}
 
-\item{...}{Other arguments are passed to the \code{scorecastfun} function.}
+\item{...}{Other arguments are passed to the function.}
 }
 \value{
 A list of class \code{c("mcp", "cpforecast", "forecast")}
@@ -83,17 +83,17 @@ series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction intervals.}
 \item{call}{The matched call.}
 \item{model}{A list containing information abouth the conformal prediction model.}
-If \code{mean} is included in the \code{object}, the components \code{mean}, \code{lower},
-\code{upper}, and \code{model} will also be returned, showing the information
-about the forecasts generated using all available observations.
+If \code{mean} is included in the \code{object}, the components \code{mean},
+\code{lower}, and \code{upper} will also be returned, showing the information
+about the test set forecasts generated using all available observations.
 }
 \description{
-Compute prediction intervals and other information obtained by
-applying the multistep-ahead conformal prediction method. The method can only
+Compute prediction intervals and other information by applying the
+multistep-ahead conformal prediction (MCP) method. The method can only
 deal with asymmetric conformity scores, i.e., forecast errors.
 }
 \details{
-Similar to the PID method, the MCP method also integrates three modules (P, I, D) to
+Similar to the PID method, the MCP method also integrates three modules (P, I, and D) to
 form the final iteration. However, instead of performing conformal prediction
 for each individual forecast horizon \code{h} separately, MCP employs a combination
 of an MA\eqn{(h-1)} model and a linear regression model of \eqn{e_{t+h|t}} on
@@ -105,7 +105,6 @@ past errors.
 # Simulate time series from an AR(2) model
 library(forecast)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-series <- as.numeric(series)
 
 # Cross-validation forecasting
 far2 <- function(x, h, level) {

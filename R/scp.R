@@ -1,7 +1,7 @@
 #' Classical split conformal prediction method
 #'
-#' Compute prediction intervals and other information obtained by
-#' applying the classical split conformal prediction method.
+#' Compute prediction intervals and other information by
+#' applying the classical split conformal prediction (SCP) method.
 #'
 #' Consider a vector \eqn{s_{t+h|t}} that contains the conformity scores for the
 #' \eqn{h}-step-ahead forecasts.
@@ -25,10 +25,10 @@
 #'
 #' @aliases print.scp summary.scp print.summary.scp
 #'
-#' @param object An object of class "\code{cvforecast}". It must have an argument
+#' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors. See the results of a call
-#' to \code{\link{cvforecast}}.
+#' point forecasts and \code{ERROR} for forecast errors on validation set.
+#' See the results of a call to \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #' coverage level \eqn{1-\alpha}.
 #' @param symmetric If \code{TRUE}, symmetric conformity scores (i.e. \eqn{|e_{t+h|t}|})
@@ -75,9 +75,9 @@
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
 #' \item{model}{A list containing information abouth the conformal prediction model.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean}, \code{lower},
-#' \code{upper}, and \code{model} will also be returned, showing the information
-#' about the forecasts generated using all available observations.
+#' If \code{mean} is included in the \code{object}, the components \code{mean},
+#' \code{lower}, and \code{upper} will also be returned, showing the information
+#' about the test set forecasts generated using all available observations.
 #'
 #' @seealso \code{\link[ggdist]{weighted_quantile}}
 #'
@@ -85,7 +85,6 @@
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
 #' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-#' series <- as.numeric(series)
 #'
 #' # Cross-validation forecasting
 #' far2 <- function(x, h, level) {

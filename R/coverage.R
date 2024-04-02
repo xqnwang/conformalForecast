@@ -1,12 +1,12 @@
 #' Calculate interval forecast coverage
 #'
 #' Calculate the mean coverage and the ifinn matrix for prediction intervals on
-#' validation set (and test set if applicable). If \code{window} is not \code{NULL},
-#' the rolling mean matrix for coverage is also returned.
+#' validation set. If \code{window} is not \code{NULL}, a matrix of the rolling
+#' means of interval forecast coverage is also returned.
 #'
 #' @aliases print.coverage
 #'
-#' @param object An object of class \code{cvforecast} or \code{cpforecast}.
+#' @param object An object of class \code{"cvforecast"} or \code{"cpforecast"}.
 #' @param ... Additional inputs if \code{object} is missing.
 #' @param level Target confidence level for prediction intervals.
 #' @param window If not \code{NULL}, the rolling mean matrix for coverage is also returned.
@@ -14,18 +14,17 @@
 #' before the mean or rolling mean computation proceeds.
 #'
 #' @return A list of class \code{"coverage"} with the following components:
-#' \item{mean}{The mean coverage across the validation set (and test set if applicable).}
+#' \item{mean}{Mean coverage across the validation set.}
 #' \item{ifinn}{A indicator matrix as a multivariate time series, where the \eqn{h}th column
 #' holds the coverage for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
-#' \item{rollmean}{If \code{window} is not NULL, a rolling mean matrix for coverage
-#' will be returned.}
+#' \item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means
+#' of interval forecast coverage will be returned.}
 #'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
 #' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
-#' series <- as.numeric(series)
 #'
 #' # Cross-validation forecasting with a rolling window of length 100
 #' far2 <- function(x, h, level) {
@@ -35,7 +34,7 @@
 #' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
 #'                  forward = TRUE, initial = 1, window = 100)
 #'
-#' # Mean and rolling mean coverage for interval forecasts on validation and test sets
+#' # Mean and rolling mean coverage for interval forecasts on validation set
 #' cov_fc <- coverage(fc, level = 95, window = 100)
 #' str(cov_fc)
 #'
