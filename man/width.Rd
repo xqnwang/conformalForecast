@@ -11,7 +11,7 @@ width(
   level = 95,
   includemedian = FALSE,
   window = NULL,
-  na.rm = TRUE
+  na.rm = FALSE
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ width(
 matrix for interval width will also be returned.}
 
 \item{na.rm}{A logical indicating whether \code{NA} values should be stripped
-before the mean, median, rolling mean, and rolling median computation proceeds.}
+before the rolling mean and rolling median computation proceeds.}
 }
 \value{
 A list of class \code{"width"} with the following components:

@@ -14,7 +14,7 @@
 #' @param window If not \code{NULL}, the rolling mean (and rolling median if applicable)
 #' matrix for interval width will also be returned.
 #' @param na.rm A logical indicating whether \code{NA} values should be stripped
-#' before the mean, median, rolling mean, and rolling median computation proceeds.
+#' before the rolling mean and rolling median computation proceeds.
 #'
 #' @return A list of class \code{"width"} with the following components:
 #' \item{width}{Forecast interval width as a multivariate time series, where the \eqn{h}th
@@ -45,7 +45,7 @@
 #' str(wid_fc)
 #'
 #' @export
-width <- function(object, ..., level = 95, includemedian = FALSE, window = NULL, na.rm = TRUE) {
+width <- function(object, ..., level = 95, includemedian = FALSE, window = NULL, na.rm = FALSE) {
   # Check inputs
   if (level > 0 && level < 1) {
     level <- 100 * level
@@ -90,7 +90,7 @@ width <- function(object, ..., level = 95, includemedian = FALSE, window = NULL,
   )
 
   # Mean width
-  out$mean <- apply(widmat, 2, mean, na.rm = na.rm)
+  out$mean <- apply(widmat, 2, mean, na.rm = TRUE)
 
   # Rolling mean width
   if (!is.null(window)) {
@@ -103,7 +103,7 @@ width <- function(object, ..., level = 95, includemedian = FALSE, window = NULL,
   # Median
   if (includemedian) {
     # Median width
-    out$median <- apply(widmat, 2, median, na.rm = na.rm)
+    out$median <- apply(widmat, 2, median, na.rm = TRUE)
 
     # Rolling median width
     if (!is.null(window)) {

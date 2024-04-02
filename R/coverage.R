@@ -11,7 +11,7 @@
 #' @param level Target confidence level for prediction intervals.
 #' @param window If not \code{NULL}, the rolling mean matrix for coverage is also returned.
 #' @param na.rm A logical indicating whether \code{NA} values should be stripped
-#' before the mean or rolling mean computation proceeds.
+#' before the rolling mean computation proceeds.
 #'
 #' @return A list of class \code{"coverage"} with the following components:
 #' \item{mean}{Mean coverage across the validation set.}
@@ -41,7 +41,7 @@
 #' @importFrom stats window
 #' @importFrom zoo rollmean
 #' @export
-coverage <- function(object, ..., level = 95, window = NULL, na.rm = TRUE) {
+coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
   # Check inputs
   if (level > 0 && level < 1) {
     level <- 100 * level
@@ -88,7 +88,7 @@ coverage <- function(object, ..., level = 95, window = NULL, na.rm = TRUE) {
   colnames(covmat) <- colnames(lower)
 
   # Mean coverage
-  covmean <- apply(covmat, 2, mean, na.rm = na.rm)
+  covmean <- apply(covmat, 2, mean, na.rm = TRUE)
 
   # Rolling mean coverage
   if (!is.null(window)) {

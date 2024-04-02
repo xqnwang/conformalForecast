@@ -5,7 +5,7 @@
 \alias{print.coverage}
 \title{Calculate interval forecast coverage}
 \usage{
-coverage(object, ..., level = 95, window = NULL, na.rm = TRUE)
+coverage(object, ..., level = 95, window = NULL, na.rm = FALSE)
 }
 \arguments{
 \item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
@@ -17,7 +17,7 @@ coverage(object, ..., level = 95, window = NULL, na.rm = TRUE)
 \item{window}{If not \code{NULL}, the rolling mean matrix for coverage is also returned.}
 
 \item{na.rm}{A logical indicating whether \code{NA} values should be stripped
-before the mean or rolling mean computation proceeds.}
+before the rolling mean computation proceeds.}
 }
 \value{
 A list of class \code{"coverage"} with the following components:
