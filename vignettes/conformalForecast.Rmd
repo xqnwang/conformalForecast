@@ -1,0 +1,191 @@
+---
+title: "Introduction to conformalForecast"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to conformalForecast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(conformalForecast)
+library(forecast)
+library(ggplot2)
+library(dplyr)
+library(tsibble)
+```
+
+The *conformalForecast* package provides some commonly used conformal prediction methods for time series forecasting.
+
+## Data simulation
+
+Suppose we are interested in forecasting a time series data generated from an AR(2) model with $\phi_1 = 0.8$, $\phi_2=-0.5$, and $\sigma^2 = 1$.
+
+```{r data}
+set.seed(0)
+series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+autoplot(series) +
+  labs(
+    title = "Time series generated from an AR(2) model",
+    ylab = ""
+  )
+```
+
+## Time series cross-validation
+
+We first train a forecasting model AR(2) on a rolling forecast origin to generate forecasts and forecast errors on validation sets.
+
+```{r cv}
+far2 <- function(x, h, level) {
+  Arima(x, order = c(2, 0, 0)) |> forecast(h = h, level)
+}
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
+                 forward = TRUE, window = 100, initial = 1)
+summary(fc)
+```
+
+```{r cvplot}
+fc |>
+  autoplot() +
+  labs(
+    title = "Forecasts produced using an AR(2) model",
+    ylab = ""
+  )
+```
+
+```{r cvinfo}
+(fc_score <- accuracy(fc, byhorizon = TRUE))
+(fc_cov <- coverage(fc, window = 100, level = 95))
+(fc_wid <- width(fc, window = 100, level = 95, includemedian = TRUE))
+```
+
+## Conformal prediction
+
+Based on the forecast errors on validation sets, we can train various conformal prediction methods to obtain distribution-free uncertainty estimation.
+
+### Classical split conformal prediction (SCP)
+
+Here, we perform a SCP method with equal weights in sample quantile estimation.
+
+```{r scp}
+scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
+             weightfun = NULL, kess = FALSE, quantiletype = 1)
+
+(scpfc_score <- accuracy(scpfc, byhorizon = TRUE))
+(scpfc_cov <- coverage(scpfc, window = 100, level = 95))
+(scpfc_wid <- width(scpfc, window = 100, level = 95, includemedian = TRUE))
+```
+
+The `scp()` function allows us to include non-equal weights for sample quantile estimation by passing a weight calculation function to the `weightfun` argument.
+
+```{r scp-exp}
+expweight <- function(n) 0.99^{n+1-(1:n)}
+scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
+                 weightfun = expweight, kess = FALSE, quantiletype = 1)
+
+(scpfc_exp_score <- accuracy(scpfc_exp, byhorizon = TRUE))
+(scpfc_exp_cov <- coverage(scpfc_exp, window = 100, level = 95))
+(scpfc_exp_wid <- width(scpfc_exp, window = 100, level = 95, includemedian = TRUE))
+```
+
+### Adaptive conformal prediction (ACP)
+
+The ACP method uses an online update of $\alpha$ to perform the calibration so that we can achieve either approximate or exact marginal coverage.
+
+```{r acp}
+acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
+
+(acpfc_score <- accuracy(acpfc, byhorizon = TRUE))
+(acpfc_cov <- coverage(acpfc, window = 100, level = 95))
+(acpfc_wid <- width(acpfc, window = 100, level = 95, includemedian = TRUE))
+```
+
+### Conformal PID control (PID)
+
+The PID method combines three modules (quantile tracking, error integration, and scorecasting) to make an iteration to produce a sequence of quantile estimates used in the prediction sets.
+
+```{r pid-setup}
+# PID setup
+Tg <- 1000; delta <- 0.01
+Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
+KI <- 2
+lr <- 0.1
+```
+
+```{r pid-nsf}
+# PID without scorecaster
+pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
+                 integrate = TRUE, scorecast = FALSE,
+                 lr = lr, KI = KI, Csat = Csat)
+
+(pidfc_nsf_score <- accuracy(pidfc_nsf, byhorizon = TRUE))
+(pidfc_nsf_cov <- coverage(pidfc_nsf, window = 100, level = 95))
+(pidfc_nsf_wid <- width(pidfc_nsf, window = 100, level = 95, includemedian = TRUE))
+```
+
+```{r pid}
+# PID with a Naive method as the scorecaster
+naivefun <- function(x, h) {
+  naive(x) |> forecast(h = h)
+}
+pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
+             integrate = TRUE, scorecast = TRUE, scorecastfun = naivefun,
+             lr = lr, KI = KI, Csat = Csat)
+
+(pidfc_score <- accuracy(pidfc, byhorizon = TRUE))
+(pidfc_cov <- coverage(pidfc, window = 100, level = 95))
+(pidfc_wid <- width(pidfc, window = 100, level = 95, includemedian = TRUE))
+```
+
+### Multistep-ahead conformal prediction (MCP)
+
+Similar to the PID method, the MCP method also integrates three modules (P, I, and D) to form the final iteration. However, instead of performing conformal prediction for each individual forecast horizon $h$ separately, MCP employs a combination of an MA($h-1$) model and a linear regression model of $e_{t+h|t}$ on $e_{t+h-1|t},\dots,e_{t+1|t}$ as the scorecaster. This allows the MCP method to capture the relationship between the $h$-step ahead forecast error and past errors.
+
+```{r mcp}
+mcpfc <- mcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
+             lr = lr, KI = KI, Csat = Csat)
+
+(mcpfc_score <- accuracy(mcpfc, byhorizon = TRUE))
+(mcpfc_cov <- coverage(mcpfc, window = 100, level = 95))
+(mcpfc_wid <- width(mcpfc, window = 100, level = 95, includemedian = TRUE))
+```
+
+## Coverage and width of prediction intervals
+
+Taking the MCP result as an example, we now show the average coverage on validation sets.
+
+```{r covplot}
+mcpfc_cov$rollmean |>
+  as_tsibble() |>
+  mutate(horizon = key, coverage = value) |>
+  select(-c(key, value)) |>
+  update_tsibble(key = horizon) |>
+  ggplot(aes(x = index, y = coverage, group = horizon)) +
+  geom_line() +
+  geom_hline(yintercept = 0.95, linetype = "dashed", color = "blue") +
+  facet_grid(horizon~., scales = "free_y") +
+  xlab("Time") +
+  ylab("Rolling mean coverage")
+```
+
+```{r widplot}
+mcpfc_wid$rollmean |>
+  as_tsibble() |>
+  mutate(horizon = key, width = value) |>
+  select(-c(key, value)) |>
+  update_tsibble(key = horizon) |>
+  ggplot(aes(x = index, y = width, group = horizon)) +
+  geom_line() +
+  facet_grid(horizon~., scales = "free_y") +
+  xlab("Time") +
+  ylab("Rolling mean width")
+```

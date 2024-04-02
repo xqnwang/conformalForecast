@@ -139,7 +139,7 @@ pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 print(pidfc_nsf)
 summary(pidfc_nsf)
 
-# PID with a Theta model for the scorecaster
+# PID with a Naive model for the scorecaster
 naivefun <- function(x, h) {
   naive(x) |> forecast(h = h)
 }
