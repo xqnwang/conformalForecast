@@ -21,6 +21,7 @@ library(conformalForecast)
 library(forecast)
 library(ggplot2)
 library(dplyr)
+library(tibble)
 library(tsibble)
 ```
 
@@ -59,7 +60,8 @@ fc |>
   labs(
     title = "Forecasts produced using an AR(2) model",
     ylab = ""
-  )
+  ) +
+  theme_bw()
 ```
 
 ```{r cvinfo}
@@ -167,25 +169,118 @@ Taking the MCP result as an example, we now show the average coverage on validat
 mcpfc_cov$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, coverage = value) |>
-  select(-c(key, value)) |>
   update_tsibble(key = horizon) |>
+  select(-c(key, value)) |>
   ggplot(aes(x = index, y = coverage, group = horizon)) +
   geom_line() +
   geom_hline(yintercept = 0.95, linetype = "dashed", color = "blue") +
   facet_grid(horizon~., scales = "free_y") +
   xlab("Time") +
-  ylab("Rolling mean coverage")
+  ylab("Rolling mean coverage for MCP") +
+  theme_bw()
 ```
+
+We can also show the rolling average interval width on validation sets.
 
 ```{r widplot}
 mcpfc_wid$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, width = value) |>
-  select(-c(key, value)) |>
   update_tsibble(key = horizon) |>
+  select(-c(key, value)) |>
   ggplot(aes(x = index, y = width, group = horizon)) +
   geom_line() +
   facet_grid(horizon~., scales = "free_y") +
   xlab("Time") +
-  ylab("Rolling mean width")
+  ylab("Rolling mean width for MCP") +
+  theme_bw()
 ```
+
+We can also combine all the results and show them in one single plot.
+
+```{r bind-cov}
+candidates <- c("fc", "scpfc", "scpfc_exp", "acpfc", "pidfc_nsf", "pidfc", "mcpfc")
+methods <- c("AR", "SCP", "WCP", "ACP", "PI", "PID", "MCP")
+for (i in 1:length(candidates)) {
+  out <- get(paste0(candidates[i], "_cov"))
+  out_pivot <- out$rollmean |>
+    as_tsibble() |>
+    mutate(horizon = key, coverage = value) |>
+    update_tsibble(key = horizon) |>
+    select(-c(key, value)) |>
+    mutate(method = methods[i]) |>
+    as_tibble()
+  assign(paste0(methods[i], "_cov"), out_pivot)
+}
+cov <- bind_rows(mget(paste0(methods, "_cov")))
+
+cols <- c(
+  "AR" = "black",
+  "SCP" = "yellow",
+  "WCP" = "#fa9200",
+  "ACP" = "green",
+  "PI" = "blue",
+  "PID" = "purple",
+  "MCP" = "red"
+)
+cov |>
+  as_tsibble(index = index, key = c(horizon, method)) |>
+  mutate(method = factor(method, levels = methods)) |>
+  ggplot(aes(x = index, y = coverage, group = method, colour = method)) +
+  geom_line(size = 0.8, alpha = 0.8) +
+  scale_colour_manual(values = cols) +
+  geom_hline(yintercept = 0.95, linetype = "dashed", colour = "gray") +
+  facet_grid(horizon~.) +
+  xlab("Time") +
+  ylab("Rolling mean coverage") +
+  theme_bw()
+```
+
+```{r bind-covmean}
+cov_mean <- lapply(1:length(candidates), function(i) {
+  out_cov <- get(paste0(candidates[i], "_cov"))
+  out_score <- get(paste0(candidates[i], "_score"))
+  out_mean <- data.frame(
+      method = methods[i],
+      covmean = as.vector(out_cov$mean),
+      winkler = as.vector(out_score[, "Winkler_95"]),
+      msis = as.vector(out_score[,"MSIS_95"])
+    ) |>
+    as_tibble() |>
+    rownames_to_column("horizon") |>
+    mutate(horizon = paste0("h=", horizon))
+  out_mean
+})
+cov_mean <- do.call(bind_rows, cov_mean) |>
+  mutate(method = factor(method, levels = methods)) |>
+  mutate(covdiff = covmean - 0.95) |>
+  arrange(horizon, method)
+print(cov_mean, n = nrow(cov_mean))
+```
+
+```{r bind-wid}
+for (i in 1:length(candidates)) {
+  out <- get(paste0(candidates[i], "_wid"))
+  out_pivot <- out$rollmean |>
+    as_tsibble() |>
+    mutate(horizon = key, width = value) |>
+    update_tsibble(key = horizon) |>
+    select(-c(key, value)) |>
+    mutate(method = methods[i]) |>
+    as_tibble()
+  assign(paste0(methods[i], "_wid"), out_pivot)
+}
+wid <- bind_rows(mget(paste0(methods, "_wid")))
+
+wid |>
+  as_tsibble(index = index, key = c(horizon, method)) |>
+  mutate(method = factor(method, levels = methods)) |>
+  ggplot(aes(x = index, y = width, group = method, colour = method)) +
+  geom_line(size = 0.8, alpha = 0.8) +
+  scale_colour_manual(values = cols) +
+  facet_grid(horizon~.) +
+  xlab("Time") +
+  ylab("Rolling mean width") +
+  theme_bw()
+```
+
