@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+The *conformalForecast* package provides some commonly used conformal prediction methods for time series forecasting.
+
 ```{r setup}
 library(conformalForecast)
 library(forecast)
@@ -25,20 +27,19 @@ library(tibble)
 library(tsibble)
 ```
 
-The *conformalForecast* package provides some commonly used conformal prediction methods for time series forecasting.
-
 ## Data simulation
 
 Suppose we are interested in forecasting a time series data generated from an AR(2) model with $\phi_1 = 0.8$, $\phi_2=-0.5$, and $\sigma^2 = 1$.
 
-```{r data}
+```{r data, fig.width = 7, fig.height = 3}
 set.seed(0)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 autoplot(series) +
   labs(
     title = "Time series generated from an AR(2) model",
     ylab = ""
-  )
+  ) +
+  theme_bw()
 ```
 
 ## Time series cross-validation
@@ -54,7 +55,7 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
 summary(fc)
 ```
 
-```{r cvplot}
+```{r cvplot, fig.width = 7, fig.height = 3}
 fc |>
   autoplot() +
   labs(
@@ -165,7 +166,7 @@ mcpfc <- mcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
 
 Taking the MCP result as an example, we now show the average coverage on validation sets.
 
-```{r covplot}
+```{r covplot, fig.width = 7, fig.height = 5}
 mcpfc_cov$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, coverage = value) |>
@@ -182,7 +183,7 @@ mcpfc_cov$rollmean |>
 
 We can also show the rolling average interval width on validation sets.
 
-```{r widplot}
+```{r widplot, fig.width = 7, fig.height = 5}
 mcpfc_wid$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, width = value) |>
@@ -198,7 +199,7 @@ mcpfc_wid$rollmean |>
 
 We can also combine all the results and show them in one single plot.
 
-```{r bind-cov}
+```{r bind-cov, fig.width = 7, fig.height = 5}
 candidates <- c("fc", "scpfc", "scpfc_exp", "acpfc", "pidfc_nsf", "pidfc", "mcpfc")
 methods <- c("AR", "SCP", "WCP", "ACP", "PI", "PID", "MCP")
 for (i in 1:length(candidates)) {
@@ -258,7 +259,7 @@ cov_mean <- do.call(bind_rows, cov_mean) |>
 print(cov_mean, n = nrow(cov_mean))
 ```
 
-```{r bind-wid}
+```{r bind-wid, fig.width = 7, fig.height = 5}
 for (i in 1:length(candidates)) {
   out <- get(paste0(candidates[i], "_wid"))
   out_pivot <- out$rollmean |>
