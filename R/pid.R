@@ -4,9 +4,9 @@
 #' applying the conformal PID control method.
 #'
 #' The PID method combines three modules to make the final iteration:
-#' \deqn{q_{t+h|t}=\underbrace{p_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h}-\alpha)}_{\mathrm{P}}+\underbrace{r_t\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\mathrm{I}}+\underbrace{\hat{s}_{t+h|t}}_{\mathrm{D}}}
+#' \deqn{q_{t+h|t}=\underbrace{q_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h}-\alpha)}_{\mathrm{P}}+\underbrace{r_t\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\mathrm{I}}+\underbrace{\hat{s}_{t+h|t}}_{\mathrm{D}}}
 #' for each individual forecast horizon \code{h}, respectively, where
-#'   - Quantile tracking part (P) is \eqn{p_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h}-\alpha)}, where \eqn{p_{1+h|1}} is set to 0 without a loss of generality.
+#'   - Quantile tracking part (P) is \eqn{q_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h}-\alpha)}, where \eqn{q_{1+h|1}} is set to 0 without a loss of generality.
 #'   - Error integration part (I) is \eqn{r_t\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}. Here we use a nonlinear saturation
 #'   function \eqn{r_t(x)=K_{\mathrm{I}} \tan \left(x \log (t) /\left(t C_{\text {sat }}\right)\right)}, where we set \eqn{\tan (x)=\operatorname{sign}(x) \cdot \infty} for \eqn{x \notin[-\pi / 2, \pi / 2]}, and \eqn{C_{\text {sat }}, K_{\mathrm{I}}>0} are constants that we choose heuristically.
 #'   - Scorecasting part (D) is \eqn{\hat{s}_{t+h|t}} is forecast generated
