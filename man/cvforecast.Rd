@@ -84,7 +84,7 @@ let \eqn{t_0} denote the initial period.
 Suppose \code{forward = TRUE}. If \code{window} is \code{NULL},
 \code{forecastfun} is applied successively to the subset time series
 \eqn{y_{1},\dots,y_t}{y[1:t]}, for \eqn{t=t_0,\dots,T},
-generating forecasts \eqn{\hat{y}_{t+h|t}}{f[t+h]}. If \code{window} is not
+generating forecasts \eqn{\hat{y}_{t+1|t},\dots,\hat{y}_{t+h|t}}{f[t+1:h]}. If \code{window} is not
 \code{NULL} and has a length of \eqn{t_w}, then \code{forecastfun} is applied
 successively to the subset time series \eqn{y_{t-t_w+1},\dots,y_{t}}{y[(t-t_w+1):t)]},
 for \eqn{t=\max(t_0, t_w),\dots,T}.
