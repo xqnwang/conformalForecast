@@ -7,7 +7,7 @@
 #' \eqn{h}-step-ahead forecasts.
 #'
 #' If \code{symmetric} is \code{TRUE}, \eqn{s_{t+h|t}=|e_{t+h|t}|}.
-#' When \code{rolling} is \code{FALSE}, the \eqn{\alpha}-quantile
+#' When \code{rolling} is \code{FALSE}, the \eqn{(1-\alpha)}-quantile
 #' \eqn{\hat{q}_{t+h|t}} are computed successively on expanding calibration sets
 #' \eqn{s_{1+h|1},\dots,s_{t|t-h}}, for \eqn{t=\mathrm{ncal}+h-1,\dots,T}. Then the
 #' prediction intervals will be
@@ -17,7 +17,7 @@
 #'
 #' If \code{symmetric} is \code{FALSE}, \eqn{s_{t+h|t}^{u}=e_{t+h|t}} for upper
 #' interval bounds and \eqn{s_{t+h|t}^{l} = -e_{t+h|t}} for lower bounds.
-#' Instead of computing \eqn{\alpha}-quantile, \eqn{\alpha/2}-quantiles for lower
+#' Instead of computing \eqn{(1-\alpha)}-quantile, \eqn{(1-\alpha/2)}-quantiles for lower
 #' bound (\eqn{\hat{q}_{t+h|t}^{l}}) and upper bound (\eqn{\hat{q}_{t+h|t}^{u}})
 #' are calculated based on their conformity scores, respectively.
 #' Then the prediction intervals will be
