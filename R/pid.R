@@ -10,7 +10,7 @@
 #'   - Error integration part (I) is \eqn{r_t\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}. Here we use a nonlinear saturation
 #'   function \eqn{r_t(x)=K_{\mathrm{I}} \tan \left(x \log (t) /\left(t C_{\text {sat }}\right)\right)}, where we set \eqn{\tan (x)=\operatorname{sign}(x) \cdot \infty} for \eqn{x \notin[-\pi / 2, \pi / 2]}, and \eqn{C_{\text {sat }}, K_{\mathrm{I}}>0} are constants that we choose heuristically.
 #'   - Scorecasting part (D) is \eqn{\hat{s}_{t+h|t}} is forecast generated
-#'   by training a scorecaster based on conformity scores available at time \eqn{t}.
+#'   by training a scorecaster based on nonconformity scores available at time \eqn{t}.
 #'
 #' @aliases print.pid summary.pid print.summary.pid
 #'
@@ -20,8 +20,8 @@
 #' See the results of a call to \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #' coverage level \eqn{1-\alpha}.
-#' @param symmetric If \code{TRUE}, symmetric conformity scores (i.e. \eqn{|e_{t+h|t}|})
-#' are used. If \code{FALSE}, asymmetric conformity scores (i.e. \eqn{e_{t+h|t}})
+#' @param symmetric If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
+#' are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
 #' are used, and then upper bounds and lower bounds are produced separately.
 #' @param ncal Length of the burn-in period for training the scorecaster.
 #' If \code{rolling = TRUE}, it is also used as the length of the trailing windows

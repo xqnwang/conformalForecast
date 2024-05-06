@@ -29,8 +29,8 @@ See the results of a call to \code{\link{cvforecast}}.}
 \item{alpha}{A numeric vector of significance levels to achieve a desired
 coverage level \eqn{1-\alpha}.}
 
-\item{symmetric}{If \code{TRUE}, symmetric conformity scores (i.e. \eqn{|e_{t+h|t}|})
-are used. If \code{FALSE}, asymmetric conformity scores (i.e. \eqn{e_{t+h|t}})
+\item{symmetric}{If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
+are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
 are used, and then upper bounds and lower bounds are produced separately.}
 
 \item{ncal}{Length of the calibration set. If \code{rolling = FALSE}, it denotes
@@ -90,13 +90,13 @@ Compute prediction intervals and other information by
 applying the classical split conformal prediction (SCP) method.
 }
 \details{
-Consider a vector \eqn{s_{t+h|t}} that contains the conformity scores for the
+Consider a vector \eqn{s_{t+h|t}} that contains the nonconformity scores for the
 \eqn{h}-step-ahead forecasts.
 
 If \code{symmetric} is \code{TRUE}, \eqn{s_{t+h|t}=|e_{t+h|t}|}.
 When \code{rolling} is \code{FALSE}, the \eqn{(1-\alpha)}-quantile
 \eqn{\hat{q}_{t+h|t}} are computed successively on expanding calibration sets
-\eqn{s_{1+h|1},\dots,s_{t|t-h}}, for \eqn{t=\mathrm{ncal}+h-1,\dots,T}. Then the
+\eqn{s_{1+h|1},\dots,s_{t|t-h}}, for \eqn{t=\mathrm{ncal}+h,\dots,T}. Then the
 prediction intervals will be
 \eqn{[\hat{y}_{t+h|t}-\hat{q}_{t+h|t}, \hat{y}_{t+h|t}+\hat{q}_{t+h|t}]}.
 When \code{rolling} is \code{TRUE}, the calibration sets will be of same length
@@ -106,7 +106,7 @@ If \code{symmetric} is \code{FALSE}, \eqn{s_{t+h|t}^{u}=e_{t+h|t}} for upper
 interval bounds and \eqn{s_{t+h|t}^{l} = -e_{t+h|t}} for lower bounds.
 Instead of computing \eqn{(1-\alpha)}-quantile, \eqn{(1-\alpha/2)}-quantiles for lower
 bound (\eqn{\hat{q}_{t+h|t}^{l}}) and upper bound (\eqn{\hat{q}_{t+h|t}^{u}})
-are calculated based on their conformity scores, respectively.
+are calculated based on their nonconformity scores, respectively.
 Then the prediction intervals will be
 \eqn{[\hat{y}_{t+h|t}-\hat{q}_{t+h|t}^{l}, \hat{y}_{t+h|t}+\hat{q}_{t+h|t}^{u}]}.
 }

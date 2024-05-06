@@ -2,7 +2,7 @@
 #'
 #' Compute prediction intervals and other information by applying the
 #' multistep-ahead conformal prediction (MCP) method. The method can only
-#' deal with asymmetric conformity scores, i.e., forecast errors.
+#' deal with asymmetric nonconformity scores, i.e., forecast errors.
 #'
 #' Similar to the PID method, the MCP method also integrates three modules (P, I, and D) to
 #' form the final iteration. However, instead of performing conformal prediction

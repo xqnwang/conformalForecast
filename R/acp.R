@@ -18,8 +18,8 @@
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #' coverage level \eqn{1-\alpha}.
 #' @param gamma The step size parameter \eqn{\gamma>0} for \eqn{\alpha} updating.
-#' @param symmetric If \code{TRUE}, symmetric conformity scores (i.e. \eqn{|e_{t+h|t}|})
-#' are used. If \code{FALSE}, asymmetric conformity scores (i.e. \eqn{e_{t+h|t}})
+#' @param symmetric If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
+#' are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
 #' are used, and then upper bounds and lower bounds are produced separately.
 #' @param ncal Length of the calibration set. If \code{rolling = FALSE}, it denotes
 #' the initial period of calibration sets. Otherwise, it indicates
@@ -76,7 +76,7 @@
 #' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
 #'                  forward = TRUE, initial = 1, window = 100)
 #'
-#' # ACP with asymmetric conformity scores and rolling calibration sets
+#' # ACP with asymmetric nonconformity scores and rolling calibration sets
 #' acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
 #' print(acpfc)
 #' summary(acpfc)
