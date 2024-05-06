@@ -87,7 +87,7 @@ The ACP method considers the online update:
 \deqn{\alpha_{t+h|t}:=\alpha_{t+h-1|t-1}+\gamma(\alpha-\mathrm{err}_{t|t-h}),}
 for each individual forecast horizon \code{h}, respectively,
 where \eqn{\mathrm{err}_{t|t-h}=1} if \eqn{s_{t|t-h}>q_{t|t-h}}, and
-\eqn{\mathrm{err}_{t|t-h}=1} if \eqn{s_{t|t-h} \leq q_{t|t-h}}.
+\eqn{\mathrm{err}_{t|t-h}=0} if \eqn{s_{t|t-h} \leq q_{t|t-h}}.
 }
 \examples{
 # Simulate time series from an AR(2) model
