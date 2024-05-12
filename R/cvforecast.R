@@ -29,6 +29,7 @@
 #' to the training and test periods, respectively.
 #' @param h Forecast horizon.
 #' @param level Confidence level for prediction intervals.
+#' If \code{NULL}, prediction intervals will not be generated.
 #' @param forward If \code{TRUE}, the final forecast origin for forecasting is
 #' \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.
 #' @param xreg Exogenous predictor variables passed to \code{forecastfun} if required.
@@ -108,12 +109,14 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
   n <- length(y)
 
   # Check confidence level
-  if (min(level) > 0 && max(level) < 1) {
-    level <- 100 * level
-  } else if (min(level) < 0 || max(level) > 99.99) {
-    stop("confidence limit out of range")
+  if (!is.null(level)) {
+    if (min(level) > 0 && max(level) < 1) {
+      level <- 100 * level
+    } else if (min(level) < 0 || max(level) > 99.99) {
+      stop("confidence limit out of range")
+    }
+    level <- sort(level)
   }
-  level <- sort(level)
 
   # Check other inputs
   if (h <= 0)
@@ -162,7 +165,8 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
        start = start(y),
        frequency = frequency(y)),
     paste0("h=", 1:h))
-  lower <- upper <- `names<-` (rep(list(pf), length(level)), paste0(level, "%"))
+  if (!is.null(level))
+    lower <- upper <- `names<-` (rep(list(pf), length(level)), paste0(level, "%"))
   out <- list(
     x = y
   )
@@ -195,10 +199,12 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
     if (!is.element("try-error", class(fc))) {
       pf[i,] <- fc$mean
       err[i,] <- y[i + 1:h] - fc$mean
-      for (l in level) {
-        levelname <- paste0(l, "%")
-        lower[[levelname]][i,] <- fc$lower[, levelname]
-        upper[[levelname]][i,] <- fc$upper[, levelname]
+      if (!is.null(level)) {
+        for (l in level) {
+          levelname <- paste0(l, "%")
+          lower[[levelname]][i,] <- fc$lower[, levelname]
+          upper[[levelname]][i,] <- fc$upper[, levelname]
+        }
       }
     }
   }
@@ -208,19 +214,23 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
   out$fit_times <- fit_times
   out$MEAN <- lagmatrix(pf, 1:h) |> window(start = time(pf)[nfirst + 1L])
   out$ERROR <- lagmatrix(err, 1:h) |> window(start = time(err)[nfirst + 1L], end = time(err)[n])
-  out$LOWER <- lapply(lower,
-                      function(low) lagmatrix(low, 1:h) |>
-                        window(start = time(low)[nfirst + 1L]))
-  out$UPPER <- lapply(upper,
-                      function(up) lagmatrix(up, 1:h) |>
-                        window(start = time(up)[nfirst + 1L]))
-  out$level <- level
+  if (!is.null(level)) {
+    out$LOWER <- lapply(lower,
+                        function(low) lagmatrix(low, 1:h) |>
+                          window(start = time(low)[nfirst + 1L]))
+    out$UPPER <- lapply(upper,
+                        function(up) lagmatrix(up, 1:h) |>
+                          window(start = time(up)[nfirst + 1L]))
+    out$level <- level
+  }
   out$call <- match.call()
   # The final forecasting model output if forward is TRUE
   if (forward) {
     out$mean <- fc$mean
-    out$lower <- fc$lower
-    out$upper <- fc$upper
+    if (!is.null(level)) {
+      out$lower <- fc$lower
+      out$upper <- fc$upper
+    }
     out$model <- fc$model
   }
 
