@@ -149,7 +149,7 @@ mcp <- function(object, alpha = 1 - 0.01 * object$level,
   )
 
   for (h in seq(horizon)) {
-    indx <- seq(h, nrow(errors), by = 1L)
+    indx <- seq(h, nrow(errors)-!object$forward, by = 1L)
 
     errt_lower_h <- errt_upper_h <-
       integ_lower_h <- integ_upper_h <-
@@ -157,6 +157,7 @@ mcp <- function(object, alpha = 1 - 0.01 * object$level,
       matrix(NA_real_, nrow = n, ncol = length(alpha))
     qts_lower_h <- qts_upper_h <-
       qs_lower_h <- qs_upper_h <- matrix(0, nrow = n, ncol = length(alpha))
+
     for (t in indx) {
       t_burnin <- max(t - ncal + 1L, h)
       errors_subset <- subset(

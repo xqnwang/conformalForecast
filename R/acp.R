@@ -124,7 +124,7 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
   )
 
   for (h in seq(horizon)) {
-    indx <- seq(ncal+h-1, nrow(errors), by = 1L)
+    indx <- seq(ncal+h-1, nrow(errors)-!object$forward, by = 1L)
 
     alphat_h <- alphat_lower_h <- alphat_upper_h <-
       errt_h <- errt_lower_h <- errt_upper_h <-

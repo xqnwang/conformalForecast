@@ -59,6 +59,7 @@
 #' series with the same dimensional characteristics as \code{MEAN}.}
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
+#' \item{forward}{Whether \code{forward} is applied.}
 #' If \code{forward} is \code{TRUE}, the components \code{mean}, \code{lower},
 #' \code{upper}, and \code{model} will also be returned, showing the information
 #' about the final fitted model and forecasts using all available observations, see
@@ -224,6 +225,7 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
     out$level <- level
   }
   out$call <- match.call()
+  out$forward <- forward
   # The final forecasting model output if forward is TRUE
   if (forward) {
     out$mean <- fc$mean

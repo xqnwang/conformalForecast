@@ -165,7 +165,7 @@ pid <- function(object, alpha = 1 - 0.01 * object$level,
   )
 
   for (h in seq(horizon)) {
-    indx <- seq(h, nrow(errors), by = 1L)
+    indx <- seq(h, nrow(errors)-!object$forward, by = 1L)
 
     errt_h <- errt_lower_h <- errt_upper_h <-
       integ_h <- integ_lower_h <- integ_upper_h <-

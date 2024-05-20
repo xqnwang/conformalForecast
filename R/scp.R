@@ -157,7 +157,7 @@ scp <- function(object, alpha = 1 - 0.01 * object$level,
   )
 
   for (h in seq(horizon)) {
-    indx <- seq(ncal+h-1, nrow(errors), by = 1L)
+    indx <- seq(ncal+h-1, nrow(errors)-!object$forward, by = 1L)
 
     for (t in indx) {
       errors_subset <- subset(
@@ -191,6 +191,7 @@ scp <- function(object, alpha = 1 - 0.01 * object$level,
           type = quantiletype,
           na.rm = na.rm)
       }
+
       for (i in seq(length(alpha))) {
         lower[[i]][t+h, h] <- pf[t+h, h] - q_lo[i]
         upper[[i]][t+h, h] <- pf[t+h, h] + q_up[i]

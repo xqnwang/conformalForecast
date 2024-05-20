@@ -68,6 +68,7 @@ each \code{level}. Each element within the list will be a multivariate time
 series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction intervals.}
 \item{call}{The matched call.}
+\item{forward}{Whether \code{forward} is applied.}
 If \code{forward} is \code{TRUE}, the components \code{mean}, \code{lower},
 \code{upper}, and \code{model} will also be returned, showing the information
 about the final fitted model and forecasts using all available observations, see
