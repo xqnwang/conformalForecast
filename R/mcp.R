@@ -66,6 +66,8 @@
 #' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the test set forecasts generated using all available observations.
 #'
+#' @references Wang, X., and Hyndman, R. J. (2024). "Online conformal inference
+#' for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.
 #' @seealso \code{\link{pid}}
 #' @examples
 #' # Simulate time series from an AR(2) model

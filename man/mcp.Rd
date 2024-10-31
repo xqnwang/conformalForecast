@@ -128,6 +128,10 @@ print(mcpfc)
 summary(mcpfc)
 
 }
+\references{
+Wang, X., and Hyndman, R. J. (2024). "Online conformal inference
+for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.
+}
 \seealso{
 \code{\link{pid}}
 }
