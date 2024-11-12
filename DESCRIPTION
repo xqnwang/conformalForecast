@@ -13,7 +13,7 @@ Description: Methods and tools for performing multistep-ahead time series
     conformal prediction, adaptive conformal prediction, conformal PID
     control, and Multistep-ahead conformal prediction.
 License: GPL (>= 3)
-URL: https://github.com/xqnwang/conformalForecast
+URL: https://github.com/xqnwang/conformalForecast, https://xqnwang.github.io/conformalForecast/
 BugReports: https://github.com/xqnwang/conformalForecast/issues
 Imports:
     forecast,
