@@ -212,10 +212,12 @@ scp <- function(object, alpha = 1 - 0.01 * object$level,
     out$lower <- extract_final(lower, nrow = n, ncol = horizon, bench = out$mean)
     out$upper <- extract_final(upper, nrow = n, ncol = horizon, bench = out$mean)
   }
-  out$model$method <- out$method
-  out$model$call <- match.call()
-  out$model$alpha <- alpha
-  out$model$symmetric <- symmetric
+  model <- list(
+    method = out$method, call = match.call(),
+    alpha = alpha, symmetric = symmetric, ncal = ncal, rolling = rolling,
+    quantiletype = quantiletype, weightfun = weightfun, kess = kess, na.rm = na.rm
+  )
+  out$model <- model
 
   return(structure(out, class = c("scp", "cpforecast", "forecast")))
 }
