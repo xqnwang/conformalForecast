@@ -141,14 +141,14 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
 
     if (nrow(xreg) < n)
       stop("xreg should be at least of the same size as y")
-    if (nrow(xreg) < n + forward * h)
+    if (nrow(xreg) < n + h - !forward)
       # Pad xreg with NAs
-      xreg <- ts(rbind(xreg, matrix(NA, nrow=n+forward*h-nrow(xreg), ncol=ncol(xreg))),
+      xreg <- ts(rbind(xreg, matrix(NA, nrow=n+h-!forward-nrow(xreg), ncol=ncol(xreg))),
                  start = start(y),
                  frequency = frequency(y))
-    if (nrow(xreg) > n + forward * h) {
-      warning(sprintf("only first %s rows of xreg are being used", n + forward * h))
-      xreg <- subset(xreg, start = 1L, end = n + forward * h)
+    if (nrow(xreg) > n + h - !forward) {
+      warning(sprintf("only first %s rows of xreg are being used", n + h - !forward))
+      xreg <- subset(xreg, start = 1L, end = n + h - !forward)
     }
     if (is.null(colnames(xreg))) {
       colnames(xreg) <- if (ncol(xreg) == 1) "xreg" else paste0("xreg", 1:ncol(xreg))
@@ -211,6 +211,7 @@ cvforecast <- function(y, forecastfun, h = 1, level = c(80, 95),
   }
 
   out$series <- seriesname
+  if (!is.null(xreg)) out$xreg <- xreg
   out$method <- paste("cvforecast")
   out$fit_times <- fit_times
   out$MEAN <- lagmatrix(pf, 1:h) |> window(start = time(pf)[nfirst + 1L])
