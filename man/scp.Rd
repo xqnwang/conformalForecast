@@ -16,6 +16,7 @@ scp(
   quantiletype = 1,
   weightfun = NULL,
   kess = FALSE,
+  update = FALSE,
   na.rm = TRUE,
   ...
 )
@@ -54,6 +55,9 @@ weights are supported.}
 \item{kess}{If \code{TRUE}, Kish's effective sample size is used for sample
 quantile computation.}
 
+\item{update}{If \code{TRUE}, the function will be compatible with the
+\code{\link[base]{update}} function, allowing for easy updates of conformal prediction.}
+
 \item{na.rm}{If \code{TRUE}, corresponding entries in sample values and weights
 are removed if either is \code{NA} when calculating sample quantile.}
 
@@ -64,6 +68,7 @@ A list of class \code{c("scp", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
+\item{xreg}{Exogenous predictor variables used, if applicable.}
 \item{method}{A character string "scp".}
 \item{cp_times}{The number of times the conformal prediction is performed in
 cross-validation.}
@@ -80,7 +85,7 @@ each \code{level}. Each element within the list will be a multivariate time
 series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction intervals.}
 \item{call}{The matched call.}
-\item{model}{A list containing information abouth the conformal prediction model.}
+\item{model}{A list containing detailed information about the \code{cvforecast} and \code{conformal} models.}
 If \code{mean} is included in the \code{object}, the components \code{mean},
 \code{lower}, and \code{upper} will also be returned, showing the information
 about the test set forecasts generated using all available observations.

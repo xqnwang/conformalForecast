@@ -50,6 +50,8 @@
 #' weights are supported.
 #' @param kess If \code{TRUE}, Kish's effective sample size is used for sample
 #' quantile computation.
+#' @param update If \code{TRUE}, the function will be compatible with the
+#' \code{\link[base]{update}} function, allowing for easy updates of conformal prediction.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values and weights
 #' are removed if either is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to \code{weightfun}.
@@ -58,6 +60,7 @@
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
+#' \item{xreg}{Exogenous predictor variables used, if applicable.}
 #' \item{method}{A character string "scp".}
 #' \item{cp_times}{The number of times the conformal prediction is performed in
 #' cross-validation.}
@@ -74,7 +77,7 @@
 #' series with the same dimensional characteristics as \code{MEAN}.}
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
-#' \item{model}{A list containing information abouth the conformal prediction model.}
+#' \item{model}{A list containing detailed information about the `cvforecast` and `conformal` models.}
 #' If \code{mean} is included in the \code{object}, the components \code{mean},
 #' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the test set forecasts generated using all available observations.
@@ -110,7 +113,8 @@
 #' @export
 scp <- function(object, alpha = 1 - 0.01 * object$level,
                 symmetric = FALSE, ncal = 10, rolling = FALSE,
-                quantiletype = 1, weightfun = NULL, kess = FALSE, na.rm = TRUE,
+                quantiletype = 1, weightfun = NULL, kess = FALSE,
+                update = FALSE, na.rm = TRUE,
                 ...) {
   # Check inputs
   if (any(alpha >= 1 | alpha <= 0))
@@ -148,18 +152,27 @@ scp <- function(object, alpha = 1 - 0.01 * object$level,
                  start = start(pf),
                  frequency = frequency(pf))
   colnames(namatrix) <- paste0("h=", seq(horizon))
-  lower <- upper <- `names<-` (rep(list(namatrix), length(alpha)),
-                               paste0(level, "%"))
+  if (update & all(c("LOWER", "UPPER") %in% names(object))) {
+    lower <- object$LOWER
+    upper <- object$UPPER
+  } else {
+    lower <- upper <- `names<-` (rep(list(namatrix), length(alpha)),
+                                 paste0(level, "%"))
+  }
 
-  out <- list(
-    x = object$x,
-    series = object$series
+  out <- c(
+    list(x = object$x, series = object$series),
+    if ("xreg" %in% names(object)) list(xreg = object$xreg)
   )
 
   for (h in seq(horizon)) {
     indx <- seq(ncal+h-1, nrow(errors)-!object$forward, by = 1L)
 
     for (t in indx) {
+      # Check whether need to skip if update = TRUE
+      if (!anyNA(c(lower[[1]][t+h, h], upper[[1]][t+h, h])))
+        next
+
       errors_subset <- subset(
         errors[, h],
         start = ifelse(!rolling, 1, t - ncal + 1L),
@@ -212,14 +225,13 @@ scp <- function(object, alpha = 1 - 0.01 * object$level,
     out$lower <- extract_final(lower, nrow = n, ncol = horizon, bench = out$mean)
     out$upper <- extract_final(upper, nrow = n, ncol = horizon, bench = out$mean)
   }
-  model <- list(
-    method = out$method, call = match.call(),
-    alpha = alpha, symmetric = symmetric, ncal = ncal, rolling = rolling,
-    quantiletype = quantiletype, weightfun = weightfun, kess = kess, na.rm = na.rm
-  )
-  out$model <- model
+  if (update) {
+    out$model$cvforecast$call <- object$model$cvforecast$call
+  } else {
+    out$model$cvforecast$call <- object$call
+  }
 
-  return(structure(out, class = c("scp", "cpforecast", "forecast")))
+  return(structure(out, class = c("scp", "cpforecast", "cvforecast", "forecast")))
 }
 
 # Extract final step forecasts from x and copy attributes from bench to it
@@ -287,7 +299,7 @@ print.cpforecast <- function(x, ...) {
   cat(paste("", "cp_times =", x$cp_times,
             ifelse("mean" %in% names(x), "(the forward step included)", ""), "\n"))
 
-  if ("model" %in% names(x)) {
+  if ("mean" %in% names(x)) {
     cat(paste("\nForecasts of the forward step:\n"))
     NextMethod()
   }
