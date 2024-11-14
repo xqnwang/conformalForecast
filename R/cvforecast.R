@@ -44,6 +44,7 @@
 #' @return A list of class \code{c("cvforecast", "forecast")} with components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
+#' \item{xreg}{Exogenous predictor variables used in the model, if applicable.}
 #' \item{method}{A character string "cvforecast".}
 #' \item{fit_times}{The number of times the model is fitted in cross-validation.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
