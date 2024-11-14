@@ -12,6 +12,7 @@ Methods and tools for performing multistep-ahead time series forecasting using c
 Useful links:
 \itemize{
   \item \url{https://github.com/xqnwang/conformalForecast}
+  \item \url{https://xqnwang.github.io/conformalForecast/}
   \item Report bugs at \url{https://github.com/xqnwang/conformalForecast/issues}
 }
 
