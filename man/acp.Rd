@@ -15,6 +15,7 @@ acp(
   ncal = 10,
   rolling = FALSE,
   quantiletype = 1,
+  update = FALSE,
   na.rm = TRUE,
   ...
 )
@@ -45,6 +46,9 @@ form the calibration set. Otherwise, expanding window strategy will be used.}
 quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 types 4 to 9 are for continuous quantiles. See the
 \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.}
+
+\item{update}{If \code{TRUE}, the function will be compatible with the
+\code{\link[base]{update}} function, allowing for easy updates of conformal prediction.}
 
 \item{na.rm}{If \code{TRUE}, corresponding entries in sample values are removed
 if it is \code{NA} when calculating sample quantile.}

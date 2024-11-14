@@ -30,6 +30,8 @@
 #' quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 #' types 4 to 9 are for continuous quantiles. See the
 #' \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
+#' @param update If \code{TRUE}, the function will be compatible with the
+#' \code{\link[base]{update}} function, allowing for easy updates of conformal prediction.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values are removed
 #' if it is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to the
@@ -85,7 +87,7 @@
 #' @export
 acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
                 symmetric = FALSE, ncal = 10, rolling = FALSE,
-                quantiletype = 1, na.rm = TRUE, ...) {
+                quantiletype = 1, update = FALSE, na.rm = TRUE, ...) {
   # Check inputs
   if (any(alpha >= 1 | alpha <= 0))
     stop("alpha should be in (0, 1)")
@@ -114,13 +116,29 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
                  start = start(pf),
                  frequency = frequency(pf))
   colnames(namatrix) <- paste0("h=", seq(horizon))
-  lower <- upper <- alphat <- alphat_lower <- alphat_upper <-
-    `names<-` (rep(list(namatrix), length(alpha)),
-               paste0(level, "%"))
+  if (update) {
+    lower <- object$LOWER
+    upper <- object$UPPER
+    if (symmetric) {
+      alphat <- object$model$alpha_update$alpha
+    } else {
+      alphat_lower <- object$model$alpha_update$lower
+      alphat_upper <- object$model$alpha_update$upper
+    }
+  } else {
+    lower <- upper <-
+      `names<-` (rep(list(namatrix), length(alpha)),
+                 paste0(level, "%"))
+    if (symmetric) {
+      alphat <- lower
+    } else {
+      alphat_lower <- alphat_upper <- lower
+    }
+  }
 
-  out <- list(
-    x = object$x,
-    series = object$series
+  out <- c(
+    list(x = object$x, series = object$series),
+    if ("xreg" %in% names(object)) list(xreg = object$xreg)
   )
 
   for (h in seq(horizon)) {
@@ -131,7 +149,27 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
       q_lo_h <- q_up_h <-
       matrix(NA_real_, nrow = n, ncol = length(alpha))
 
+    if (update) {
+      for (i in seq(length(alpha))) {
+        q_lo_h[, i] <- pf[, h] - lower[[i]][, h]
+        q_up_h[, i] <- upper[[i]][, h] - pf[, h]
+      }
+      if (symmetric) {
+        alphat_h <- sapply(alphat, function(mat) mat[, h])
+        errt_h <- abs(errors[, h]) > q_lo_h
+      } else {
+        alphat_lower_h <- sapply(alphat_lower, function(mat) mat[, h])
+        alphat_upper_h <- sapply(alphat_upper, function(mat) mat[, h])
+        padded_errors <- rbind(errors, matrix(NA, nrow = n - nrow(errors), ncol = horizon))
+        errt_lower_h <- (-padded_errors[, h]) > q_lo_h
+        errt_upper_h <- padded_errors[, h] > q_up_h
+      }
+    }
+
     for (t in indx) {
+      if (!t %in% tail(indx, n - nrow(errors) + 1))
+        next
+
       errors_subset <- subset(
         errors[, h],
         start = ifelse(!rolling, 1, t - ncal + 1L),
@@ -225,9 +263,12 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
       }
     }
     for (i in seq(length(alpha))) {
-      alphat[[i]][, h] <- alphat_h[, i]
-      alphat_lower[[i]][, h] <- alphat_lower_h[, i]
-      alphat_upper[[i]][, h] <- alphat_upper_h[, i]
+      if (symmetric) {
+        alphat[[i]][, h] <- alphat_h[, i]
+      } else {
+        alphat_lower[[i]][, h] <- alphat_lower_h[, i]
+        alphat_upper[[i]][, h] <- alphat_upper_h[, i]
+      }
     }
   }
 
@@ -244,18 +285,18 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
     out$lower <- extract_final(lower, nrow = n, ncol = horizon, bench = out$mean)
     out$upper <- extract_final(upper, nrow = n, ncol = horizon, bench = out$mean)
   }
-  out$model$method <- out$method
-  out$model$call <- match.call()
-  out$model$alpha <- alpha
-  out$model$gamma <- gamma
-  out$model$symmetric <- symmetric
+  if (update) {
+    out$model$cvforecast$call <- object$model$cvforecast$call
+  } else {
+    out$model$cvforecast$call <- object$call
+  }
   if (symmetric) {
-    out$model$alpha_update <- alphat
+    out$model$alpha_update <- list(alpha = alphat)
   } else {
     out$model$alpha_update <- list(lower = alphat_lower, upper = alphat_upper)
   }
 
-  return(structure(out, class = c("acp", "cpforecast", "forecast")))
+  return(structure(out, class = c("acp", "cpforecast", "cvforecast", "forecast")))
 }
 
 #' @export
