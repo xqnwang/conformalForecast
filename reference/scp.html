@@ -52,6 +52,7 @@ applying the classical split conformal prediction (SCP) method.</p>
 <span>  quantiletype <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  weightfun <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  kess <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -110,6 +111,11 @@ weights are supported.</p></dd>
 quantile computation.</p></dd>
 
 
+<dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
+<dd><p>If <code>TRUE</code>, the function will be compatible with the
+<code>update</code> function, allowing for easy updates of conformal prediction.</p></dd>
+
+
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
 <dd><p>If <code>TRUE</code>, corresponding entries in sample values and weights
 are removed if either is <code>NA</code> when calculating sample quantile.</p></dd>
@@ -128,6 +134,9 @@ with the following components:</p>
 
 <dt>series</dt>
 <dd><p>The name of the series <code>x</code>.</p></dd>
+
+<dt>xreg</dt>
+<dd><p>Exogenous predictor variables used, if applicable.</p></dd>
 
 <dt>method</dt>
 <dd><p>A character string "scp".</p></dd>
@@ -162,7 +171,7 @@ series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
 <dd><p>The matched call.</p></dd>
 
 <dt>model</dt>
-<dd><p>A list containing information abouth the conformal prediction model.</p></dd>
+<dd><p>A list containing detailed information about the <code>cvforecast</code> and <code>conformal</code> models.</p></dd>
 
 </dl><p>If <code>mean</code> is included in the <code>object</code>, the components <code>mean</code>,
 <code>lower</code>, and <code>upper</code> will also be returned, showing the information
@@ -218,6 +227,14 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.2540418 -0.1490929 2.520996 -1.065434 3.817075</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.3784289 -1.2282025 2.186605 -2.834616 3.380624</span>
@@ -229,6 +246,14 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
