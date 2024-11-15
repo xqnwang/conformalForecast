@@ -51,7 +51,7 @@
 #' @param kess If \code{TRUE}, Kish's effective sample size is used for sample
 #' quantile computation.
 #' @param update If \code{TRUE}, the function will be compatible with the
-#' \code{\link[base]{update}} function, allowing for easy updates of conformal prediction.
+#' \code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values and weights
 #' are removed if either is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to \code{weightfun}.

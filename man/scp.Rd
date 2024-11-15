@@ -56,7 +56,7 @@ weights are supported.}
 quantile computation.}
 
 \item{update}{If \code{TRUE}, the function will be compatible with the
-\code{\link[base]{update}} function, allowing for easy updates of conformal prediction.}
+\code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.}
 
 \item{na.rm}{If \code{TRUE}, corresponding entries in sample values and weights
 are removed if either is \code{NA} when calculating sample quantile.}

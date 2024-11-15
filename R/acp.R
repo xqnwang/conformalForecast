@@ -31,7 +31,7 @@
 #' types 4 to 9 are for continuous quantiles. See the
 #' \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
 #' @param update If \code{TRUE}, the function will be compatible with the
-#' \code{\link[base]{update}} function, allowing for easy updates of conformal prediction.
+#' \code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values are removed
 #' if it is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to the

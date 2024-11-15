@@ -18,7 +18,8 @@ See the results of a call to \code{\link{cvforecast}}.}
 \item{...}{Additional arguments to be passed to the selected conformal method.}
 
 \item{method}{A character string specifying the conformal method to be applied.
-Possible options include \code{"scp"} (\link{scp}), \code{"acp"} (\link{acp}), \code{"pid"} (\link{pid}), and \code{"mcp"} (\link{mcp}).}
+Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
+\code{"pid"}(\link{pid}), and \code{"mcp"}(\link{mcp}).}
 }
 \description{
 This function allows you to specify the method used to perform conformal prediction.

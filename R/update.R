@@ -39,14 +39,7 @@
 #' summary(scpfc_update)
 #'
 #' @export
-update <- function(object, ...) {
-  UseMethod("update")
-}
-
-#' @rdname update
-#' @export
 update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ...) {
-  # browser()
   level <- object$level
   alpha <- 1 - level / 100
   h <- dim(object$MEAN)[2]
@@ -70,16 +63,8 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
 
   # Info required for model fitting
   cvcall <- object$model$cvforecast$call
-  if ("initial" %in% names(cvcall)) {
-    initial <- eval.parent(parse(text = as.character(cvcall)[names(cvcall) == "initial"]))
-  } else {
-    initial <- 1
-  }
-  if ("window" %in% names(cvcall)) {
-    window <- eval.parent(parse(text = as.character(cvcall)[names(cvcall) == "window"]))
-  } else {
-    window <- NULL
-  }
+  initial <- eval(get_call_arg_with_defaults(cvforecast, cvcall, "initial"), .GlobalEnv)
+  window <- eval(get_call_arg_with_defaults(cvforecast, cvcall, "window"), .GlobalEnv)
 
   # Model fitting and forecasting
   nfirst <- ifelse(forward, length(object$x) + 1L, length(object$x))
