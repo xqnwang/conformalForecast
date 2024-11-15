@@ -51,6 +51,7 @@ applying the adaptive conformal prediction (ACP) method.</p>
 <span>  ncal <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rolling <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  quantiletype <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  update <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -98,6 +99,11 @@ form the calibration set. Otherwise, expanding window strategy will be used.</p>
 quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 types 4 to 9 are for continuous quantiles. See the
 <code><a href="http://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.</p></dd>
+
+
+<dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
+<dd><p>If <code>TRUE</code>, the function will be compatible with the
+<code>update</code> function, allowing for easy updates of conformal prediction.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
@@ -200,10 +206,19 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80      Hi 80     Lo 95       Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855 -2.838942 -0.3890362 -3.916409 -0.01019289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581 -2.030470  1.2135450 -2.429294  2.88365546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807 -1.101664  2.1795586 -1.508596  3.69397326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 100,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast Lo 80 Hi 80 Lo 95 Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855    NA    NA    NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581    NA    NA    NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807    NA    NA    NA    NA</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -214,14 +229,23 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80      Hi 80     Lo 95       Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855 -2.838942 -0.3890362 -3.916409 -0.01019289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581 -2.030470  1.2135450 -2.429294  2.88365546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807 -1.101664  2.1795586 -1.508596  3.69397326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 100,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast Lo 80 Hi 80 Lo 95 Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855    NA    NA    NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581    NA    NA    NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807    NA    NA    NA    NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.01 0.924 1.345 1.038 187.647 359.433 0.902 0.818        Inf     Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.01 0.924 1.345 1.038 187.647 359.433 0.902 0.818        NaN     NaN</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

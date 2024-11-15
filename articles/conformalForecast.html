@@ -212,21 +212,21 @@ exact marginal coverage.</p>
 <code class="sourceCode R"><span><span class="va">acpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acp.html">acp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, gamma <span class="op">=</span> <span class="fl">0.005</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">acpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">acpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
-<span><span class="co">#&gt; CV h=1   5.036517 4.863717</span></span>
-<span><span class="co">#&gt; CV h=2   6.644759 6.416735</span></span>
-<span><span class="co">#&gt; CV h=3   6.785646 6.551065</span></span>
+<span><span class="co">#&gt;        Winkler_95 MSIS_95</span></span>
+<span><span class="co">#&gt; CV h=1        NaN     NaN</span></span>
+<span><span class="co">#&gt; CV h=2        NaN     NaN</span></span>
+<span><span class="co">#&gt; CV h=3        NaN     NaN</span></span>
 <span><span class="op">(</span><span class="va">acpfc_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">acpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       h=1       h=2       h=3 </span></span>
-<span><span class="co">#&gt; 0.9487500 0.9498747 0.9497487</span></span>
+<span><span class="co">#&gt; h=1 h=2 h=3 </span></span>
+<span><span class="co">#&gt; NaN NaN NaN</span></span>
 <span><span class="op">(</span><span class="va">acpfc_wid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/width.html">width</a></span><span class="op">(</span><span class="va">acpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Mean width:</span></span>
-<span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
-<span><span class="co">#&gt; 4.119178 5.420955 5.635120 </span></span>
+<span><span class="co">#&gt; h=1 h=2 h=3 </span></span>
+<span><span class="co">#&gt; NaN NaN NaN </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Median width:</span></span>
-<span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
-<span><span class="co">#&gt; 4.034989 5.426268 5.499007</span></span></code></pre></div>
+<span><span class="co">#&gt; h=1 h=2 h=3 </span></span>
+<span><span class="co">#&gt;  NA  NA  NA</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="conformal-pid-control-pid">Conformal PID control (PID)<a class="anchor" aria-label="anchor" href="#conformal-pid-control-pid"></a>
@@ -421,29 +421,29 @@ plot.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">horizon</span>, <span class="va">method</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cov_mean</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cov_mean</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    horizon method covmean winkler  msis   covdiff</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> h=1     AR       0.954    4.78  4.66  0.004<span style="text-decoration: underline;">44</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> h=1     SCP      0.95     5.00  4.83  0       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> h=1     WCP      0.955    5.11  4.93  0.005<span style="text-decoration: underline;">00</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> h=1     ACP      0.949    5.04  4.86 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> h=1     PI       0.944    5.12  4.95 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> h=1     PID      0.939    7.13  6.89 -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">2</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> h=1     MCP      0.944    5.16  4.98 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> h=2     AR       0.942    6.25  6.09 -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">84</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> h=2     SCP      0.947    6.53  6.30 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> h=2     WCP      0.955    6.56  6.34  0.004<span style="text-decoration: underline;">89</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> h=2     ACP      0.950    6.64  6.42 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">125</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> h=2     PI       0.946    6.76  6.53 -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">88</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> h=2     PID      0.941    9.34  9.03 -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">90</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> h=2     MCP      0.947    6.66  6.44 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> h=3     AR       0.935    6.27  6.11 -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> h=3     SCP      0.940    6.64  6.40 -<span style="color: #BB0000;">0.010</span><span style="color: #BB0000; text-decoration: underline;">3</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> h=3     WCP      0.948    6.62  6.38 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">51</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> h=3     ACP      0.950    6.79  6.55 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">251</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> h=3     PI       0.945    6.96  6.72 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> h=3     PID      0.941   10.0   9.71 -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">05</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> h=3     MCP      0.945    6.90  6.66 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span></code></pre></div>
+<span><span class="co">#&gt;    horizon method covmean winkler   msis   covdiff</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> h=1     AR       0.954    4.78   4.66   0.004<span style="text-decoration: underline;">44</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> h=1     SCP      0.95     5.00   4.83   0      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> h=1     WCP      0.955    5.11   4.93   0.005<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> h=1     ACP    <span style="color: #BB0000;">NaN</span>      <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> h=1     PI       0.944    5.12   4.95  -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> h=1     PID      0.939    7.13   6.89  -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">2</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> h=1     MCP      0.944    5.16   4.98  -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> h=2     AR       0.942    6.25   6.09  -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">84</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> h=2     SCP      0.947    6.53   6.30  -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> h=2     WCP      0.955    6.56   6.34   0.004<span style="text-decoration: underline;">89</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> h=2     ACP    <span style="color: #BB0000;">NaN</span>      <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> h=2     PI       0.946    6.76   6.53  -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">88</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> h=2     PID      0.941    9.34   9.03  -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">90</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> h=2     MCP      0.947    6.66   6.44  -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> h=3     AR       0.935    6.27   6.11  -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> h=3     SCP      0.940    6.64   6.40  -<span style="color: #BB0000;">0.010</span><span style="color: #BB0000; text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> h=3     WCP      0.948    6.62   6.38  -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">51</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> h=3     ACP    <span style="color: #BB0000;">NaN</span>      <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>      </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> h=3     PI       0.945    6.96   6.72  -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> h=3     PID      0.941   10.0    9.71  -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">05</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> h=3     MCP      0.945    6.90   6.66  -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_wid"</span><span class="op">)</span><span class="op">)</span></span>
