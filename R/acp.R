@@ -167,8 +167,10 @@ acp <- function(object, alpha = 1 - 0.01 * object$level, gamma = 0.005,
     }
 
     for (t in indx) {
-      if (!t %in% tail(indx, n - nrow(errors) + 1))
-        next
+      if (update) {
+        if (!t %in% tail(indx, n - nrow(errors) + 1))
+          next
+      }
 
       errors_subset <- subset(
         errors[, h],
