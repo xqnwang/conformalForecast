@@ -98,7 +98,7 @@ form the calibration set. Otherwise, expanding window strategy will be used.</p>
 <dd><p>An integer between 1 and 9 determining the type of
 quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 types 4 to 9 are for continuous quantiles. See the
-<code><a href="http://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.</p></dd>
+<code><a href="https://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.</p></dd>
 
 
 <dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
@@ -113,7 +113,7 @@ if it is <code>NA</code> when calculating sample quantile.</p></dd>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Other arguments are passed to the
-<code><a href="http://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function for quantile computation.</p></dd>
+<code><a href="https://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function for quantile computation.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -215,10 +215,10 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80      Hi 80     Lo 95       Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855 -2.838942 -0.3890362 -3.916409 -0.01019289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581 -2.030470  1.2135450 -2.429294  2.88365546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807 -1.101664  2.1795586 -1.508596  3.69397326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast        Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.0539540  0.004453064 2.440103 -1.087270 2.818947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.5349292 -1.224282884 2.019732 -1.623107 3.689843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1518494 -1.844293650 1.436928 -2.251227 2.951343</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -238,14 +238,14 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80      Hi 80     Lo 95       Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -1.7751855 -2.838942 -0.3890362 -3.916409 -0.01019289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2712581 -2.030470  1.2135450 -2.429294  2.88365546</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.5907807 -1.101664  2.1795586 -1.508596  3.69397326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast        Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.0539540  0.004453064 2.440103 -1.087270 2.818947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.5349292 -1.224282884 2.019732 -1.623107 3.689843</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1518494 -1.844293650 1.436928 -2.251227 2.951343</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.01 0.924 1.345 1.038 187.647 359.433 0.902 0.818        Inf     Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.01 0.922 1.339 1.035 187.692 359.329 0.898 0.815        Inf     Inf</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -258,7 +258,7 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

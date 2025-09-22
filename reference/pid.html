@@ -240,10 +240,10 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80     Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    0.264457085 -0.8488525 0.9538264 -1.496723 2.524613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    0.232331391 -1.0526208 1.9153472 -2.058756 3.493363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003   -0.003700809 -1.6744563 1.3092852 -2.192779 2.643844</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.8089014 -2.025371 1.009153 -2.070359 1.701787</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.6209920 -1.314295 2.326066 -2.792548 2.502585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1819397 -1.380323 2.332600 -2.568855 2.949366</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -255,14 +255,14 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80     Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    0.264457085 -0.8488525 0.9538264 -1.496723 2.524613</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    0.232331391 -1.0526208 1.9153472 -2.058756 3.493363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003   -0.003700809 -1.6744563 1.3092852 -2.192779 2.643844</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.8089014 -2.025371 1.009153 -2.070359 1.701787</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.6209920 -1.314295 2.326066 -2.792548 2.502585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1819397 -1.380323 2.332600 -2.568855 2.949366</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.014 0.961 1.444 1.079 182.346 263.405 0.922 0.814      6.053   5.898</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.026 0.962 1.447 1.08 181.661 264.517 0.934 0.827      5.994   5.903</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PID with a Naive model for the scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">naivefun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -283,7 +283,7 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

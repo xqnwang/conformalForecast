@@ -199,10 +199,10 @@ be \(y_{T-1}\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.5217675 -0.752827 1.796362 -1.427557 2.471092</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.1349178 -1.723101 1.453266 -2.563835 2.293999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.5149283 -2.103334 1.073477 -2.944185 1.914328</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80      Hi 80     Lo 95     Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -1.68767994 -2.9404221 -0.4349377 -3.603584 0.2282239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.05350847 -1.4796974  1.5867144 -2.291328 2.3983445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.77860922 -0.7547002  2.3119186 -1.566385 3.1236036</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -213,14 +213,14 @@ be \(y_{T-1}\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.5217675 -0.752827 1.796362 -1.427557 2.471092</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.1349178 -1.723101 1.453266 -2.563835 2.293999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.5149283 -2.103334 1.073477 -2.944185 1.914328</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80      Hi 80     Lo 95     Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -1.68767994 -2.9404221 -0.4349377 -3.603584 0.2282239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.05350847 -1.4796974  1.5867144 -2.291328 2.3983445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.77860922 -0.7547002  2.3119186 -1.566385 3.1236036</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.023 0.971 1.511 1.093 90.064 237.646 0.914 0.822      5.799   5.462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE MSE  RMSE    MPE   MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.031 0.967 1.5 1.088 90.954 238.48 0.913 0.819      5.797   5.476</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example with exogenous predictors</span></span></span>
 <span class="r-in"><span><span class="va">far2_xreg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span>, <span class="va">xreg</span>, <span class="va">newxreg</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -242,7 +242,7 @@ be \(y_{T-1}\).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

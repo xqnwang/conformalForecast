@@ -95,7 +95,7 @@ form the calibration set. Otherwise, expanding window strategy will be used.</p>
 <dd><p>An integer between 1 and 9 determining the type of
 quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 types 4 to 9 are for continuous quantiles. See the
-<code><a href="http://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.</p></dd>
+<code><a href="https://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.</p></dd>
 
 
 <dt id="arg-weightfun">weightfun<a class="anchor" aria-label="anchor" href="#arg-weightfun"></a></dt>
@@ -199,7 +199,7 @@ Then the prediction intervals will be
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="http://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code></p></div>
+    <div class="dont-index"><p><code><a href="https://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -235,10 +235,10 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.2540418 -0.1490929 2.520996 -1.065434 3.817075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.3784289 -1.2282025 2.186605 -2.834616 3.380624</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.3086171 -1.8457568 1.494619 -3.414272 2.618403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.08588534 -1.061028 1.352839 -1.508918 2.648919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.12507106 -1.417928 1.728357 -2.041341 2.877124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.19580845 -1.512955 1.607427 -2.216183 2.731212</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -256,14 +256,14 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.2540418 -0.1490929 2.520996 -1.065434 3.817075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.3784289 -1.2282025 2.186605 -2.834616 3.380624</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.3086171 -1.8457568 1.494619 -3.414272 2.618403</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.08588534 -1.061028 1.352839 -1.508918 2.648919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.12507106 -1.417928 1.728357 -2.041341 2.877124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.19580845 -1.512955 1.607427 -2.216183 2.731212</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE  MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.011 0.958 1.46 1.08 42.611 228.563 0.934 0.837      5.944   5.731</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.007 0.953 1.452 1.075 42.022 228.939 0.916 0.825      5.936   5.673</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Classical conformal prediction with exponential weights</span></span></span>
 <span class="r-in"><span><span class="va">expweight</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -283,7 +283,7 @@ Then the prediction intervals will be
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

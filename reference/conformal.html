@@ -102,13 +102,13 @@ Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.5165515 -2.015214 0.910992 -2.615997 1.526088</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.1132015 -2.043974 1.533047 -3.245547 3.232007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.2844349 -1.819366 1.857624 -2.714702 3.733580</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.654117 2.487968</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.277334 2.372208 -2.406386 4.071168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.638340 2.038650 -2.533676 3.914606</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE    MPE    MAPE MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.004 0.959 1.452 1.088 33.284 206.539  0.9 0.809      5.813   5.463</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 0.958 1.45 1.086 32.966 206.131 0.898 0.808      5.818   5.466</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ACP with asymmetric nonconformity scores and rolling calibration sets</span></span></span>
 <span class="r-in"><span><span class="va">acpfc</span> <span class="op">&lt;-</span> <span class="fu">conformal</span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"acp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, gamma <span class="op">=</span> <span class="fl">0.005</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -132,13 +132,13 @@ Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.5165515 -2.015214 0.910992 -2.556367 1.423885</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.1132015 -2.374143 1.417650 -3.309647 3.232007</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.2844349 -2.092529 1.792021 -2.948984 4.092585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.594486 2.385765</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.524677 2.256811 -2.470486 4.071168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.911503 1.973047 -2.767959 4.273610</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE    MPE    MAPE MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.004 0.959 1.452 1.088 33.284 206.539  0.9 0.809        Inf     Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 0.958 1.45 1.086 32.966 206.131 0.898 0.808        Inf     Inf</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -151,7 +151,7 @@ Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
