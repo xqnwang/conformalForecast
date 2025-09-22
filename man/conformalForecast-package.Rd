@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Xiaoqian Wang \email{Xiaoqian.Wang@monash.edu} (\href{https://orcid.org/0000-0003-4827-496X}{ORCID})
+\strong{Maintainer}: Xiaoqian Wang \email{Xiaoqian.Wang@amss.ac.cn} (\href{https://orcid.org/0000-0003-4827-496X}{ORCID})
 
 Authors:
 \itemize{

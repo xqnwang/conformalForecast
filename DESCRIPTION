@@ -3,7 +3,7 @@ Title: Conformal prediction methods for multistep-ahead time series
     forecasting
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Xiaoqian", "Wang", , "Xiaoqian.Wang@monash.edu", role = c("aut", "cre"),
+    person("Xiaoqian", "Wang", , "Xiaoqian.Wang@amss.ac.cn", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4827-496X")),
     person("Rob", "Hyndman", , "Rob.Hyndman@monash.edu", role = "aut",
            comment = c(ORCID = "0000-0002-2140-5352"))
