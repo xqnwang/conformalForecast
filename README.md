@@ -5,7 +5,7 @@
 [![R-CMD-check](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The R package *conformalForecast* provides methods and tools for performing multistep-ahead time series forecasting using conformal prediction methods including classical conformal prediction, adaptive conformal prediction, conformal PID control, and Multistep-ahead conformal prediction.
+The R package *conformalForecast* provides methods and tools for performing multistep-ahead time series forecasting using conformal prediction methods including classical conformal prediction, adaptive conformal prediction, conformal PID control, and autocorrelated multistep-ahead conformal prediction.
 
 ## Installation
 
@@ -14,6 +14,12 @@ You can install the development version of conformalForecast from [GitHub](https
 ``` r
 # install.packages("remotes")
 remotes::install_github("xqnwang/conformalForecast")
+```
+
+You can also get the official release version from CRAN:
+
+``` r
+install.packages("conformalForecast")
 ```
 
 ## Example
