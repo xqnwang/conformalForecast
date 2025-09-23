@@ -8,7 +8,7 @@
 #' See the results of a call to \code{\link{cvforecast}}.
 #' @param method A character string specifying the conformal method to be applied.
 #' Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
-#' \code{"pid"}(\link{pid}), and \code{"mcp"}(\link{mcp}).
+#' \code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).
 #' @param ... Additional arguments to be passed to the selected conformal method.
 #'
 #' @examples
@@ -39,7 +39,7 @@ conformal <- function(object, ...) {
 
 #' @rdname conformal
 #' @export
-conformal.cvforecast <- function(object, method = c("scp", "acp", "pid", "mcp"), ...) {
+conformal.cvforecast <- function(object, method = c("scp", "acp", "pid", "acmcp"), ...) {
   # Match the method argument
   method <- match.arg(method)
 
@@ -48,7 +48,7 @@ conformal.cvforecast <- function(object, method = c("scp", "acp", "pid", "mcp"),
                    scp = scp(object, ...),
                    acp = acp(object, ...),
                    pid = pid(object, ...),
-                   mcp = mcp(object, ...))
+                   acmcp = acmcp(object, ...))
 
   # Return the result of the chosen method
   return(result)

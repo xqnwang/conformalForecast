@@ -149,25 +149,25 @@ pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 (pidfc_wid <- width(pidfc, window = 100, level = 95, includemedian = TRUE))
 ```
 
-### Multistep-ahead conformal prediction (MCP)
+### Multistep-ahead conformal prediction (AcMCP)
 
-Similar to the PID method, the MCP method also integrates three modules (P, I, and D) to form the final iteration. However, instead of performing conformal prediction for each individual forecast horizon $h$ separately, MCP employs a combination of an MA($h-1$) model and a linear regression model of $e_{t+h|t}$ on $e_{t+h-1|t},\dots,e_{t+1|t}$ as the scorecaster. This allows the MCP method to capture the relationship between the $h$-step ahead forecast error and past errors.
+Similar to the PID method, the AcMCP method also integrates three modules (P, I, and D) to form the final iteration. However, instead of performing conformal prediction for each individual forecast horizon $h$ separately, AcMCP employs a combination of an MA($h-1$) model and a linear regression model of $e_{t+h|t}$ on $e_{t+h-1|t},\dots,e_{t+1|t}$ as the scorecaster. This allows the AcMCP method to capture the relationship between the $h$-step ahead forecast error and past errors.
 
-```{r mcp}
-mcpfc <- mcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
+```{r acmcp}
+acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
              lr = lr, KI = KI, Csat = Csat)
 
-(mcpfc_score <- accuracy(mcpfc, byhorizon = TRUE))
-(mcpfc_cov <- coverage(mcpfc, window = 100, level = 95))
-(mcpfc_wid <- width(mcpfc, window = 100, level = 95, includemedian = TRUE))
+(acmcpfc_score <- accuracy(acmcpfc, byhorizon = TRUE))
+(acmcpfc_cov <- coverage(acmcpfc, window = 100, level = 95))
+(acmcpfc_wid <- width(acmcpfc, window = 100, level = 95, includemedian = TRUE))
 ```
 
 ## Coverage and width of prediction intervals
 
-Taking the MCP result as an example, we now show the average coverage on validation sets.
+Taking the AcMCP result as an example, we now show the average coverage on validation sets.
 
 ```{r covplot, fig.width = 7, fig.height = 5}
-mcpfc_cov$rollmean |>
+acmcpfc_cov$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, coverage = value) |>
   update_tsibble(key = horizon) |>
@@ -177,14 +177,14 @@ mcpfc_cov$rollmean |>
   geom_hline(yintercept = 0.95, linetype = "dashed", color = "blue") +
   facet_grid(horizon~., scales = "free_y") +
   xlab("Time") +
-  ylab("Rolling mean coverage for MCP") +
+  ylab("Rolling mean coverage for AcMCP") +
   theme_bw()
 ```
 
 We can also show the rolling average interval width on validation sets.
 
 ```{r widplot, fig.width = 7, fig.height = 5}
-mcpfc_wid$rollmean |>
+acmcpfc_wid$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, width = value) |>
   update_tsibble(key = horizon) |>
@@ -193,15 +193,15 @@ mcpfc_wid$rollmean |>
   geom_line() +
   facet_grid(horizon~., scales = "free_y") +
   xlab("Time") +
-  ylab("Rolling mean width for MCP") +
+  ylab("Rolling mean width for AcMCP") +
   theme_bw()
 ```
 
 We can also combine all the results and show them in one single plot.
 
 ```{r bind-cov, fig.width = 7, fig.height = 5}
-candidates <- c("fc", "scpfc", "scpfc_exp", "acpfc", "pidfc_nsf", "pidfc", "mcpfc")
-methods <- c("AR", "SCP", "WCP", "ACP", "PI", "PID", "MCP")
+candidates <- c("fc", "scpfc", "scpfc_exp", "acpfc", "pidfc_nsf", "pidfc", "acmcpfc")
+methods <- c("AR", "SCP", "WCP", "ACP", "PI", "PID", "AcMCP")
 for (i in 1:length(candidates)) {
   out <- get(paste0(candidates[i], "_cov"))
   out_pivot <- out$rollmean |>
@@ -222,7 +222,7 @@ cols <- c(
   "ACP" = "green",
   "PI" = "blue",
   "PID" = "purple",
-  "MCP" = "red"
+  "AcMCP" = "red"
 )
 cov |>
   as_tsibble(index = index, key = c(horizon, method)) |>

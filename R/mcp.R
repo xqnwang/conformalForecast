@@ -1,18 +1,18 @@
 #' Multistep-ahead conformal prediction method
 #'
 #' Compute prediction intervals and other information by applying the
-#' multistep-ahead conformal prediction (MCP) method. The method can only
+#' multistep-ahead conformal prediction (AcMCP) method. The method can only
 #' deal with asymmetric nonconformity scores, i.e., forecast errors.
 #'
-#' Similar to the PID method, the MCP method also integrates three modules (P, I, and D) to
+#' Similar to the PID method, the AcMCP method also integrates three modules (P, I, and D) to
 #' form the final iteration. However, instead of performing conformal prediction
-#' for each individual forecast horizon \code{h} separately, MCP employs a combination
+#' for each individual forecast horizon \code{h} separately, AcMCP employs a combination
 #' of an MA\eqn{(h-1)} model and a linear regression model of \eqn{e_{t+h|t}} on
-#' \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the MCP method
+#' \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the AcMCP method
 #' to capture the relationship between the \eqn{h}-step ahead forecast error and
 #' past errors.
 #'
-#' @aliases print.mcp summary.mcp print.summary.mcp
+#' @aliases print.acmcp summary.acmcp print.summary.acmcp
 #'
 #' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
@@ -41,11 +41,11 @@
 #' @param KI A positive constant to place the integrator on the same scale as the scores.
 #' @param ... Other arguments are passed to the function.
 #'
-#' @return A list of class \code{c("mcp", "cpforecast", "forecast")}
+#' @return A list of class \code{c("acmcp", "cpforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
-#' \item{method}{A character string "mcp".}
+#' \item{method}{A character string "acmcp".}
 #' \item{cp_times}{The number of times the conformal prediction is performed in
 #' cross-validation.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
@@ -82,23 +82,23 @@
 #' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
 #'                  forward = TRUE, initial = 1, window = 100)
 #'
-#' # MCP setup
+#' # AcMCP setup
 #' Tg <- 1000; delta <- 0.01
 #' Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
 #' KI <- 2
 #' lr <- 0.1
 #'
-#' # MCP with integrator and scorecaster
-#' mcpfc <- mcp(fc, ncal = 100, rolling = TRUE,
+#' # AcMCP with integrator and scorecaster
+#' acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE,
 #'              integrate = TRUE, scorecast = TRUE,
 #'              lr = lr, KI = KI, Csat = Csat)
-#' print(mcpfc)
-#' summary(mcpfc)
+#' print(acmcpfc)
+#' summary(acmcpfc)
 #'
 #' @importFrom stats lm
 #' @importFrom forecast meanf Arima forecast
 #' @export
-mcp <- function(object, alpha = 1 - 0.01 * object$level,
+acmcp <- function(object, alpha = 1 - 0.01 * object$level,
                 ncal = 10, rolling = FALSE,
                 integrate = TRUE, scorecast = TRUE,
                 lr = 0.1, Tg = NULL, delta = NULL,
@@ -265,7 +265,7 @@ mcp <- function(object, alpha = 1 - 0.01 * object$level,
     }
   }
 
-  out$method <- paste("mcp")
+  out$method <- paste("acmcp")
   out$cp_times <- length(indx)
   out$MEAN <- object$MEAN
   out$ERROR <- object$ERROR
@@ -292,21 +292,21 @@ mcp <- function(object, alpha = 1 - 0.01 * object$level,
   if (scorecast)
     out$model$scorecaster <- list(lower = scorecaster_lower, upper = scorecaster_upper)
 
-  return(structure(out, class = c("mcp", "cpforecast", "forecast")))
+  return(structure(out, class = c("acmcp", "cpforecast", "forecast")))
 }
 
 
 #' @export
-print.mcp <- function(x, ...) {
+print.acmcp <- function(x, ...) {
   NextMethod()
 }
 
 #' @export
-summary.mcp <- function(object, ...) {
+summary.acmcp <- function(object, ...) {
   NextMethod()
 }
 
 #' @export
-print.summary.mcp <- function(x, ...) {
+print.summary.acmcp <- function(x, ...) {
   NextMethod()
 }

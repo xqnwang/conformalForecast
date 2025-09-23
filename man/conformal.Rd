@@ -7,7 +7,7 @@
 \usage{
 conformal(object, ...)
 
-\method{conformal}{cvforecast}(object, method = c("scp", "acp", "pid", "mcp"), ...)
+\method{conformal}{cvforecast}(object, method = c("scp", "acp", "pid", "acmcp"), ...)
 }
 \arguments{
 \item{object}{An object of class \code{"cvforecast"}. It must have an argument
@@ -19,7 +19,7 @@ See the results of a call to \code{\link{cvforecast}}.}
 
 \item{method}{A character string specifying the conformal method to be applied.
 Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
-\code{"pid"}(\link{pid}), and \code{"mcp"}(\link{mcp}).}
+\code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).}
 }
 \description{
 This function allows you to specify the method used to perform conformal prediction.
