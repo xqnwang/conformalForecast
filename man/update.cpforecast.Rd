@@ -25,6 +25,12 @@ the \code{xreg} argument in \code{object}.}
 
 \item{...}{Other arguments are passed to \code{forecastfun}.}
 }
+\value{
+A refreshed object of class \code{"cpforecast"} with updated fields (e.g.,
+\code{x}, \code{MEAN}, \code{ERROR}, \code{LOWER}, \code{UPPER}, and any
+method-specific components), reflecting newly appended data and re-computed
+cross-validation forecasts and conformal prediction intervals.
+}
 \description{
 Update conformal prediction intervals and other information by applying the
 \code{cvforecast} and \code{conformal} functions.

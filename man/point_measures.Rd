@@ -53,16 +53,15 @@ RMSSE(
 point_measures
 }
 \arguments{
-\item{resid}{A vector of residuals from either the validation or test data.}
+\item{resid}{A numeric vector of residuals from either the validation or test data.}
 
-\item{na.rm}{If \code{TRUE}, remove the missing values before calculating the
-accuracy measure.}
+\item{na.rm}{If \code{TRUE}, remove missing values before calculating the measure.}
 
 \item{...}{Additional arguments for each measure.}
 
-\item{actual}{A vector of responses matching the forecasts.}
+\item{actual}{A numeric vector of responses matching the forecasts (for percentage measures).}
 
-\item{train}{A vector of responses used to train the model.}
+\item{train}{A numeric vector of responses used to train the model (for scaled measures).}
 
 \item{demean}{Should the response be demeaned (for MASE and RMSSE)?}
 
@@ -72,7 +71,36 @@ accuracy measure.}
 
 \item{D}{Should the response model include a seasonal difference?}
 }
+\value{
+For the individual functions (\code{ME}, \code{MAE}, \code{MSE}, \code{RMSE}, \code{MPE}, \code{MAPE}, \code{MASE}, \code{RMSSE}),
+returns a single numeric scalar giving the requested accuracy measure.
+
+For the exported object \code{point_measures}, returns a \strong{named list of functions}
+that can be supplied to higher-level accuracy routines.
+}
 \description{
-Point estimate accuracy measures
+Accuracy measures for point forecast residuals.
+}
+\examples{
+# Toy residuals and data
+set.seed(1)
+y_train <- rnorm(50)
+y_test  <- rnorm(10)
+fcast   <- y_test + rnorm(10, sd = 0.2)
+resid   <- y_test - fcast
+
+# Basic measures
+ME(resid)
+MAE(resid)
+RMSE(resid)
+
+# Percentage measures require 'actual'
+MPE(resid, actual = y_test)
+MAPE(resid, actual = y_test)
+
+# Scaled measures require training data (and seasonal period if applicable)
+MASE(resid, train = y_train, period = 1)
+RMSSE(resid, train = y_train, period = 1)
+
 }
 \keyword{datasets}

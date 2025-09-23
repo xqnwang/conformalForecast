@@ -11,6 +11,8 @@
 #' \code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).
 #' @param ... Additional arguments to be passed to the selected conformal method.
 #'
+#' @return An object whose class depends on the method invoked.
+#' @seealso \code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}}, and \code{\link{acmcp}}
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)

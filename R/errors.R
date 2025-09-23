@@ -70,20 +70,69 @@ RMSSE <- function(resid, train, demean = FALSE, na.rm = TRUE,
 
 #' Point estimate accuracy measures
 #'
-#' @param resid A vector of residuals from either the validation or test data.
-#' @param actual A vector of responses matching the forecasts.
-#' @param train A vector of responses used to train the model.
+#' Accuracy measures for point forecast residuals.
+#'
+#' @param resid A numeric vector of residuals from either the validation or test data.
+#' @param actual A numeric vector of responses matching the forecasts (for percentage measures).
+#' @param train A numeric vector of responses used to train the model (for scaled measures).
 #' @param period The seasonal period of the data.
 #' @param d Should the response model include a first difference?
 #' @param D Should the response model include a seasonal difference?
 #' @param demean Should the response be demeaned (for MASE and RMSSE)?
-#' @param na.rm If \code{TRUE}, remove the missing values before calculating the
-#' accuracy measure.
+#' @param na.rm If `TRUE`, remove missing values before calculating the measure.
 #' @param ... Additional arguments for each measure.
 #'
+#' @return
+#' For the individual functions (`ME`, `MAE`, `MSE`, `RMSE`, `MPE`, `MAPE`, `MASE`, `RMSSE`),
+#' returns a single numeric scalar giving the requested accuracy measure.
+#'
+#' For the exported object `point_measures`, returns a **named list of functions**
+#' that can be supplied to higher-level accuracy routines.
+#'
+#' @examples
+#' # Toy residuals and data
+#' set.seed(1)
+#' y_train <- rnorm(50)
+#' y_test  <- rnorm(10)
+#' fcast   <- y_test + rnorm(10, sd = 0.2)
+#' resid   <- y_test - fcast
+#'
+#' # Basic measures
+#' ME(resid)
+#' MAE(resid)
+#' RMSE(resid)
+#'
+#' # Percentage measures require 'actual'
+#' MPE(resid, actual = y_test)
+#' MAPE(resid, actual = y_test)
+#'
+#' # Scaled measures require training data (and seasonal period if applicable)
+#' MASE(resid, train = y_train, period = 1)
+#' RMSSE(resid, train = y_train, period = 1)
+#'
+#' @name point_measures
 #' @export
 point_measures <- list(ME = ME, MAE = MAE, MSE = MSE, RMSE = RMSE, MPE = MPE,
                        MAPE = MAPE, MASE = MASE, RMSSE = RMSSE)
+
+
+
+#' @rdname interval_measures
+#' @export
+MSIS <- function(lower, upper, actual, train, level = 95,
+                 period, d = period == 1, D = period > 1,
+                 na.rm = TRUE, ...) {
+  if (D > 0) { # seasonal differencing
+    train <- diff(train, lag = period, differences = D)
+  }
+  if (d > 0) {
+    train <- diff(train, differences = d)
+  }
+  scale <- mean(abs(train), na.rm = na.rm)
+  score <- winkler_score(lower = lower, upper = upper, actual = actual,
+                         level = level, na.rm = na.rm)
+  mean(score / scale, na.rm = na.rm)
+}
 
 #' @rdname interval_measures
 #' @export
@@ -106,42 +155,46 @@ winkler_score <- function(lower, upper, actual, level = 95, na.rm = TRUE, ...){
   mean(score, na.rm = na.rm)
 }
 
-#' @rdname interval_measures
-#' @export
-MSIS <- function(lower, upper, actual, train, level = 95,
-                 period, d = period == 1, D = period > 1,
-                 na.rm = TRUE, ...) {
-  if (D > 0) { # seasonal differencing
-    train <- diff(train, lag = period, differences = D)
-  }
-  if (d > 0) {
-    train <- diff(train, differences = d)
-  }
-  scale <- mean(abs(train), na.rm = na.rm)
-  score <- winkler_score(lower = lower, upper = upper, actual = actual,
-                         level = level, na.rm = na.rm)
-  mean(score / scale, na.rm = na.rm)
-}
-
-
 #' Interval estimate accuracy measures
 #'
-#' @param lower A vector of lower bound of interval forecasts from either the
-#' validation or test data.
-#' @param upper A vector of upper bound of interval forecasts from either the
-#' validation or test data.
-#' @param actual A vector of responses matching the forecasts.
-#' @param train A vector of responses used to train the model.
-#' @param level The level of the forecast interval.
+#' Accuracy measures for interval forecasts.
+#'
+#' @param lower A numeric vector of lower bounds of interval forecasts.
+#' @param upper A numeric vector of upper bounds of interval forecasts.
+#' @param actual A numeric vector of realised values.
+#' @param train A numeric vector of responses used to train the model (for scaled scores).
+#' @param level The nominal level of the forecast interval (e.g., 95 or 0.95).
 #' @param period The seasonal period of the data.
 #' @param d Should the response model include a first difference?
 #' @param D Should the response model include a seasonal difference?
-#' @param na.rm If \code{TRUE}, remove the missing values before calculating the
-#' accuracy measure.
+#' @param na.rm If `TRUE`, remove missing values before calculating the measure.
 #' @param ... Additional arguments for each measure.
 #'
+#' @return
+#' For `winkler_score` and `MSIS`, returns a single numeric scalar giving
+#' the average interval score (Winkler or mean scaled interval score).
+#'
+#' For the exported object `interval_measures`, returns a **named list of functions**
+#' that can be supplied to higher-level accuracy routines.
+#'
+#' @examples
+#' set.seed(1)
+#' actual <- rnorm(10)
+#' lower  <- actual - runif(10, 0.5, 1)
+#' upper  <- actual + runif(10, 0.5, 1)
+#' train  <- rnorm(50)
+#'
+#' # Winkler score at 95%
+#' winkler_score(lower, upper, actual, level = 95)
+#'
+#' # Mean scaled interval score (needs training data and period)
+#' MSIS(lower, upper, actual, train, level = 95, period = 1)
+#'
+#' @name interval_measures
 #' @export
 interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
+
+
 
 #' Accuracy measures for a cross-validation model and a conformal prediction model
 #'

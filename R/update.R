@@ -17,6 +17,12 @@
 #' the \code{xreg} argument in \code{object}.
 #' @param ... Other arguments are passed to \code{forecastfun}.
 #'
+#' @return
+#' A refreshed object of class \code{"cpforecast"} with updated fields (e.g.,
+#' \code{x}, \code{MEAN}, \code{ERROR}, \code{LOWER}, \code{UPPER}, and any
+#' method-specific components), reflecting newly appended data and re-computed
+#' cross-validation forecasts and conformal prediction intervals.
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)

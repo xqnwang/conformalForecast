@@ -21,6 +21,9 @@ See the results of a call to \code{\link{cvforecast}}.}
 Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
 \code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).}
 }
+\value{
+An object whose class depends on the method invoked.
+}
 \description{
 This function allows you to specify the method used to perform conformal prediction.
 }
@@ -45,4 +48,7 @@ summary(scpfc)
 acpfc <- conformal(fc, method = "acp", symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
 summary(acpfc)
 
+}
+\seealso{
+\code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}}, and \code{\link{acmcp}}
 }
