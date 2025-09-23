@@ -209,66 +209,62 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting</span></span></span>
 <span class="r-in"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="cvforecast.html">cvforecast</a></span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">95</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="cvforecast.html">cvforecast</a></span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
+<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># PID setup</span></span></span>
-<span class="r-in"><span><span class="va">Tg</span> <span class="op">&lt;-</span> <span class="fl">1000</span>; <span class="va">delta</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span></span>
+<span class="r-in"><span><span class="va">Tg</span> <span class="op">&lt;-</span> <span class="fl">200</span>; <span class="va">delta</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span></span>
 <span class="r-in"><span><span class="va">Csat</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">/</span> <span class="va">pi</span> <span class="op">*</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">ceiling</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tg</span><span class="op">)</span> <span class="op">*</span> <span class="va">delta</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Tg</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">KI</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="va">lr</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PID without scorecaster</span></span></span>
-<span class="r-in"><span><span class="va">pidfc_nsf</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span><span class="va">pidfc_nsf</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                 integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>                 lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 148 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4724991 -0.7198562 1.896926 -1.702476 2.420515</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2928721 -1.8137613 1.653398 -3.248808 2.292659</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.4499592 -2.2744118 1.210475 -3.064869 1.723912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     0.78863033 -1.494426 2.585959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.19240047 -1.821271 2.751143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203    -0.02560772 -1.919723 2.370350</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 148 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4724991 -0.7198562 1.896926 -1.702476 2.420515</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2928721 -1.8137613 1.653398 -3.248808 2.292659</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.4499592 -2.2744118 1.210475 -3.064869 1.723912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     0.78863033 -1.494426 2.585959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.19240047 -1.821271 2.751143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203    -0.02560772 -1.919723 2.370350</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME  MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.006 1.01 1.596 1.137 62.342 258.699 0.932 0.835      6.421   5.884</span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.144 0.979 1.508 1.105 -89.391 522.845 0.993 0.866      6.066   5.969</span>
 <span class="r-in"><span><span class="co"># PID with a Naive model for the scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">naivefun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/naive.html" class="external-link">naive</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">pidfc</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span><span class="va">pidfc</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>             integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>, scorecastfun <span class="op">=</span> <span class="va">naivefun</span>,</span></span>
 <span class="r-in"><span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

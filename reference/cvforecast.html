@@ -180,56 +180,56 @@ be \(y_{T-1}\).</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example with a rolling window of length 100</span></span></span>
+<span class="r-in"><span><span class="co"># Example with a rolling window</span></span></span>
 <span class="r-in"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">95</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
+<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = c(80,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      95), forward = TRUE, initial = 1, window = 100) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      forward = TRUE, initial = 1, window = 50) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 151 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.06724377 -1.316412 1.450899 -2.048875 2.183363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.06194713 -1.670696 1.794590 -2.587901 2.711796</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.10006880 -1.660370 1.860508 -2.592290 2.792428</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -1.1554197 -2.740135 0.429296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.2822432 -1.902485 2.466971</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      1.0323863 -1.174433 3.239206</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = c(80,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      95), forward = TRUE, initial = 1, window = 100) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      forward = TRUE, initial = 1, window = 50) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 151 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.06724377 -1.316412 1.450899 -2.048875 2.183363</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.06194713 -1.670696 1.794590 -2.587901 2.711796</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.10006880 -1.660370 1.860508 -2.592290 2.792428</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -1.1554197 -2.740135 0.429296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.2822432 -1.902485 2.466971</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      1.0323863 -1.174433 3.239206</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE      MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.002 0.968 1.521 1.097 -100.684 560.118 0.908 0.815      6.032   5.654</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.02 0.997 1.552 1.112 -18.514 291.627 0.941  0.84      5.526     5.2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example with exogenous predictors</span></span></span>
 <span class="r-in"><span><span class="va">far2_xreg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span>, <span class="va">xreg</span>, <span class="va">newxreg</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, xreg <span class="op">=</span> <span class="va">xreg</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, level <span class="op">=</span> <span class="va">level</span>, xreg <span class="op">=</span> <span class="va">newxreg</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">fc_xreg</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2_xreg</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">95</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      forward <span class="op">=</span> <span class="cn">TRUE</span>, xreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">2006</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">1003</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fc_xreg</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2_xreg</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
+<span class="r-in"><span>                      forward <span class="op">=</span> <span class="cn">TRUE</span>, xreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">406</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">203</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

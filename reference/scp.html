@@ -206,70 +206,70 @@ Then the prediction intervals will be
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting</span></span></span>
 <span class="r-in"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="cvforecast.html">cvforecast</a></span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">95</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="cvforecast.html">cvforecast</a></span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
+<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Classical conformal prediction with equal weights</span></span></span>
-<span class="r-in"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu">scp</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu">scp</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">scpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 99 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     1.13878107 -0.2512587 2.402811 -0.7557084 3.318682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.01830376 -2.0100360 1.666569 -2.9495023 2.661308</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.62191623 -2.5902655 1.109107 -3.4968756 1.936869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -0.6049760 -2.837393 2.103852</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202     -0.5913297 -2.376767 1.900967</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203     -0.1246454 -1.950841 2.334243</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 799 (the forward step included) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 99 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 100, rolling = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     1.13878107 -0.2512587 2.402811 -0.7557084 3.318682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.01830376 -2.0100360 1.666569 -2.9495023 2.661308</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.62191623 -2.5902655 1.109107 -3.4968756 1.936869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -0.6049760 -2.837393 2.103852</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202     -0.5913297 -2.376767 1.900967</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203     -0.1246454 -1.950841 2.334243</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV  0 1.014 1.61 1.142 61.442 261.189 0.947 0.848      6.299   5.824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.077 1.036 1.672 1.169 -69.16 546.408 1.112 0.973       6.45   6.492</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Classical conformal prediction with exponential weights</span></span></span>
 <span class="r-in"><span><span class="va">expweight</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fl">0.99</span><span class="op">^</span><span class="op">{</span><span class="va">n</span><span class="op">+</span><span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">scpfc_exp</span> <span class="op">&lt;-</span> <span class="fu">scp</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span><span class="va">scpfc_exp</span> <span class="op">&lt;-</span> <span class="fu">scp</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                 weightfun <span class="op">=</span> <span class="va">expweight</span>, kess <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
