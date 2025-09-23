@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -289,35 +289,35 @@ sequence of quantile estimates used in the prediction sets.</p>
 <span><span class="co">#&gt; 5.972480 7.664302 7.656036</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="multistep-ahead-conformal-prediction-mcp">Multistep-ahead conformal prediction (MCP)<a class="anchor" aria-label="anchor" href="#multistep-ahead-conformal-prediction-mcp"></a>
+<h3 id="multistep-ahead-conformal-prediction-acmcp">Multistep-ahead conformal prediction (AcMCP)<a class="anchor" aria-label="anchor" href="#multistep-ahead-conformal-prediction-acmcp"></a>
 </h3>
-<p>Similar to the PID method, the MCP method also integrates three
+<p>Similar to the PID method, the AcMCP method also integrates three
 modules (P, I, and D) to form the final iteration. However, instead of
 performing conformal prediction for each individual forecast horizon
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>
-separately, MCP employs a combination of an
+separately, AcMCP employs a combination of an
 MA(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">h-1</annotation></semantics></math>)
 model and a linear regression model of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi><mo stretchy="false" form="prefix">|</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">e_{t+h|t}</annotation></semantics></math>
 on
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>e</mi><mrow><mi>t</mi><mo>+</mo><mi>h</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>e</mi><mrow><mi>t</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">e_{t+h-1|t},\dots,e_{t+1|t}</annotation></semantics></math>
-as the scorecaster. This allows the MCP method to capture the
+as the scorecaster. This allows the AcMCP method to capture the
 relationship between the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>h</mi><annotation encoding="application/x-tex">h</annotation></semantics></math>-step
 ahead forecast error and past errors.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mcpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcp.html">mcp</a></span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<code class="sourceCode R"><span><span class="va">acmcpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acmcp.html">acmcp</a></span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">mcpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">mcpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">acmcpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">acmcpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
 <span><span class="co">#&gt; CV h=1   5.159843 4.984948</span></span>
 <span><span class="co">#&gt; CV h=2   6.664827 6.437713</span></span>
 <span><span class="co">#&gt; CV h=3   6.904946 6.662531</span></span>
-<span><span class="op">(</span><span class="va">mcpfc_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">mcpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">acmcpfc_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">acmcpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       h=1       h=2       h=3 </span></span>
 <span><span class="co">#&gt; 0.9437500 0.9473684 0.9447236</span></span>
-<span><span class="op">(</span><span class="va">mcpfc_wid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/width.html">width</a></span><span class="op">(</span><span class="va">mcpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">acmcpfc_wid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/width.html">width</a></span><span class="op">(</span><span class="va">acmcpfc</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Mean width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
 <span><span class="co">#&gt; 4.134144 5.601782 5.796113 </span></span>
@@ -330,10 +330,10 @@ ahead forecast error and past errors.</p>
 <div class="section level2">
 <h2 id="coverage-and-width-of-prediction-intervals">Coverage and width of prediction intervals<a class="anchor" aria-label="anchor" href="#coverage-and-width-of-prediction-intervals"></a>
 </h2>
-<p>Taking the MCP result as an example, we now show the average coverage
-on validation sets.</p>
+<p>Taking the AcMCP result as an example, we now show the average
+coverage on validation sets.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mcpfc_cov</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">acmcpfc_cov</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>horizon <span class="op">=</span> <span class="va">key</span>, coverage <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/update_tsibble.html" class="external-link">update_tsibble</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">horizon</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -343,13 +343,13 @@ on validation sets.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0.95</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">horizon</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean coverage for MCP"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean coverage for AcMCP"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/covplot-1.png" width="672"></p>
 <p>We can also show the rolling average interval width on validation
 sets.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mcpfc_wid</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">acmcpfc_wid</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>horizon <span class="op">=</span> <span class="va">key</span>, width <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/update_tsibble.html" class="external-link">update_tsibble</a></span><span class="op">(</span>key <span class="op">=</span> <span class="va">horizon</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -358,14 +358,14 @@ sets.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">horizon</span><span class="op">~</span><span class="va">.</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean width for MCP"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean width for AcMCP"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/widplot-1.png" width="672"></p>
 <p>We can also combine all the results and show them in one single
 plot.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fc"</span>, <span class="st">"scpfc"</span>, <span class="st">"scpfc_exp"</span>, <span class="st">"acpfc"</span>, <span class="st">"pidfc_nsf"</span>, <span class="st">"pidfc"</span>, <span class="st">"mcpfc"</span><span class="op">)</span></span>
-<span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AR"</span>, <span class="st">"SCP"</span>, <span class="st">"WCP"</span>, <span class="st">"ACP"</span>, <span class="st">"PI"</span>, <span class="st">"PID"</span>, <span class="st">"MCP"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fc"</span>, <span class="st">"scpfc"</span>, <span class="st">"scpfc_exp"</span>, <span class="st">"acpfc"</span>, <span class="st">"pidfc_nsf"</span>, <span class="st">"pidfc"</span>, <span class="st">"acmcpfc"</span><span class="op">)</span></span>
+<span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AR"</span>, <span class="st">"SCP"</span>, <span class="st">"WCP"</span>, <span class="st">"ACP"</span>, <span class="st">"PI"</span>, <span class="st">"PID"</span>, <span class="st">"AcMCP"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_cov"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">out_pivot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
@@ -386,7 +386,7 @@ plot.</p>
 <span>  <span class="st">"ACP"</span> <span class="op">=</span> <span class="st">"green"</span>,</span>
 <span>  <span class="st">"PI"</span> <span class="op">=</span> <span class="st">"blue"</span>,</span>
 <span>  <span class="st">"PID"</span> <span class="op">=</span> <span class="st">"purple"</span>,</span>
-<span>  <span class="st">"MCP"</span> <span class="op">=</span> <span class="st">"red"</span></span>
+<span>  <span class="st">"AcMCP"</span> <span class="op">=</span> <span class="st">"red"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">cov</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">index</span>, key <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">horizon</span>, <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -429,21 +429,21 @@ plot.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> h=1     ACP      0.949    5.04  4.86 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> h=1     PI       0.944    5.12  4.95 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> h=1     PID      0.939    7.13  6.89 -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">2</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> h=1     MCP      0.944    5.16  4.98 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> h=1     AcMCP    0.944    5.16  4.98 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> h=2     AR       0.942    6.25  6.09 -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">84</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> h=2     SCP      0.947    6.53  6.30 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> h=2     WCP      0.955    6.56  6.34  0.004<span style="text-decoration: underline;">89</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> h=2     ACP      0.950    6.64  6.42 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">125</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> h=2     PI       0.946    6.76  6.53 -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">88</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> h=2     PID      0.941    9.34  9.03 -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">90</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> h=2     MCP      0.947    6.66  6.44 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> h=2     AcMCP    0.947    6.66  6.44 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> h=3     AR       0.935    6.27  6.11 -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> h=3     SCP      0.940    6.64  6.40 -<span style="color: #BB0000;">0.010</span><span style="color: #BB0000; text-decoration: underline;">3</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> h=3     WCP      0.948    6.62  6.38 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">51</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> h=3     ACP      0.950    6.79  6.55 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">251</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> h=3     PI       0.945    6.96  6.72 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> h=3     PID      0.941   10.0   9.71 -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">05</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> h=3     MCP      0.945    6.90  6.66 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> h=3     AcMCP    0.945    6.90  6.66 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_wid"</span><span class="op">)</span><span class="op">)</span></span>

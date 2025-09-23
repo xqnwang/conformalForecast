@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">conformal</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'cvforecast'</span></span>
-<span><span class="fu">conformal</span><span class="op">(</span><span class="va">object</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scp"</span>, <span class="st">"acp"</span>, <span class="st">"pid"</span>, <span class="st">"mcp"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">conformal</span><span class="op">(</span><span class="va">object</span>, method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scp"</span>, <span class="st">"acp"</span>, <span class="st">"pid"</span>, <span class="st">"acmcp"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,7 +64,7 @@ See the results of a call to <code><a href="cvforecast.html">cvforecast</a></cod
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>A character string specifying the conformal method to be applied.
 Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>"acp"</code>(<a href="acp.html">acp</a>),
-<code>"pid"</code>(<a href="pid.html">pid</a>), and <code>"mcp"</code>(<a href="mcp.html">mcp</a>).</p></dd>
+<code>"pid"</code>(<a href="pid.html">pid</a>), and <code>"acmcp"</code>(<a href="acmcp.html">acmcp</a>).</p></dd>
 
 </dl></div>
 
@@ -101,14 +101,14 @@ Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.654117 2.487968</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.277334 2.372208 -2.406386 4.071168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.638340 2.038650 -2.533676 3.914606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -0.08437476 -1.1244676 1.159050 -1.593417 3.005021</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.46523697 -0.9041538 2.450771 -1.569012 3.372274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.61204279 -0.6261994 2.634302 -1.480779 3.585074</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 0.958 1.45 1.086 32.966 206.131 0.898 0.808      5.818   5.466</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE      MPE     MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.942 1.418 1.062 -3267.96 3527.809 0.972 0.869      5.802   5.954</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># ACP with asymmetric nonconformity scores and rolling calibration sets</span></span></span>
 <span class="r-in"><span><span class="va">acpfc</span> <span class="op">&lt;-</span> <span class="fu">conformal</span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"acp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, gamma <span class="op">=</span> <span class="fl">0.005</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -131,14 +131,14 @@ Possible options include <code>"scp"</code> (<a href="scp.html">scp</a>), <code>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.594486 2.385765</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.524677 2.256811 -2.470486 4.071168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.911503 1.973047 -2.767959 4.273610</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -0.08437476 -1.1244676 1.116326 -1.593417 2.142659</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.46523697 -0.9363703 2.513404 -2.106567 3.372274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.61204279 -0.6708841 2.739924 -1.824936 3.585074</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 0.958 1.45 1.086 32.966 206.131 0.898 0.808        Inf     Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE  RMSE      MPE     MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.942 1.418 1.062 -3267.96 3527.809 0.972 0.869      5.985   6.138</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

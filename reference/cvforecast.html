@@ -11,7 +11,7 @@ rolling forecast origin."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -199,10 +199,10 @@ be \(y_{T-1}\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80      Hi 80     Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -1.68767994 -2.9404221 -0.4349377 -3.603584 0.2282239</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.05350847 -1.4796974  1.5867144 -2.291328 2.3983445</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.77860922 -0.7547002  2.3119186 -1.566385 3.1236036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.06724377 -1.316412 1.450899 -2.048875 2.183363</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.06194713 -1.670696 1.794590 -2.587901 2.711796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.10006880 -1.660370 1.860508 -2.592290 2.792428</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -213,14 +213,14 @@ be \(y_{T-1}\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 901 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80      Hi 80     Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001    -1.68767994 -2.9404221 -0.4349377 -3.603584 0.2282239</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.05350847 -1.4796974  1.5867144 -2.291328 2.3983445</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.77860922 -0.7547002  2.3119186 -1.566385 3.1236036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.06724377 -1.316412 1.450899 -2.048875 2.183363</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     0.06194713 -1.670696 1.794590 -2.587901 2.711796</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     0.10006880 -1.660370 1.860508 -2.592290 2.792428</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE MSE  RMSE    MPE   MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.031 0.967 1.5 1.088 90.954 238.48 0.913 0.819      5.797   5.476</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE      MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.002 0.968 1.521 1.097 -100.684 560.118 0.908 0.815      6.032   5.654</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example with exogenous predictors</span></span></span>
 <span class="r-in"><span><span class="va">far2_xreg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span>, <span class="va">xreg</span>, <span class="va">newxreg</span><span class="op">)</span> <span class="op">{</span></span></span>

@@ -9,7 +9,7 @@ applying the adaptive conformal prediction (ACP) method."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -215,10 +215,10 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast        Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.0539540  0.004453064 2.440103 -1.087270 2.818947</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.5349292 -1.224282884 2.019732 -1.623107 3.689843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1518494 -1.844293650 1.436928 -2.251227 2.951343</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.594486 2.385765</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.524677 2.256811 -2.470486 4.071168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.911503 1.973047 -2.767959 4.273610</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -238,14 +238,14 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast        Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      1.0539540  0.004453064 2.440103 -1.087270 2.818947</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.5349292 -1.224282884 2.019732 -1.623107 3.689843</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1518494 -1.844293650 1.436928 -2.251227 2.951343</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4453288 -1.053333 1.872872 -1.594486 2.385765</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002      0.7259593 -1.524677 2.256811 -2.470486 4.071168</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003      0.4654608 -1.911503 1.973047 -2.767959 4.273610</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.01 0.922 1.339 1.035 187.692 359.329 0.898 0.815        Inf     Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 0.958 1.45 1.086 32.966 206.131 0.898 0.808        Inf     Inf</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
