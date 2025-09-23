@@ -26,18 +26,18 @@
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
-#' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+#' series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 #'
 #' # Cross-validation forecasting
 #' far2 <- function(x, h, level) {
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
-#'                  forward = TRUE, initial = 1, window = 100)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
+#'                  forward = TRUE, initial = 1, window = 50)
 #'
 #' # Classical conformal prediction with equal weights
-#' scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 100, rolling = TRUE)
+#' scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 50, rolling = TRUE)
 #'
 #' # Update conformal prediction using newly available data
 #' scpfc_update <- update(scpfc, forecastfun = far2, new_data = c(1.5, 0.8, 2.3))

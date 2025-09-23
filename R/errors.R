@@ -234,15 +234,15 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
-#' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+#' series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 #'
-#' # Cross-validation forecasting with a rolling window of length 100
+#' # Cross-validation forecasting with a rolling window
 #' far2 <- function(x, h, level) {
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
-#'                  forward = TRUE, initial = 1, window = 100)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
+#'                  forward = TRUE, initial = 1, window = 50)
 #'
 #' # Out-of-sample forecast accuracy on validation set
 #' accuracy(fc, measures = point_measures, byhorizon = TRUE)

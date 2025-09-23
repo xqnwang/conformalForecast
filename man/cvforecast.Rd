@@ -98,15 +98,15 @@ be \eqn{y_{T-1}}.
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
-series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
-# Example with a rolling window of length 100
+# Example with a rolling window
 far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
-                 forward = TRUE, initial = 1, window = 100)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
+                 forward = TRUE, initial = 1, window = 50)
 print(fc)
 summary(fc)
 
@@ -115,8 +115,8 @@ far2_xreg <- function(x, h, level, xreg, newxreg) {
   Arima(x, order=c(2, 0, 0), xreg = xreg) |>
     forecast(h = h, level = level, xreg = newxreg)
 }
-fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = c(80, 95),
-                      forward = TRUE, xreg = matrix(rnorm(2006), ncol = 2, nrow = 1003),
-                      initial = 1, window = 100)
+fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = 95,
+                      forward = TRUE, xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
+                      initial = 1, window = 50)
 
 }

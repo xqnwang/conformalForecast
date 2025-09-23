@@ -72,24 +72,24 @@
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
-#' series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+#' series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 #'
 #' # Cross-validation forecasting
 #' far2 <- function(x, h, level) {
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
-#'                  forward = TRUE, initial = 1, window = 100)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
+#'                  forward = TRUE, initial = 1, window = 50)
 #'
 #' # AcMCP setup
-#' Tg <- 1000; delta <- 0.01
+#' Tg <- 200; delta <- 0.01
 #' Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
 #' KI <- 2
 #' lr <- 0.1
 #'
 #' # AcMCP with integrator and scorecaster
-#' acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE,
+#' acmcpfc <- acmcp(fc, ncal = 50, rolling = TRUE,
 #'              integrate = TRUE, scorecast = TRUE,
 #'              lr = lr, KI = KI, Csat = Csat)
 #' print(acmcpfc)
