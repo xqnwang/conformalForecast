@@ -13,7 +13,7 @@ Description: Methods and tools for performing multistep-ahead time series
     forecasting using conformal prediction methods including classical
     conformal prediction, adaptive conformal prediction, conformal PID
     control, and autocorrelated multistep-ahead conformal prediction.
-    The methods were described by Wang and Hyndman (2024) <arXiv:2410.13115>.
+    The methods were described by Wang and Hyndman (2024) <doi:10.48550/arXiv.2410.13115>.
 License: GPL-3
 URL: https://github.com/xqnwang/conformalForecast, https://xqnwang.github.io/conformalForecast/
 BugReports: https://github.com/xqnwang/conformalForecast/issues
@@ -36,3 +36,5 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
+Depends: 
+    R (>= 4.1.0)
