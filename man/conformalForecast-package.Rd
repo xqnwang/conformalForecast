@@ -4,9 +4,9 @@
 \name{conformalForecast-package}
 \alias{conformalForecast}
 \alias{conformalForecast-package}
-\title{conformalForecast: Conformal Prediction Methods for Multistep-ahead Time Series Forecasting}
+\title{conformalForecast: Conformal Prediction Methods for Multistep-Ahead Time Series Forecasting}
 \description{
-Methods and tools for performing multistep-ahead time series forecasting using conformal prediction methods including classical conformal prediction, adaptive conformal prediction, conformal PID control, and autocorrelated multistep-ahead conformal prediction. The methods were described by Wang and Hyndman (2024) \href{https://arxiv.org/abs/2410.13115}{arXiv:2410.13115}
+Methods and tools for performing multistep-ahead time series forecasting using conformal prediction methods including classical conformal prediction, adaptive conformal prediction, conformal PID control, and autocorrelated multistep-ahead conformal prediction. The methods were described by Wang and Hyndman (2024) \href{https://arxiv.org/abs/2410.13115}{arXiv:2410.13115}.
 }
 \seealso{
 Useful links:
