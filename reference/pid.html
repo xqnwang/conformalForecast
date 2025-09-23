@@ -240,10 +240,10 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.8089014 -2.025371 1.009153 -2.070359 1.701787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.6209920 -1.314295 2.326066 -2.792548 2.502585</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1819397 -1.380323 2.332600 -2.568855 2.949366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4724991 -0.7198562 1.896926 -1.702476 2.420515</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2928721 -1.8137613 1.653398 -3.248808 2.292659</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.4499592 -2.2744118 1.210475 -3.064869 1.723912</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -255,14 +255,14 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times = 898 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     -0.8089014 -2.025371 1.009153 -2.070359 1.701787</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.6209920 -1.314295 2.326066 -2.792548 2.502585</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.1819397 -1.380323 2.332600 -2.568855 2.949366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001      0.4724991 -0.7198562 1.896926 -1.702476 2.420515</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002     -0.2928721 -1.8137613 1.653398 -3.248808 2.292659</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003     -0.4499592 -2.2744118 1.210475 -3.064869 1.723912</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.026 0.962 1.447 1.08 181.661 264.517 0.934 0.827      5.994   5.903</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ME  MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.006 1.01 1.596 1.137 62.342 258.699 0.932 0.835      6.421   5.884</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># PID with a Naive model for the scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">naivefun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span></span>

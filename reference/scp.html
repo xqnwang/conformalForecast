@@ -235,10 +235,10 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.08588534 -1.061028 1.352839 -1.508918 2.648919</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.12507106 -1.417928 1.728357 -2.041341 2.877124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.19580845 -1.512955 1.607427 -2.216183 2.731212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     1.13878107 -0.2512587 2.402811 -0.7557084 3.318682</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.01830376 -2.0100360 1.666569 -2.9495023 2.661308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.62191623 -2.5902655 1.109107 -3.4968756 1.936869</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -256,14 +256,14 @@ Then the prediction intervals will be
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80    Hi 80     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     0.08588534 -1.061028 1.352839 -1.508918 2.648919</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.12507106 -1.417928 1.728357 -2.041341 2.877124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.19580845 -1.512955 1.607427 -2.216183 2.731212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001     1.13878107 -0.2512587 2.402811 -0.7557084 3.318682</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002    -0.01830376 -2.0100360 1.666569 -2.9495023 2.661308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003    -0.62191623 -2.5902655 1.109107 -3.4968756 1.936869</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.007 0.953 1.452 1.075 42.022 228.939 0.916 0.825      5.936   5.673</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV  0 1.014 1.61 1.142 61.442 261.189 0.947 0.848      6.299   5.824</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Classical conformal prediction with exponential weights</span></span></span>
 <span class="r-in"><span><span class="va">expweight</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span></span>

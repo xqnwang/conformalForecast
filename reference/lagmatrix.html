@@ -70,23 +70,23 @@ a length equal to the number of columns of <code>x</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create lags of a matrix</span></span></span>
 <span class="r-in"><span><span class="fu">lagmatrix</span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]      [,3]      [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  0.5937553         NA        NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.1486926  1.1892520        NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.5805002  0.3786405  2.221341        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.6968124 -0.1954181 -1.157051 0.3630778</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -0.1894449 -1.4826255  1.070486 0.9048346</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]         [,2]       [,3]       [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.7099464           NA         NA         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.6107264 -0.443291873         NA         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.9340976  0.001105352 -0.1351786         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -1.2536334  0.074341324  1.1780870  1.0630998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.2914462 -0.589520946 -1.5235668 -0.3041839</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create leads of a matrix</span></span></span>
 <span class="r-in"><span><span class="fu">lagmatrix</span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]       [,4]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  0.5937553  0.3786405  1.0704862 -0.2215526</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.1486926 -0.1954181  1.2460614  0.4538506</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.5805002 -1.4826255 -0.2497968         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.6968124 -0.8725588         NA         NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -0.1894449         NA         NA         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]         [,2]       [,3]       [,4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.7099464  0.001105352 -1.5235668  0.2670988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.6107264  0.074341324  0.5939462 -0.5425200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.9340976 -0.589520946  0.3329504         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -1.2536334 -0.568668733         NA         NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.2914462           NA         NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span></span></span>

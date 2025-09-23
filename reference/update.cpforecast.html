@@ -79,6 +79,13 @@ the <code>xreg</code> argument in <code>object</code>.</p></dd>
 <dd><p>Other arguments are passed to <code>forecastfun</code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A refreshed object of class <code>"cpforecast"</code> with updated fields (e.g.,
+<code>x</code>, <code>MEAN</code>, <code>ERROR</code>, <code>LOWER</code>, <code>UPPER</code>, and any
+method-specific components), reflecting newly appended data and re-computed
+cross-validation forecasts and conformal prediction intervals.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -118,10 +125,10 @@ the <code>xreg</code> argument in <code>object</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80     Hi 80      Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1004      1.3625153  0.304457 2.3975663 -0.5079623 3.656607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1005      0.2204378 -1.266030 1.5764205 -2.3797319 2.656815</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1006     -0.2918833 -1.655931 0.9410916 -2.8300024 2.312757</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1004      1.4311355  0.2326921 3.137519 -0.6226506 3.906162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1005     -0.1419406 -2.2170484 1.897396 -2.8675195 2.959082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1006     -0.9772612 -2.8894833 1.076199 -3.4553026 2.321411</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">scpfc_update</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -141,14 +148,14 @@ the <code>xreg</code> argument in <code>object</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times =  (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast     Lo 80     Hi 80      Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1004      1.3625153  0.304457 2.3975663 -0.5079623 3.656607</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1005      0.2204378 -1.266030 1.5764205 -2.3797319 2.656815</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1006     -0.2918833 -1.655931 0.9410916 -2.8300024 2.312757</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Point Forecast      Lo 80    Hi 80      Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1004      1.4311355  0.2326921 3.137519 -0.6226506 3.906162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1005     -0.1419406 -2.2170484 1.897396 -2.8675195 2.959082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1006     -0.9772612 -2.8894833 1.076199 -3.4553026 2.321411</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.002 0.996 1.599 1.123 -50.51 601.622 0.941 0.847      6.194   5.859</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE  MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.003 1.032 1.68 1.162 68.131 305.946 0.967 0.855      6.207   5.822</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
