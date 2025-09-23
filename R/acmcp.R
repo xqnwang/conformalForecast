@@ -1,7 +1,7 @@
-#' Multistep-ahead conformal prediction method
+#' Autocorrelated multistep-ahead conformal prediction method
 #'
-#' Compute prediction intervals and other information by applying the
-#' multistep-ahead conformal prediction (AcMCP) method. The method can only
+#' Compute prediction intervals and other information by applying the Autocorrelated
+#' Multistep-ahead Conformal Prediction (AcMCP) method. The method can only
 #' deal with asymmetric nonconformity scores, i.e., forecast errors.
 #'
 #' Similar to the PID method, the AcMCP method also integrates three modules (P, I, and D) to
