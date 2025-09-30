@@ -1,7 +1,7 @@
 #' Conformal PID control method
 #'
 #' Compute prediction intervals and other information by
-#' applying the conformal PID control method.
+#' applying the conformal PID (Proportional-Integral-Derivative) control method.
 #'
 #' The PID method combines three modules to make the final iteration:
 #' \deqn{q_{t+h|t}=\underbrace{q_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h}-\alpha)}_{\mathrm{P}}+\underbrace{r_t\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\mathrm{I}}+\underbrace{\hat{s}_{t+h|t}}_{\mathrm{D}}}

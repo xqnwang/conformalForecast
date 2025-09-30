@@ -99,7 +99,7 @@ about the forecasts generated using all available observations.
 }
 \description{
 Compute prediction intervals and other information by
-applying the conformal PID control method.
+applying the conformal PID (Proportional-Integral-Derivative) control method.
 }
 \details{
 The PID method combines three modules to make the final iteration:
