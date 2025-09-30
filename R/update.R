@@ -69,8 +69,26 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
 
   # Info required for model fitting
   cvcall <- object$model$cvforecast$call
-  initial <- eval(get_call_arg_with_defaults(cvforecast, cvcall, "initial"), .GlobalEnv)
-  window <- eval(get_call_arg_with_defaults(cvforecast, cvcall, "window"), .GlobalEnv)
+  call_env <- attr(cvcall, ".Environment")
+  if (is.null(call_env) || !is.environment(call_env)) {
+    # fall back to the package namespace of cvforecast
+    call_env <- environment(cvforecast)
+    if (is.null(call_env) || !is.environment(call_env)) {
+      call_env <- parent.frame()
+    }
+  }
+  .get_arg_value <- function(fun, call, name, env) {
+    al <- as.list(call)
+    if (!is.null(al[[name]])) {
+      eval(al[[name]], envir = env)
+    } else {
+      # evaluate default from the function's formals in the function's env
+      fml <- formals(fun)[[name]]
+      eval(fml, envir = environment(fun))
+    }
+  }
+  initial <- .get_arg_value(cvforecast, cvcall, "initial", call_env)
+  window  <- .get_arg_value(cvforecast, cvcall, "window",  call_env)
 
   # Model fitting and forecasting
   nfirst <- ifelse(forward, length(object$x) + 1L, length(object$x))
@@ -124,7 +142,7 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
   # Update object info for conformal
   object$x <- x
   if (!is.null(xreg)) object$xreg <- xreg
-  if (forward) object$mean <- fc$mean
+  if (forward && exists("fc")) object$mean <- fc$mean
   object$MEAN <- MEAN
   object$ERROR <- ERROR
   object$LOWER <- LOWER
