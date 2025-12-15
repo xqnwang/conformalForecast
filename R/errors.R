@@ -255,11 +255,9 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #' @importFrom stats frequency tsp window
 #' @importFrom rlang dots_list
 #' @export
-accuracy.default <- function(object, x, CV = TRUE, period = NULL,
+accuracy.cvforecast <- function(object, x, CV = TRUE, period = NULL,
                              measures = interval_measures,
                              byhorizon = FALSE, ...) {
-  if (!any(is.element(class(object), c("cvforecast", "cpforecast"))))
-    stop(paste("no accuracy method found for an object of class",class(object)))
   if (!is.list(measures))
     stop("the `measures` argument must contain a list of accuracy measures")
 
@@ -397,3 +395,10 @@ accuracy.default <- function(object, x, CV = TRUE, period = NULL,
   out <- rbind(cvout, testout)
   return(out)
 }
+
+#' @rdname accuracy.cvforecast
+#' @export
+accuracy.cpforecast <- function(object, ...) {
+  accuracy.cvforecast(object, ...)
+}
+
