@@ -1,0 +1,115 @@
+# conformalForecast
+
+The R package *conformalForecast* provides methods and tools for
+performing multistep-ahead time series forecasting using conformal
+prediction methods including classical conformal prediction, adaptive
+conformal prediction, conformal PID control, and autocorrelated
+multistep-ahead conformal prediction.
+
+## Installation
+
+You can install the development version of conformalForecast from
+[GitHub](https://github.com/xqnwang/conformalForecast) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("xqnwang/conformalForecast")
+```
+
+You can also get the official release version from CRAN:
+
+``` r
+install.packages("conformalForecast")
+```
+
+## Example
+
+This is a basic example which shows you how to perform a classical
+conformal prediction method:
+
+``` r
+library(conformalForecast)
+library(forecast)
+
+# Simulate time series from an AR(2) model
+series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+
+# Time series cross-validation
+far2 <- function(x, h, level) {
+  Arima(x, order = c(2, 0, 0)) |>
+    forecast(h = h, level)
+}
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
+                 forward = TRUE, initial = 1, window = 100)
+
+# Classical conformal prediction
+scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE)
+
+# Interval forecast accuracy
+accuracy(scpfc, byhorizon = TRUE)
+
+# Mean coverage
+coverage(scpfc, window = 500, level = 95)
+
+# Mean and median interval width
+width(scpfc, window = 500, level = 95, includemedian = TRUE)
+```
+
+## License
+
+This package is free and open source software, licensed under GPL-3.
+
+# Package index
+
+## All functions
+
+- [`accuracy(`*`<cvforecast>`*`)`](https://xqnwang.github.io/conformalForecast/reference/accuracy.cvforecast.md)
+  [`accuracy(`*`<cpforecast>`*`)`](https://xqnwang.github.io/conformalForecast/reference/accuracy.cvforecast.md)
+  : Accuracy measures for a cross-validation model and a conformal
+  prediction model
+- [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)
+  : Autocorrelated multistep-ahead conformal prediction method
+- [`acp()`](https://xqnwang.github.io/conformalForecast/reference/acp.md)
+  : Adaptive conformal prediction method
+- [`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md)
+  : Conformal prediction
+- [`conformalForecast`](https://xqnwang.github.io/conformalForecast/reference/conformalForecast-package.md)
+  [`conformalForecast-package`](https://xqnwang.github.io/conformalForecast/reference/conformalForecast-package.md)
+  : conformalForecast: Conformal Prediction Methods for Multistep-Ahead
+  Time Series Forecasting
+- [`coverage()`](https://xqnwang.github.io/conformalForecast/reference/coverage.md)
+  : Calculate interval forecast coverage
+- [`cvforecast()`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
+  : Time series cross-validation forecasting
+- [`MSIS()`](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)
+  [`winkler_score()`](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)
+  [`interval_measures`](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)
+  : Interval estimate accuracy measures
+- [`lagmatrix()`](https://xqnwang.github.io/conformalForecast/reference/lagmatrix.md)
+  : Create lags or leads of a matrix
+- [`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md)
+  : Conformal PID control method
+- [`ME()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`MAE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`MSE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`RMSE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`MPE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`MAPE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`MASE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`RMSSE()`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  [`point_measures`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+  : Point estimate accuracy measures
+- [`scp()`](https://xqnwang.github.io/conformalForecast/reference/scp.md)
+  : Classical split conformal prediction method
+- [`update(`*`<cpforecast>`*`)`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+  : Update and repeform cross-validation forecasting and conformal
+  prediction
+- [`width()`](https://xqnwang.github.io/conformalForecast/reference/width.md)
+  : Calculate interval forecast width
+
+# Articles
+
+### All vignettes
+
+- [Introduction to
+  conformalForecast](https://xqnwang.github.io/conformalForecast/articles/conformalForecast.md):
