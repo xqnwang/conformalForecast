@@ -9,7 +9,7 @@ applying the conformal PID (Proportional-Integral-Derivative) control method."><
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -262,7 +262,7 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.144 0.979 1.508 1.105 -89.391 522.845 0.993 0.866      6.066   5.969</span>
 <span class="r-in"><span><span class="co"># PID with a Naive model for the scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">naivefun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/naive.html" class="external-link">naive</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/forecast.rw_model.html" class="external-link">naive</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">pidfc</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>             integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>, scorecastfun <span class="op">=</span> <span class="va">naivefun</span>,</span></span>
