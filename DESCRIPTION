@@ -1,6 +1,6 @@
 Package: conformalForecast
 Title: Conformal Prediction Methods for Multistep-Ahead Time Series Forecasting
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Xiaoqian", "Wang", , "Xiaoqian.Wang@amss.ac.cn",
            role = c("aut", "cre", "cph"),
