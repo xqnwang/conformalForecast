@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   conformalForecast: conformalForecast.html
-last_built: 2026-01-15T08:22Z
+last_built: 2026-01-15T08:25Z
 urls:
   reference: https://xqnwang.github.io/conformalForecast/reference
   article: https://xqnwang.github.io/conformalForecast/articles
