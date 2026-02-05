@@ -2,6 +2,8 @@
 
 ## conformalForecast 0.1.1
 
+CRAN release: 2026-01-15
+
 - Changed accuracy.default to use S3 methods
 
 ## conformalForecast 0.1.0
