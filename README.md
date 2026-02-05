@@ -24,6 +24,8 @@ install.packages("conformalForecast")
 
 ## Example
 
+For a detailed tutorial and examples, please see the [vignette](https://xqnwang.github.io/conformalForecast/articles/conformalForecast.html).
+
 This is a basic example which shows you how to perform a classical conformal prediction method:
 
 ``` r
