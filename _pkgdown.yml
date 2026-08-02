@@ -1,4 +1,5 @@
 url: https://xqnwang.github.io/conformalForecast/
 template:
   bootstrap: 5
+  math-rendering: mathjax
 
