@@ -18,8 +18,10 @@ Description: Methods and tools for performing multistep-ahead time series
 License: GPL-3
 URL: https://github.com/xqnwang/conformalForecast, https://xqnwang.github.io/conformalForecast/
 BugReports: https://github.com/xqnwang/conformalForecast/issues
+Depends:
+    R (>= 4.1.0)
+    forecast
 Imports:
-    forecast,
     ggdist,
     rlang,
     stats,
