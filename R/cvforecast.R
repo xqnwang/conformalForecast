@@ -283,12 +283,20 @@ cvforecast <- function(
   out$forward <- forward
   # The final forecasting model output if forward is TRUE
   if (forward) {
-    out$mean <- fc$mean
-    if (!is.null(level)) {
-      out$lower <- fc$lower
-      out$upper <- fc$upper
+    if (inherits(fc, "try-error")) {
+      warning(
+        "the final (forward) model fit failed; `mean`, `lower`, `upper` ",
+        "and `model` are not available",
+        call. = FALSE
+      )
+    } else {
+      out$mean <- fc$mean
+      if (!is.null(level)) {
+        out$lower <- fc$lower
+        out$upper <- fc$upper
+      }
+      out$model <- fc$model
     }
-    out$model <- fc$model
   }
 
   return(structure(out, class = c("cvforecast", "forecast")))
