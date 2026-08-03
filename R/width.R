@@ -64,21 +64,31 @@ width <- function(
   dots <- rlang::dots_list(...)
   if (missing(object)) {
     if (any(!(c("LOWER", "UPPER") %in% names(dots)))) {
-      stop("LOWER, and UPPER are required for interval width calculation")
+      stop("LOWER, and UPPER are required for coverage calculation")
+    }
+    lower <- dots$LOWER
+    upper <- dots$UPPER
+    if (is.list(lower)) {
+      lower <- lower[[paste0(level, "%")]]
+    }
+    if (is.list(upper)) {
+      upper <- upper[[paste0(level, "%")]]
     }
   } else {
     if (any(!(c("LOWER", "UPPER") %in% names(object)))) {
-      stop("LOWER, and UPPER are required for interval width calculation")
+      stop("LOWER, and UPPER are required for coverage calculation")
     }
     if (!(level %in% object$level)) {
       stop("no interval forecasts of target confidence level in object")
     }
     levelname <- paste0(level, "%")
-    LOWER <- object$LOWER[[levelname]]
-    UPPER <- object$UPPER[[levelname]]
+    lower <- object$LOWER[[levelname]]
+    upper <- object$UPPER[[levelname]]
   }
-  lower <- LOWER
-  upper <- UPPER
+
+  if (ncol(lower) != ncol(upper)) {
+    stop("LOWER and UPPER should have the same number of columns")
+  }
   horizon <- ncol(lower)
   period <- frequency(lower)
 
