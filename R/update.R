@@ -1,4 +1,4 @@
-#' Update and repeform cross-validation forecasting and conformal prediction
+#' Update and reperform cross-validation forecasting and conformal prediction
 #'
 #' Update conformal prediction intervals and other information by applying the
 #' \code{cvforecast} and \code{conformal} functions.
