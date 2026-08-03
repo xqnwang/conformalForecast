@@ -158,8 +158,13 @@ scp <- function(
   horizon <- ncol(pf)
   n <- nrow(pf)
 
-  if (ncal > nrow(errors)) {
-    stop("`ncal` is larger than the number of rows in object$ERROR")
+  if (ncal + horizon - 1L > nrow(errors) - !object$forward) {
+    stop(
+      "`ncal` is too large: `ncal + h - 1` must not exceed ",
+      nrow(errors) - !object$forward,
+      " for h = ",
+      horizon
+    )
   }
 
   namatrix <- ts(
