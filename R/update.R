@@ -45,7 +45,13 @@
 #' summary(scpfc_update)
 #'
 #' @export
-update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ...) {
+update.cpforecast <- function(
+  object,
+  new_data,
+  forecastfun,
+  new_xreg = NULL,
+  ...
+) {
   level <- object$level
   alpha <- 1 - level / 100
   h <- dim(object$MEAN)[2]
@@ -53,16 +59,24 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
 
   # Append new data
   n_new <- length(new_data)
-  x <- ts(c(object$x, new_data), start = start(object$x), frequency = frequency(object$x))
+  x <- ts(
+    c(object$x, new_data),
+    start = start(object$x),
+    frequency = frequency(object$x)
+  )
   if (!is.null(new_xreg) & ("xreg" %in% names(object))) {
-    if(!is.numeric(new_xreg))
+    if (!is.numeric(new_xreg)) {
       stop("'new_xreg' should be a numeric matrix or a numeric vector")
+    }
     new_xreg <- as.matrix(new_xreg)
-    if (nrow(new_xreg) != n_new)
+    if (nrow(new_xreg) != n_new) {
       stop("the size of 'new_xreg' must match that of 'new_data'")
-    xreg <- ts(rbind(object$xreg, new_xreg),
-               start = start(object$xreg),
-               frequency = frequency(object$xreg))
+    }
+    xreg <- ts(
+      rbind(object$xreg, new_xreg),
+      start = start(object$xreg),
+      frequency = frequency(object$xreg)
+    )
   } else {
     xreg <- NULL
   }
@@ -88,7 +102,7 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
     }
   }
   initial <- .get_arg_value(cvforecast, cvcall, "initial", call_env)
-  window  <- .get_arg_value(cvforecast, cvcall, "window",  call_env)
+  window <- .get_arg_value(cvforecast, cvcall, "window", call_env)
 
   # Model fitting and forecasting
   nfirst <- ifelse(forward, length(object$x) + 1L, length(object$x))
@@ -112,24 +126,39 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
     x_subset <- subset(
       x,
       start = ifelse(is.null(window), 1L, i - window + 1L),
-      end = i)
+      end = i
+    )
     if (is.null(xreg)) {
-      fc <- try(suppressWarnings(
-        forecastfun(x_subset, h = h, level = level, ...)
-      ), silent = TRUE)
+      fc <- try(
+        suppressWarnings(
+          forecastfun(x_subset, h = h, level = level, ...)
+        ),
+        silent = TRUE
+      )
     } else {
       xreg_subset <- subset(
         xreg,
         start = ifelse(is.null(window), 1L, i - window + 1L),
-        end = i)
+        end = i
+      )
       xreg_future <- subset(
         xreg,
         start = i + 1L,
-        end = i + h)
-      fc <- try(suppressWarnings(
-        forecastfun(x_subset, h = h, level = level,
-                    xreg = xreg_subset, newxreg = xreg_future, ...)
-      ), silent = TRUE)
+        end = i + h
+      )
+      fc <- try(
+        suppressWarnings(
+          forecastfun(
+            x_subset,
+            h = h,
+            level = level,
+            xreg = xreg_subset,
+            newxreg = xreg_future,
+            ...
+          )
+        ),
+        silent = TRUE
+      )
     }
 
     if (!is.element("try-error", class(fc))) {
@@ -137,24 +166,32 @@ update.cpforecast <- function(object, new_data, forecastfun, new_xreg = NULL, ..
       MEAN[cbind(tm + 1:h, 1:h)] <- fc$mean
     }
   }
-  ERROR[(nrow(ERROR)-n_new+1):nrow(ERROR),] <- new_data - MEAN[(nrow(ERROR)-n_new+1):nrow(ERROR),]
+  ERROR[(nrow(ERROR) - n_new + 1):nrow(ERROR), ] <- new_data -
+    MEAN[(nrow(ERROR) - n_new + 1):nrow(ERROR), ]
 
   # Update object info for conformal
   object$x <- x
-  if (!is.null(xreg)) object$xreg <- xreg
-  if (forward && exists("fc")) object$mean <- fc$mean
+  if (!is.null(xreg)) {
+    object$xreg <- xreg
+  }
+  if (forward && exists("fc")) {
+    object$mean <- fc$mean
+  }
   object$MEAN <- MEAN
   object$ERROR <- ERROR
   object$LOWER <- LOWER
   object$UPPER <- UPPER
   object$forward <- forward
   if (object$method == "acp") {
-    object$model$alpha_update <- lapply(object$model$alpha_update, function(alp){
-      lapply(alp, function(lv){
-        rbind(lv, matrix(NA, nrow = n_new, ncol = h)) |>
-          ts(start = start(lv), frequency = frequency(lv))
-      })
-    })
+    object$model$alpha_update <- lapply(
+      object$model$alpha_update,
+      function(alp) {
+        lapply(alp, function(lv) {
+          rbind(lv, matrix(NA, nrow = n_new, ncol = h)) |>
+            ts(start = start(lv), frequency = frequency(lv))
+        })
+      }
+    )
   }
 
   # Conformal prediction
