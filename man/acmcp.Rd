@@ -62,10 +62,10 @@ previous call and only the newly added time steps are computed; the
 prediction intervals produced earlier are carried over unchanged. Set by
 \code{\link{update.cpforecast}} and not normally set by hand.}
 
-\item{...}{Other arguments are passed to the function.}
+\item{...}{Not used.}
 }
 \value{
-A list of class \code{c("acmcp", "cpforecast", "forecast")}
+A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}

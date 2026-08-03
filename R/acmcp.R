@@ -41,7 +41,7 @@
 #' previous call and only the newly added time steps are computed; the
 #' prediction intervals produced earlier are carried over unchanged. Set by
 #' \code{\link{update.cpforecast}} and not normally set by hand.
-#' @param ... Other arguments are passed to the function.
+#' @param ... Not used.
 #'
 #' @return A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:

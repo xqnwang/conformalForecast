@@ -28,7 +28,7 @@ lagmatrix <- function(x, lag) {
   k <- length(lag)
 
   if (ncol(x) != k) {
-    stop("lag must have the same number of columns as x")
+    stop("`lag` must have one element per column of `x`")
   }
 
   lmat <- x

@@ -2,7 +2,7 @@
 % Please edit documentation in R/update.R
 \name{update.cpforecast}
 \alias{update.cpforecast}
-\title{Update and repeform cross-validation forecasting and conformal prediction}
+\title{Update and reperform cross-validation forecasting and conformal prediction}
 \usage{
 \method{update}{cpforecast}(object, new_data, forecastfun, new_xreg = NULL, ...)
 }

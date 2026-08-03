@@ -63,7 +63,7 @@ are removed if either is \code{NA} when calculating sample quantile.}
 \item{...}{Other arguments are passed to \code{weightfun}.}
 }
 \value{
-A list of class \code{c("scp", "cvforecast", "forecast")}
+A list of class \code{c("scp", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}

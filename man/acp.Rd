@@ -56,7 +56,7 @@ if it is \code{NA} when calculating sample quantile.}
 \code{\link[ggdist]{weighted_quantile}} function for quantile computation.}
 }
 \value{
-A list of class \code{c("acp", "cpforecast", "forecast")}
+A list of class \code{c("acp", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}

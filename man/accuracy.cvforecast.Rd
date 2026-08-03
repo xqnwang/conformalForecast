@@ -55,7 +55,7 @@ The measures calculated are:
 \item MAPE: Mean Absolute Percentage Error
 \item MASE: Mean Absolute Scaled Error
 \item RMSSE: Root Mean Squared Scaled Error
-\item winkler_score: Winkler Score
+\item Winkler: Winkler Score
 \item MSIS: Mean Scaled Interval Score
 }
 }

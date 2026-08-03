@@ -75,7 +75,7 @@ prediction intervals produced earlier are carried over unchanged. Set by
 \item{...}{Other arguments are passed to the \code{scorecastfun} function.}
 }
 \value{
-A list of class \code{c("pid", "cpforecast", "forecast")}
+A list of class \code{c("pid", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
