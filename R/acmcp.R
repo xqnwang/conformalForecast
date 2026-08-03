@@ -43,7 +43,7 @@
 #' \code{\link{update.cpforecast}} and not normally set by hand.
 #' @param ... Other arguments are passed to the function.
 #'
-#' @return A list of class \code{c("acmcp", "cpforecast", "forecast")}
+#' @return A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}

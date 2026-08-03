@@ -56,7 +56,7 @@
 #' are removed if either is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to \code{weightfun}.
 #'
-#' @return A list of class \code{c("scp", "cvforecast", "forecast")}
+#' @return A list of class \code{c("scp", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}

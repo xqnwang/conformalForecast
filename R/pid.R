@@ -49,7 +49,7 @@
 #' \code{\link{update.cpforecast}} and not normally set by hand.
 #' @param ... Other arguments are passed to the \code{scorecastfun} function.
 #'
-#' @return A list of class \code{c("pid", "cpforecast", "forecast")}
+#' @return A list of class \code{c("pid", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}

@@ -37,7 +37,7 @@
 #' @param ... Other arguments are passed to the
 #' \code{\link[ggdist]{weighted_quantile}} function for quantile computation.
 #'
-#' @return A list of class \code{c("acp", "cpforecast", "forecast")}
+#' @return A list of class \code{c("acp", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
