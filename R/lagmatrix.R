@@ -35,10 +35,10 @@ lagmatrix <- function(x, lag) {
   for (i in 1:k) {
     if (lag[i] == 0) {
       lmat[, i] <- x[, i]
-    } else if (lag[i] > 0) {
-      lmat[, i] <- c(rep(NA, lag[i]), x[1:(n - lag[i]), i])
     } else if (abs(lag[i]) >= n) {
       lmat[, i] <- rep(NA_real_, n)
+    } else if (lag[i] > 0) {
+      lmat[, i] <- c(rep(NA, lag[i]), x[1:(n - lag[i]), i])
     } else {
       lmat[, i] <- c(x[(abs(lag[i]) + 1):n, i], rep(NA, abs(lag[i])))
     }
