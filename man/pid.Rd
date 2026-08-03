@@ -18,6 +18,7 @@ pid(
   delta = 0.01,
   Csat = 2/pi * (ceiling(log(Tg) * delta) - 1/log(Tg)),
   KI = max(abs(object$ERROR), na.rm = TRUE),
+  update = FALSE,
   ...
 )
 }
@@ -66,6 +67,11 @@ guarantee is of at least \eqn{1-\alpha-\delta} coverage.}
 
 \item{KI}{A positive constant to place the integrator on the same scale as the scores.}
 
+\item{update}{If \code{TRUE}, \code{object} already holds the results of a
+previous call and only the newly added time steps are computed; the
+prediction intervals produced earlier are carried over unchanged. Set by
+\code{\link{update.cpforecast}} and not normally set by hand.}
+
 \item{...}{Other arguments are passed to the \code{scorecastfun} function.}
 }
 \value{
@@ -89,7 +95,7 @@ each \code{level}. Each element within the list will be a multivariate time
 series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction intervals.}
 \item{call}{The matched call.}
-\item{model}{A list containing information abouth the conformal prediction model.}
+\item{model}{A list containing information about the conformal prediction model.}
 If \code{mean} is included in the \code{object}, the components \code{mean},
 \code{lower}, and \code{upper} will also be returned, showing the information
 about the forecasts generated using all available observations.

@@ -44,8 +44,10 @@ quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 types 4 to 9 are for continuous quantiles. See the
 \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.}
 
-\item{update}{If \code{TRUE}, the function will be compatible with the
-\code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.}
+\item{update}{If \code{TRUE}, \code{object} already holds the results of a
+previous call and only the newly added time steps are computed; the
+prediction intervals produced earlier are carried over unchanged. Set by
+\code{\link{update.cpforecast}} and not normally set by hand.}
 
 \item{na.rm}{If \code{TRUE}, corresponding entries in sample values are removed
 if it is \code{NA} when calculating sample quantile.}
@@ -74,7 +76,7 @@ each \code{level}. Each element within the list will be a multivariate time
 series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction intervals.}
 \item{call}{The matched call.}
-\item{model}{A list containing information abouth the conformal prediction model.}
+\item{model}{A list containing information about the conformal prediction model.}
 If \code{mean} is included in the \code{object}, the components \code{mean},
 \code{lower}, and \code{upper} will also be returned, showing the information
 about the forecasts generated using all available observations.

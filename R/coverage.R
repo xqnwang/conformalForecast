@@ -1,8 +1,8 @@
 #' Calculate interval forecast coverage
 #'
-#' Calculate the mean coverage and the ifinn matrix for prediction intervals on
-#' validation set. If \code{window} is not \code{NULL}, a matrix of the rolling
-#' means of interval forecast coverage is also returned.
+#' Calculate the mean coverage and the \code{ifinn} matrix for prediction
+#' intervals on validation set. If \code{window} is not \code{NULL}, a matrix
+#' of the rolling means of interval forecast coverage is also returned.
 #'
 #' @aliases print.coverage
 #'
@@ -15,7 +15,7 @@
 #'
 #' @return A list of class \code{"coverage"} with the following components:
 #' \item{mean}{Mean coverage across the validation set.}
-#' \item{ifinn}{A indicator matrix as a multivariate time series, where the \eqn{h}th column
+#' \item{ifinn}{An indicator matrix as a multivariate time series, where the \eqn{h}th column
 #' holds the coverage for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
 #' \item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means

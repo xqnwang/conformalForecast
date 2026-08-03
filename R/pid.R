@@ -69,7 +69,7 @@
 #' series with the same dimensional characteristics as \code{MEAN}.}
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
-#' \item{model}{A list containing information abouth the conformal prediction model.}
+#' \item{model}{A list containing information about the conformal prediction model.}
 #' If \code{mean} is included in the \code{object}, the components \code{mean},
 #' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the forecasts generated using all available observations.
