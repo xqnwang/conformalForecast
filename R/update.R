@@ -114,6 +114,7 @@ update.cpforecast <- function(
   ERROR <- rbind(object$ERROR, matrix(NA, nrow = n_new, ncol = h)) |>
     ts(start = start(object$ERROR), frequency = frequency(object$ERROR))
 
+  offset <- round((tsp(MEAN)[1L] - tsp(x)[1L]) * frequency(x))
   for (i in indx) {
     x_subset <- subset(
       x,
@@ -154,7 +155,15 @@ update.cpforecast <- function(
     }
 
     if (!is.element("try-error", class(fc))) {
-      tm <- which(tail(as.numeric(time(x_subset)), 1) == as.numeric(time(MEAN)))
+      tm <- i - offset
+      if (tm < 1L || tm + h > nrow(MEAN)) {
+        stop(
+          "cannot place the forecasts for origin ",
+          i,
+          " in `MEAN`",
+          call. = FALSE
+        )
+      }
       MEAN[cbind(tm + 1:h, 1:h)] <- fc$mean
     }
   }
