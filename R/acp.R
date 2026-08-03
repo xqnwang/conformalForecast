@@ -28,8 +28,10 @@
 #' quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
 #' types 4 to 9 are for continuous quantiles. See the
 #' \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
-#' @param update If \code{TRUE}, the function will be compatible with the
-#' \code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.
+#' @param update If \code{TRUE}, \code{object} already holds the results of a
+#' previous call and only the newly added time steps are computed; the
+#' prediction intervals produced earlier are carried over unchanged. Set by
+#' \code{\link{update.cpforecast}} and not normally set by hand.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values are removed
 #' if it is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to the
@@ -179,16 +181,17 @@ acp <- function(
         q_lo_h[, i] <- pf[, h] - lower[[i]][, h]
         q_up_h[, i] <- upper[[i]][, h] - pf[, h]
       }
+      padded_errors <- rbind(
+        errors,
+        matrix(NA, nrow = n - nrow(errors), ncol = horizon)
+      )
+
       if (symmetric) {
         alphat_h <- sapply(alphat, function(mat) mat[, h])
-        errt_h <- abs(errors[, h]) > q_lo_h
+        errt_h <- abs(padded_errors[, h]) > q_lo_h
       } else {
         alphat_lower_h <- sapply(alphat_lower, function(mat) mat[, h])
         alphat_upper_h <- sapply(alphat_upper, function(mat) mat[, h])
-        padded_errors <- rbind(
-          errors,
-          matrix(NA, nrow = n - nrow(errors), ncol = horizon)
-        )
         errt_lower_h <- (-padded_errors[, h]) > q_lo_h
         errt_upper_h <- padded_errors[, h] > q_up_h
       }
@@ -221,22 +224,15 @@ acp <- function(
           ...
         )
 
-        # Compute errt
-        tryCatch(
-          {
-            errt_h[t + 1, ] <- abs(errors[t + 1, h]) > q_lo_h[t + 1, ]
-            outl <- which(alphat_h[t + 1, ] >= 1)
-            outs <- which(alphat_h[t + 1, ] <= 0)
-            errt_h[t + 1, outl] <- TRUE
-            errt_h[t + 1, outs] <- FALSE
-          },
-          error = function(e) {
-            errt_h[t + 1, ] <- NA_real_
-          }
-        )
-
         if (t < tail(indx, 1)) {
-          if (any(is.na(errt_h[t + 1, ]))) {
+          # Compute errt
+          errt_h[t + 1, ] <- abs(errors[t + 1, h]) > q_lo_h[t + 1, ]
+          outl <- which(alphat_h[t + 1, ] >= 1)
+          outs <- which(alphat_h[t + 1, ] <= 0)
+          errt_h[t + 1, outl] <- TRUE
+          errt_h[t + 1, outs] <- FALSE
+
+          if (anyNA(errt_h[t + 1, ])) {
             # Keep alpha unchanged
             alphat_h[t + h + 1, ] <- alphat_h[t + h, ]
           } else {
@@ -266,28 +262,16 @@ acp <- function(
           ...
         )
 
-        # Compute errt
-        tryCatch(
-          {
-            errt_lower_h[t + 1, ] <- (-errors[t + 1, h]) > q_lo_h[t + 1, ]
-            errt_lower_h[t + 1, which(alphat_lower_h[t + 1, ] >= 1)] <- TRUE
-            errt_lower_h[t + 1, which(alphat_lower_h[t + 1, ] <= 0)] <- FALSE
-
-            errt_upper_h[t + 1, ] <- (errors[t + 1, h]) > q_up_h[t + 1, ]
-            errt_upper_h[t + 1, which(alphat_upper_h[t + 1, ] >= 1)] <- TRUE
-            errt_upper_h[t + 1, which(alphat_upper_h[t + 1, ] <= 0)] <- FALSE
-          },
-          error = function(e) {
-            errt_lower_h[t + 1, ] <- NA_real_
-            errt_upper_h[t + 1, ] <- NA_real_
-          }
-        )
-
         if (t < tail(indx, 1)) {
-          if (
-            any(is.na(errt_lower_h[t + 1, ])) ||
-              any(is.na(errt_upper_h[t + 1, ]))
-          ) {
+          errt_lower_h[t + 1, ] <- (-errors[t + 1, h]) > q_lo_h[t + 1, ]
+          errt_lower_h[t + 1, which(alphat_lower_h[t + 1, ] >= 1)] <- TRUE
+          errt_lower_h[t + 1, which(alphat_lower_h[t + 1, ] <= 0)] <- FALSE
+
+          errt_upper_h[t + 1, ] <- (errors[t + 1, h]) > q_up_h[t + 1, ]
+          errt_upper_h[t + 1, which(alphat_upper_h[t + 1, ] >= 1)] <- TRUE
+          errt_upper_h[t + 1, which(alphat_upper_h[t + 1, ] <= 0)] <- FALSE
+
+          if (anyNA(errt_lower_h[t + 1, ]) || anyNA(errt_upper_h[t + 1, ])) {
             # Keep alpha unchanged
             alphat_lower_h[t + h + 1, ] <- alphat_lower_h[t + h, ]
             alphat_upper_h[t + h + 1, ] <- alphat_upper_h[t + h, ]
@@ -338,10 +322,24 @@ acp <- function(
       bench = out$mean
     )
   }
+  out$model$args <- c(
+    list(
+      alpha = alpha,
+      gamma = gamma,
+      symmetric = symmetric,
+      ncal = ncal,
+      rolling = rolling,
+      quantiletype = quantiletype,
+      na.rm = na.rm
+    ),
+    list(...)
+  )
   if (update) {
     out$model$cvforecast$call <- object$model$cvforecast$call
+    out$model$cvforecast$args <- object$model$cvforecast$args
   } else {
     out$model$cvforecast$call <- object$call
+    out$model$cvforecast$args <- object$args
   }
   if (symmetric) {
     out$model$alpha_update <- list(alpha = alphat)
@@ -349,5 +347,8 @@ acp <- function(
     out$model$alpha_update <- list(lower = alphat_lower, upper = alphat_upper)
   }
 
-  return(structure(out, class = c("acp", "cpforecast", "forecast")))
+  return(structure(
+    out,
+    class = c("acp", "cpforecast", "cvforecast", "forecast")
+  ))
 }

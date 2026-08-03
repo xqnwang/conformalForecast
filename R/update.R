@@ -81,28 +81,20 @@ update.cpforecast <- function(
     xreg <- NULL
   }
 
-  # Info required for model fitting
-  cvcall <- object$model$cvforecast$call
-  call_env <- attr(cvcall, ".Environment")
-  if (is.null(call_env) || !is.environment(call_env)) {
-    # fall back to the package namespace of cvforecast
-    call_env <- environment(cvforecast)
-    if (is.null(call_env) || !is.environment(call_env)) {
-      call_env <- parent.frame()
-    }
+  # Info required for model fitting. The resolved values recorded when the
+  # object was built are used; the stored calls are never re-evaluated, so the
+  # result does not depend on what the calling environment happens to contain
+  # at this point.
+  cvargs <- object$model$cvforecast$args
+  if (is.null(cvargs)) {
+    stop(
+      "`object` carries no record of the `cvforecast` arguments; it was not ",
+      "produced by scp(), acp(), pid() or acmcp()",
+      call. = FALSE
+    )
   }
-  .get_arg_value <- function(fun, call, name, env) {
-    al <- as.list(call)
-    if (!is.null(al[[name]])) {
-      eval(al[[name]], envir = env)
-    } else {
-      # evaluate default from the function's formals in the function's env
-      fml <- formals(fun)[[name]]
-      eval(fml, envir = environment(fun))
-    }
-  }
-  initial <- .get_arg_value(cvforecast, cvcall, "initial", call_env)
-  window <- .get_arg_value(cvforecast, cvcall, "window", call_env)
+  initial <- cvargs$initial
+  window <- cvargs$window
 
   # Model fitting and forecasting
   nfirst <- ifelse(forward, length(object$x) + 1L, length(object$x))
@@ -194,8 +186,12 @@ update.cpforecast <- function(
     )
   }
 
-  # Conformal prediction
-  args <- as.list(object$call)[-1]
+  # Conformal prediction. Replay the resolved arguments, not the unevaluated
+  # expressions in `object$call`.
+  args <- object$model$args
+  if (is.null(args)) {
+    stop("`object` carries no record of its conformal arguments", call. = FALSE)
+  }
   args$object <- object
   args$method <- object$method
   args$update <- TRUE

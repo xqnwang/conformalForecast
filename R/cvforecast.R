@@ -281,6 +281,17 @@ cvforecast <- function(
   }
   out$call <- match.call()
   out$forward <- forward
+  # Resolved argument values. `call` records what the user typed and is meant
+  # for display only; `args` is what update.cpforecast() replays, so that the
+  # cross-validation is never re-run by re-evaluating expressions in a
+  # different environment.
+  out$args <- list(
+    h = h,
+    level = level,
+    forward = forward,
+    initial = initial,
+    window = window
+  )
   # The final forecasting model output if forward is TRUE
   if (forward) {
     if (inherits(fc, "try-error")) {

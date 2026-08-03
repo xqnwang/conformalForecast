@@ -48,8 +48,10 @@
 #' weights are supported.
 #' @param kess If \code{TRUE}, Kish's effective sample size is used for sample
 #' quantile computation.
-#' @param update If \code{TRUE}, the function will be compatible with the
-#' \code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.
+#' @param update If \code{TRUE}, \code{object} already holds the results of a
+#' previous call and only the newly added time steps are computed; the
+#' prediction intervals produced earlier are carried over unchanged. Set by
+#' \code{\link{update.cpforecast}} and not normally set by hand.
 #' @param na.rm If \code{TRUE}, corresponding entries in sample values and weights
 #' are removed if either is \code{NA} when calculating sample quantile.
 #' @param ... Other arguments are passed to \code{weightfun}.
@@ -132,6 +134,24 @@ scp <- function(
   if (!quantiletype %in% 1:9) {
     stop("`quantiletype` is invalid. It must be in 1:9.")
   }
+
+  # Resolved argument values, captured here because `weightfun` and `kess` are
+  # replaced by their internal equivalents a few lines below; replaying those
+  # would change their meaning (`kess` becomes a function, and `if (kess)`
+  # would then fail).
+  cp_args <- c(
+    list(
+      alpha = alpha,
+      symmetric = symmetric,
+      ncal = ncal,
+      rolling = rolling,
+      quantiletype = quantiletype,
+      weightfun = weightfun,
+      kess = kess,
+      na.rm = na.rm
+    ),
+    list(...)
+  )
   if (is.null(weightfun)) {
     # Equal weights
     weightfun <- function(n) rep(1, n)
@@ -266,15 +286,18 @@ scp <- function(
       bench = out$mean
     )
   }
+  out$model$args <- cp_args
   if (update) {
     out$model$cvforecast$call <- object$model$cvforecast$call
+    out$model$cvforecast$args <- object$model$cvforecast$args
   } else {
     out$model$cvforecast$call <- object$call
+    out$model$cvforecast$args <- object$args
   }
 
   return(structure(
     out,
-    class = c("scp", "cpforecast", "forecast")
+    class = c("scp", "cpforecast", "cvforecast", "forecast")
   ))
 }
 
@@ -337,7 +360,9 @@ print.cpforecast <- function(x, ...) {
 
   if ("mean" %in% names(x)) {
     cat(paste("\nForecasts of the forward step:\n"))
-    NextMethod()
+    y <- x
+    class(y) <- "forecast"
+    print(y)
   }
 }
 
