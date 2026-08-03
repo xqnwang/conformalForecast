@@ -183,8 +183,11 @@ scp <- function(
     if ("xreg" %in% names(object)) list(xreg = object$xreg)
   )
 
+  cp_times <- integer(horizon)
   for (h in seq(horizon)) {
     indx <- seq(ncal + h - 1, nrow(errors) - !object$forward, by = 1L)
+    # indx where the conformal prediction is performed:
+    cp_times[h] <- sum(indx >= ncal + h - 1)
 
     for (t in indx) {
       # Check whether need to skip if update = TRUE
@@ -236,7 +239,7 @@ scp <- function(
   }
 
   out$method <- paste("scp")
-  out$cp_times <- length(indx)
+  out$cp_times <- cp_times
   out$MEAN <- object$MEAN
   out$ERROR <- object$ERROR
   out$LOWER <- lower
@@ -320,11 +323,10 @@ print.cpforecast <- function(x, ...) {
     cat(paste("\n"))
   }
 
-  cat(paste(
-    "",
-    "cp_times =",
-    x$cp_times,
-    ifelse("mean" %in% names(x), "(the forward step included)", ""),
+  cat(paste0(
+    " cp_times",
+    ifelse("mean" %in% names(x), " (the forward step included): ", ": "),
+    paste0(cp_times, " (h=", 1:(length(cp_times)), ")", collapse = ", "),
     "\n"
   ))
 

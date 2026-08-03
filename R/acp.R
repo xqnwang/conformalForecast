@@ -158,8 +158,11 @@ acp <- function(
     if ("xreg" %in% names(object)) list(xreg = object$xreg)
   )
 
+  cp_times <- integer(horizon)
   for (h in seq(horizon)) {
     indx <- seq(ncal + h - 1, nrow(errors) - !object$forward, by = 1L)
+    # indx where the conformal prediction is performed:
+    cp_times[h] <- sum(indx >= ncal + h - 1)
 
     alphat_h <- alphat_lower_h <- alphat_upper_h <-
       errt_h <- errt_lower_h <- errt_upper_h <-
@@ -308,7 +311,7 @@ acp <- function(
   }
 
   out$method <- paste("acp")
-  out$cp_times <- length(indx)
+  out$cp_times <- cp_times
   out$MEAN <- object$MEAN
   out$ERROR <- object$ERROR
   out$LOWER <- lower
