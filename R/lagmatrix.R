@@ -21,13 +21,15 @@
 #' @export
 lagmatrix <- function(x, lag) {
   # Ensure 'x' is a matrix
-  if (!is.matrix(x))
+  if (!is.matrix(x)) {
     stop("ensure x is a matrix")
+  }
   n <- nrow(x)
   k <- length(lag)
 
-  if (ncol(x) != k)
+  if (ncol(x) != k) {
     stop("lag must have the same number of columns as x")
+  }
 
   lmat <- x
   for (i in 1:k) {
@@ -35,8 +37,10 @@ lagmatrix <- function(x, lag) {
       lmat[, i] <- x[, i]
     } else if (lag[i] > 0) {
       lmat[, i] <- c(rep(NA, lag[i]), x[1:(n - lag[i]), i])
+    } else if (abs(lag[i]) >= n) {
+      lmat[, i] <- rep(NA_real_, n)
     } else {
-      lmat[, i] <- c(x[(abs(lag[i])+1):n, i], rep(NA, abs(lag[i])))
+      lmat[, i] <- c(x[(abs(lag[i]) + 1):n, i], rep(NA, abs(lag[i])))
     }
   }
   return(structure(lmat, class = class(x)))
