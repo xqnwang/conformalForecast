@@ -103,16 +103,18 @@ cvforecast <- function(
   ...
 ) {
   # Check whether there are non-existent arguments
-  all.args <- names(formals())
-  user.args <- names(match.call())[-1L] # including arguments passed to 3 dots
-  check <- user.args %in% all.args
-  if (!all(check)) {
-    error.args <- user.args[!check]
-    warning(sprintf(
-      "The non-existent %s arguments will be ignored.",
-      error.args
-    ))
+  args_fun <- list(...)
+  all.args <- union(names(formals()), names(formals(forecastfun)))
+  user.args <- names(match.call())[-1L]
+  bad <- setdiff(user.args, all.args)
+  if (length(bad) && !"..." %in% names(formals(forecastfun))) {
+    warning(
+      "Unused argument(s) will be ignored: ",
+      paste(bad, collapse = ", "),
+      call. = FALSE
+    )
   }
+  args_fun <- args_fun[-which(names(args_fun) %in% bad)]
 
   # Check forecast function
   if (missing(forecastfun)) {
@@ -223,38 +225,26 @@ cvforecast <- function(
       end = i
     )
 
-    if (is.null(xreg)) {
-      fc <- try(
-        suppressWarnings(
-          forecastfun(y_subset, h = h, level = level, ...)
-        ),
-        silent = TRUE
-      )
-    } else {
-      xreg_subset <- subset(
+    if (!is.null(xreg)) {
+      args_fun$xreg_subset <- subset(
         xreg,
         start = ifelse(is.null(window), 1L, i - window + 1L),
         end = i
       )
-      xreg_future <- subset(
+      args_fun$xreg_future <- subset(
         xreg,
         start = i + 1L,
         end = i + h
       )
-      fc <- try(
-        suppressWarnings(
-          forecastfun(
-            y_subset,
-            h = h,
-            level = level,
-            xreg = xreg_subset,
-            newxreg = xreg_future,
-            ...
-          )
-        ),
-        silent = TRUE
-      )
     }
+
+    fc <- try(
+      suppressWarnings(do.call(
+        forecastfun,
+        c(list(x = y_subset, h = h, level = level), args_fun)
+      )),
+      silent = TRUE
+    )
 
     if (!is.element("try-error", class(fc))) {
       pf[i, ] <- fc$mean

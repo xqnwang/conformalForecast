@@ -2,9 +2,6 @@
 % Please edit documentation in R/scp.R
 \name{scp}
 \alias{scp}
-\alias{print.scp}
-\alias{summary.scp}
-\alias{print.summary.scp}
 \title{Classical split conformal prediction method}
 \usage{
 scp(

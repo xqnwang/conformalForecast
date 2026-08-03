@@ -2,9 +2,6 @@
 % Please edit documentation in R/acmcp.R
 \name{acmcp}
 \alias{acmcp}
-\alias{print.acmcp}
-\alias{summary.acmcp}
-\alias{print.summary.acmcp}
 \title{Autocorrelated multistep-ahead conformal prediction method}
 \usage{
 acmcp(

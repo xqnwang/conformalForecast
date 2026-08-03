@@ -2,9 +2,6 @@
 % Please edit documentation in R/acp.R
 \name{acp}
 \alias{acp}
-\alias{print.acp}
-\alias{summary.acp}
-\alias{print.summary.acp}
 \title{Adaptive conformal prediction method}
 \usage{
 acp(

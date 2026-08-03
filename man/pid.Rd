@@ -2,9 +2,6 @@
 % Please edit documentation in R/pid.R
 \name{pid}
 \alias{pid}
-\alias{print.pid}
-\alias{summary.pid}
-\alias{print.summary.pid}
 \title{Conformal PID control method}
 \usage{
 pid(
