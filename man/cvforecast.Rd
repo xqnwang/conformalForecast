@@ -31,8 +31,7 @@ to the training and test periods, respectively.}
 
 \item{h}{Forecast horizon.}
 
-\item{level}{Confidence level for prediction intervals.
-If \code{NULL}, prediction intervals will not be generated.}
+\item{level}{Confidence level for prediction intervals.}
 
 \item{forward}{If \code{TRUE}, the final forecast origin for forecasting is
 \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.}
