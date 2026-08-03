@@ -43,7 +43,9 @@
 #' @export
 coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
   # Check inputs
-  if (level > 0 && level < 1) {
+  if (length(level) != 1) {
+    stop("only one confidence level can be specified")
+  } else if (level > 0 && level < 1) {
     level <- 100 * level
   } else if (level < 0 || level > 99.99) {
     stop("confidence limit out of range")
