@@ -12,8 +12,6 @@
 #'   - Scorecasting part (D) is \eqn{\hat{s}_{t+h|t}} is forecast generated
 #'   by training a scorecaster based on nonconformity scores available at time \eqn{t}.
 #'
-#' @aliases print.pid summary.pid print.summary.pid
-#'
 #' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
 #' point forecasts and \code{ERROR} for forecast errors on validation set.
@@ -436,19 +434,4 @@ mytan <- function(x) {
   } else {
     return(tan(x))
   }
-}
-
-#' @export
-print.pid <- function(x, ...) {
-  NextMethod()
-}
-
-#' @export
-summary.pid <- function(object, ...) {
-  NextMethod()
-}
-
-#' @export
-print.summary.pid <- function(x, ...) {
-  NextMethod()
 }

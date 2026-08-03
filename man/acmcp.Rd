@@ -15,10 +15,10 @@ acmcp(
   integrate = TRUE,
   scorecast = TRUE,
   lr = 0.1,
-  Tg = NULL,
-  delta = NULL,
+  Tg = NROW(object$ERROR),
+  delta = 0.01,
   Csat = 2/pi * (ceiling(log(Tg) * delta) - 1/log(Tg)),
-  KI = max(abs(object$errors), na.rm = TRUE),
+  KI = max(abs(object$ERROR), na.rm = TRUE),
   ...
 )
 }

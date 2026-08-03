@@ -12,8 +12,6 @@
 #' to capture the relationship between the \eqn{h}-step ahead forecast error and
 #' past errors.
 #'
-#' @aliases print.acmcp summary.acmcp print.summary.acmcp
-#'
 #' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
 #' point forecasts and \code{ERROR} for forecast errors on validation set.
@@ -381,20 +379,4 @@ acmcp <- function(
   }
 
   return(structure(out, class = c("acmcp", "cpforecast", "forecast")))
-}
-
-
-#' @export
-print.acmcp <- function(x, ...) {
-  NextMethod()
-}
-
-#' @export
-summary.acmcp <- function(object, ...) {
-  NextMethod()
-}
-
-#' @export
-print.summary.acmcp <- function(x, ...) {
-  NextMethod()
 }
