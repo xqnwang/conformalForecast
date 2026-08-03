@@ -354,7 +354,7 @@ print.cpforecast <- function(x, ...) {
   cat(paste0(
     " cp_times",
     ifelse("mean" %in% names(x), " (the forward step included): ", ": "),
-    paste0(cp_times, " (h=", 1:(length(cp_times)), ")", collapse = ", "),
+    paste0(x$cp_times, " (h=", 1:(length(x$cp_times)), ")", collapse = ", "),
     "\n"
   ))
 
