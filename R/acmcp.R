@@ -30,13 +30,15 @@
 #' update process.
 #' @param scorecast If \code{TRUE}, scorecasting will be included in the update
 #' process.
-#' @param lr Initial learning rate used for quantile tracking.
+#' @param lr Initial learning rate used for quantile tracking (0.1 as default).
 #' @param Tg The time that is set to achieve the target absolute coverage
-#' guarantee before this.
-#' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.
+#' guarantee before this. Defaults to the number of cross-validation periods in \code{object}.
+#' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta} (0.01 as default).
 #' @param Csat A positive constant ensuring that by time \code{Tg}, an absolute
-#' guarantee is of at least \eqn{1-\alpha-\delta} coverage.
-#' @param KI A positive constant to place the integrator on the same scale as the scores.
+#' guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
+#' and \code{delta} when not supplied.
+#' @param KI A positive constant to place the integrator on the same scale as
+#' the scores. Defaults to the largest absolute forecast error in \code{object}.
 #' @param update If \code{TRUE}, \code{object} already holds the results of a
 #' previous call and only the newly added time steps are computed; the
 #' prediction intervals produced earlier are carried over unchanged. Set by

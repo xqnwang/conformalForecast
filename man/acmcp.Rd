@@ -45,17 +45,19 @@ update process.}
 \item{scorecast}{If \code{TRUE}, scorecasting will be included in the update
 process.}
 
-\item{lr}{Initial learning rate used for quantile tracking.}
+\item{lr}{Initial learning rate used for quantile tracking (0.1 as default).}
 
 \item{Tg}{The time that is set to achieve the target absolute coverage
-guarantee before this.}
+guarantee before this. Defaults to the number of cross-validation periods in \code{object}.}
 
-\item{delta}{The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.}
+\item{delta}{The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta} (0.01 as default).}
 
 \item{Csat}{A positive constant ensuring that by time \code{Tg}, an absolute
-guarantee is of at least \eqn{1-\alpha-\delta} coverage.}
+guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
+and \code{delta} when not supplied.}
 
-\item{KI}{A positive constant to place the integrator on the same scale as the scores.}
+\item{KI}{A positive constant to place the integrator on the same scale as
+the scores. Defaults to the largest absolute forecast error in \code{object}.}
 
 \item{update}{If \code{TRUE}, \code{object} already holds the results of a
 previous call and only the newly added time steps are computed; the

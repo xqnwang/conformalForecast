@@ -16,7 +16,7 @@ pid(
   lr = 0.1,
   Tg = NROW(object$ERROR),
   delta = 0.01,
-  Csat = 2/pi * (ceiling(log(Tg) * delta) - 1/log(Tg)),
+  Csat = NULL,
   KI = max(abs(object$ERROR), na.rm = TRUE),
   update = FALSE,
   ...
@@ -29,7 +29,7 @@ point forecasts and \code{ERROR} for forecast errors on validation set.
 See the results of a call to \code{\link{cvforecast}}.}
 
 \item{alpha}{A numeric vector of significance levels to achieve a desired
-coverage level \eqn{1-\alpha}.}
+coverage level \eqn{1-\alpha}. Defaults to the levels used in \code{object}.}
 
 \item{symmetric}{If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
 are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
@@ -58,14 +58,16 @@ it must have an argument \code{h} for the forecast horizon.}
 \item{lr}{Initial learning rate used for quantile tracking.}
 
 \item{Tg}{The time that is set to achieve the target absolute coverage
-guarantee before this.}
+guarantee before this. Defaults to the number of cross-validation periods in \code{object}.}
 
 \item{delta}{The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.}
 
 \item{Csat}{A positive constant ensuring that by time \code{Tg}, an absolute
-guarantee is of at least \eqn{1-\alpha-\delta} coverage.}
+guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
+and \code{delta} when not supplied.}
 
-\item{KI}{A positive constant to place the integrator on the same scale as the scores.}
+\item{KI}{A positive constant to place the integrator on the same scale as
+the scores. Defaults to the largest absolute forecast error in \code{object}.}
 
 \item{update}{If \code{TRUE}, \code{object} already holds the results of a
 previous call and only the newly added time steps are computed; the

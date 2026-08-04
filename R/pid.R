@@ -17,7 +17,7 @@
 #' point forecasts and \code{ERROR} for forecast errors on validation set.
 #' See the results of a call to \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
-#' coverage level \eqn{1-\alpha}.
+#' coverage level \eqn{1-\alpha}. Defaults to the levels used in \code{object}.
 #' @param symmetric If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
 #' are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
 #' are used, and then upper bounds and lower bounds are produced separately.
@@ -38,11 +38,13 @@
 #' it must have an argument \code{h} for the forecast horizon.
 #' @param lr Initial learning rate used for quantile tracking.
 #' @param Tg The time that is set to achieve the target absolute coverage
-#' guarantee before this.
+#' guarantee before this. Defaults to the number of cross-validation periods in \code{object}.
 #' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.
 #' @param Csat A positive constant ensuring that by time \code{Tg}, an absolute
-#' guarantee is of at least \eqn{1-\alpha-\delta} coverage.
-#' @param KI A positive constant to place the integrator on the same scale as the scores.
+#' guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
+#' and \code{delta} when not supplied.
+#' @param KI A positive constant to place the integrator on the same scale as
+#' the scores. Defaults to the largest absolute forecast error in \code{object}.
 #' @param update If \code{TRUE}, \code{object} already holds the results of a
 #' previous call and only the newly added time steps are computed; the
 #' prediction intervals produced earlier are carried over unchanged. Set by
@@ -120,7 +122,7 @@ pid <- function(
   lr = 0.1,
   Tg = NROW(object$ERROR),
   delta = 0.01,
-  Csat = 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg)),
+  Csat = NULL,
   KI = max(abs(object$ERROR), na.rm = TRUE),
   update = FALSE,
   ...
@@ -134,6 +136,10 @@ pid <- function(
   }
   if (scorecast && is.null(scorecastfun)) {
     stop("scorecastfun should not be NULL if scorecast is TRUE")
+  }
+
+  if (is.null(Csat)) {
+    Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
   }
 
   alpha <- sort(alpha, decreasing = TRUE)
