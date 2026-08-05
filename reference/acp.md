@@ -103,8 +103,8 @@ the following components:
 
 - cp_times:
 
-  The number of times the conformal prediction is performed in
-  cross-validation.
+  An integer vector giving the number of conformal predictions performed
+  in cross-validation for each forecast horizon.
 
 - MEAN:
 

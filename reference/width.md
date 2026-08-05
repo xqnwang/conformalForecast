@@ -26,7 +26,7 @@ width(
 
 - ...:
 
-  Additional inputs if `object` is missing.
+  Time-series matrices `LOWER` and `UPPER` if `object` is missing.
 
 - level:
 
