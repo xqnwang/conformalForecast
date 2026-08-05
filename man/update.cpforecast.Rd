@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{An object of class \code{"cpforecast"}.}
 
-\item{new_data}{A vector of newly available data.}
+\item{new_data}{A non-empty numeric vector of newly available data.}
 
 \item{forecastfun}{Function to return an object of class \code{"forecast"}.
 Its first argument must be a univariate time series, and it must have an
@@ -21,7 +21,8 @@ to the training and test periods, respectively.}
 \item{new_xreg}{Newly available exogenous predictor variables passed to
 \code{forecastfun} if required. The number of rows should match the length of
 \code{new_data}, and the number of columns should match the dimensions of
-the \code{xreg} argument in \code{object}.}
+the \code{xreg} argument in \code{object}. These rows extend
+\code{object$xreg} and correspond to the periods immediately following it.}
 
 \item{...}{Other arguments are passed to \code{forecastfun}.}
 }

@@ -4,7 +4,7 @@
 #' \code{cvforecast} and \code{conformal} functions.
 #'
 #' @param object An object of class \code{"cpforecast"}.
-#' @param new_data A vector of newly available data.
+#' @param new_data A non-empty numeric vector of newly available data.
 #' @param forecastfun Function to return an object of class \code{"forecast"}.
 #' Its first argument must be a univariate time series, and it must have an
 #' argument \code{h} for the forecast horizon and an argument \code{level} for
@@ -14,7 +14,8 @@
 #' @param new_xreg Newly available exogenous predictor variables passed to
 #' \code{forecastfun} if required. The number of rows should match the length of
 #' \code{new_data}, and the number of columns should match the dimensions of
-#' the \code{xreg} argument in \code{object}.
+#' the \code{xreg} argument in \code{object}. These rows extend
+#' \code{object$xreg} and correspond to the periods immediately following it.
 #' @param ... Other arguments are passed to \code{forecastfun}.
 #'
 #' @return
@@ -53,24 +54,48 @@ update.cpforecast <- function(
   ...
 ) {
   level <- object$level
-  alpha <- 1 - level / 100
   h <- dim(object$MEAN)[2]
-  forward <- "mean" %in% names(object)
+
+  cvargs <- object$model$cvforecast$args
+  if (is.null(cvargs)) {
+    stop(
+      "`object` carries no record of the `cvforecast` arguments; it was not ",
+      "produced by scp(), acp(), pid() or acmcp()",
+      call. = FALSE
+    )
+  }
+  forward <- cvargs$forward
+  window <- cvargs$window
 
   # Append new data
+  if (!is.numeric(new_data) || !is.null(dim(new_data)) || !length(new_data)) {
+    stop("`new_data` should be a non-empty numeric vector")
+  }
   n_new <- length(new_data)
   x <- ts(
     c(object$x, new_data),
     start = start(object$x),
     frequency = frequency(object$x)
   )
-  if (!is.null(new_xreg) & ("xreg" %in% names(object))) {
+  has_xreg <- "xreg" %in% names(object)
+  if (has_xreg && is.null(new_xreg)) {
+    stop("`new_xreg` is required because `object` contains `xreg`")
+  }
+  if (!has_xreg && !is.null(new_xreg)) {
+    stop("`new_xreg` should only be supplied when `object` contains `xreg`")
+  }
+  if (has_xreg) {
     if (!is.numeric(new_xreg)) {
-      stop("'new_xreg' should be a numeric matrix or a numeric vector")
+      stop("`new_xreg` should be a numeric matrix or vector")
     }
     new_xreg <- as.matrix(new_xreg)
     if (nrow(new_xreg) != n_new) {
-      stop("the size of 'new_xreg' must match that of 'new_data'")
+      stop("`new_xreg` should have one row per observation in `new_data`")
+    }
+    if (ncol(new_xreg) != ncol(object$xreg)) {
+      stop(
+        "`new_xreg` and `object$xreg` should have the same number of columns"
+      )
     }
     xreg <- ts(
       rbind(object$xreg, new_xreg),
@@ -80,21 +105,6 @@ update.cpforecast <- function(
   } else {
     xreg <- NULL
   }
-
-  # Info required for model fitting. The resolved values recorded when the
-  # object was built are used; the stored calls are never re-evaluated, so the
-  # result does not depend on what the calling environment happens to contain
-  # at this point.
-  cvargs <- object$model$cvforecast$args
-  if (is.null(cvargs)) {
-    stop(
-      "`object` carries no record of the `cvforecast` arguments; it was not ",
-      "produced by scp(), acp(), pid() or acmcp()",
-      call. = FALSE
-    )
-  }
-  initial <- cvargs$initial
-  window <- cvargs$window
 
   # Model fitting and forecasting
   nfirst <- ifelse(forward, length(object$x) + 1L, length(object$x))
@@ -175,8 +185,16 @@ update.cpforecast <- function(
   if (!is.null(xreg)) {
     object$xreg <- xreg
   }
-  if (forward && exists("fc")) {
-    object$mean <- fc$mean
+  if (forward) {
+    if (inherits(fc, "try-error")) {
+      object$mean <- NULL
+      warning(
+        "the final (forward) model fit failed; forward forecasts are not available",
+        call. = FALSE
+      )
+    } else {
+      object$mean <- fc$mean
+    }
   }
   object$MEAN <- MEAN
   object$ERROR <- ERROR
