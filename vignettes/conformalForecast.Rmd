@@ -33,7 +33,9 @@ Suppose we are interested in forecasting a time series generated from an AR(2) m
 
 ```{r data, fig.width = 7, fig.height = 3}
 set.seed(0)
-series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+series_all <- arima.sim(n = 1005, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+series <- head(series_all, 1000)
+new_data <- as.numeric(tail(series_all, 5))
 autoplot(series) +
   labs(
     title = "Time series generated from an AR(2) model"
@@ -165,6 +167,66 @@ acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = T
 (acmcpfc_score <- accuracy(acmcpfc, byhorizon = TRUE))
 (acmcpfc_cov <- coverage(acmcpfc, window = 100, level = 95))
 (acmcpfc_wid <- width(acmcpfc, window = 100, level = 95, includemedian = TRUE))
+```
+
+## Updating with new observations
+
+When new observations become available, `update()` extends the cross-validation forecasts and conformal intervals without recomputing the existing results. It also reuses the conformal settings stored in the fitted object.
+
+```{r update}
+scpfc_updated <- update(scpfc, new_data = new_data, forecastfun = far2)
+length(scpfc_updated$x)
+scpfc_updated$mean
+```
+
+## Forecasting with external regressors
+
+If the forecasting model uses external regressors, `forecastfun` should accept `xreg` for the training period and `newxreg` for the forecast period. The following smaller example uses the first 300 observations of the simulated series and reserves the next five for updating.
+
+```{r xreg}
+far2_xreg <- function(x, h, level, xreg, newxreg) {
+  Arima(x, order = c(2, 0, 0), xreg = xreg) |>
+    forecast(h = h, level = level, xreg = newxreg)
+}
+
+n <- 300
+h <- 3
+n_update <- 5
+series_xreg <- head(series_all, n)
+new_data_xreg <- as.numeric(series_all[n + seq_len(n_update)])
+xreg_all <- cbind(
+  trend = seq_len(n + h + n_update),
+  cycle = sin(2 * pi * seq_len(n + h + n_update) / 12)
+)
+
+fc_xreg <- cvforecast(
+  series_xreg,
+  forecastfun = far2_xreg,
+  h = h,
+  level = 95,
+  forward = TRUE,
+  window = 100,
+  xreg = xreg_all[seq_len(n + h), ]
+)
+scpfc_xreg <- conformal(
+  fc_xreg,
+  method = "scp",
+  symmetric = FALSE,
+  ncal = 100,
+  rolling = TRUE
+)
+```
+
+With `forward = TRUE`, the stored `xreg` already contains the original $h$ future rows. Therefore, `new_xreg` supplies the rows immediately after the stored predictor matrix, keeping the next forecast horizon available after the update. It must have one row per new observation and the same columns as the stored `xreg`.
+
+```{r xreg-update}
+scpfc_xreg_updated <- update(
+  scpfc_xreg,
+  new_data = new_data_xreg,
+  forecastfun = far2_xreg,
+  new_xreg = xreg_all[n + h + seq_len(n_update), ]
+)
+scpfc_xreg_updated$mean
 ```
 
 ## Coverage and width of prediction intervals
