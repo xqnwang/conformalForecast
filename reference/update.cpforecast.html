@@ -62,7 +62,7 @@ cvforecast and conformal functions."></head><body>
 
 
 <dt id="arg-new-data">new_data<a class="anchor" aria-label="anchor" href="#arg-new-data"></a></dt>
-<dd><p>A vector of newly available data.</p></dd>
+<dd><p>A non-empty numeric vector of newly available data.</p></dd>
 
 
 <dt id="arg-forecastfun">forecastfun<a class="anchor" aria-label="anchor" href="#arg-forecastfun"></a></dt>
@@ -78,7 +78,8 @@ to the training and test periods, respectively.</p></dd>
 <dd><p>Newly available exogenous predictor variables passed to
 <code>forecastfun</code> if required. The number of rows should match the length of
 <code>new_data</code>, and the number of columns should match the dimensions of
-the <code>xreg</code> argument in <code>object</code>.</p></dd>
+the <code>xreg</code> argument in <code>object</code>. These rows extend
+<code>object$xreg</code> and correspond to the periods immediately following it.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -154,7 +155,7 @@ cross-validation forecasts and conformal prediction intervals.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Xiaoqian Wang, Rob Hyndman.</p>
+  <p>Developed by Xiaoqian Wang, Rob Hyndman, Daniele Girolimetto.</p>
 </div>
 
 <div class="pkgdown-footer-right">

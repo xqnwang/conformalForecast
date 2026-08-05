@@ -129,6 +129,10 @@ the following components:
 
   The name of the series `x`.
 
+- xreg:
+
+  Exogenous predictor variables used, if applicable.
+
 - method:
 
   A character string "pid".

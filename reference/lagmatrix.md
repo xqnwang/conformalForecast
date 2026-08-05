@@ -18,8 +18,8 @@ lagmatrix(x, lag)
 
 - lag:
 
-  A vector of lags (positive values) or leads (negative values) with a
-  length equal to the number of columns of `x`.
+  A vector of finite integer lags (positive values) or leads (negative
+  values) with a length equal to the number of columns of `x`.
 
 ## Value
 

@@ -74,7 +74,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>For a detailed tutorial and examples, please see the <a href="https://xqnwang.github.io/conformalForecast/articles/conformalForecast.html">vignette</a>.</p>
-<p>This is a basic example which shows you how to perform a classical conformal prediction method:</p>
+<p>This basic example shows how to perform classical conformal prediction and update the results when new observations become available:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/xqnwang/conformalForecast" class="external-link">conformalForecast</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span>
@@ -91,16 +91,21 @@
 <span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Classical conformal prediction</span></span>
-<span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                   rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Update conformal prediction with newly available observations</span></span>
+<span><span class="va">scpfc_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scpfc</span>, new_data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">0.8</span>, <span class="fl">2.3</span><span class="op">)</span>,</span>
+<span>                        forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Interval forecast accuracy</span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Mean coverage</span></span>
-<span><span class="fu"><a href="reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">scpfc</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Mean and median interval width</span></span>
-<span><span class="fu"><a href="reference/width.html">width</a></span><span class="op">(</span><span class="va">scpfc</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/width.html">width</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -138,6 +143,7 @@
 <ul class="list-unstyled">
 <li>Xiaoqian Wang <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-4827-496X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Rob Hyndman <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-2140-5352" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Daniele Girolimetto <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9387-1232" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -156,7 +162,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Xiaoqian Wang, Rob Hyndman.</p>
+  <p>Developed by Xiaoqian Wang, Rob Hyndman, Daniele Girolimetto.</p>
 </div>
 
 <div class="pkgdown-footer-right">

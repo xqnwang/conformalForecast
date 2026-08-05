@@ -18,7 +18,8 @@ coverage(object, ..., level = 95, window = NULL, na.rm = FALSE)
 
 - ...:
 
-  Additional inputs if `object` is missing.
+  Arguments `x`, `LOWER`, and `UPPER` if `object` is missing. Bounds may
+  be time-series matrices or lists keyed by confidence level.
 
 - level:
 

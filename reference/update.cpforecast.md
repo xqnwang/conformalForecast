@@ -18,7 +18,7 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
 
 - new_data:
 
-  A vector of newly available data.
+  A non-empty numeric vector of newly available data.
 
 - forecastfun:
 
@@ -34,7 +34,8 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
   Newly available exogenous predictor variables passed to `forecastfun`
   if required. The number of rows should match the length of `new_data`,
   and the number of columns should match the dimensions of the `xreg`
-  argument in `object`.
+  argument in `object`. These rows extend `object$xreg` and correspond
+  to the periods immediately following it.
 
 - ...:
 
