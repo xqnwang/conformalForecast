@@ -202,5 +202,4 @@ far2_xreg <- function(x, h, level, xreg, newxreg) {
 fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = 95,
                       forward = TRUE, xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
                       initial = 1, window = 50)
-#> Warning: the final (forward) model fit failed; `mean`, `lower`, `upper` and `model` are not available
 ```
