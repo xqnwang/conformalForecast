@@ -6,6 +6,12 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/conformalForecast)](https://CRAN.R-project.org/package=conformalForecast)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/conformalForecast)](https://cran.r-project.org/package=conformalForecast)
+[![License:
+GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://github.com/xqnwang/conformalForecast/blob/main/LICENSE.md)
 <!-- badges: end -->
 
 The R package *conformalForecast* provides methods and tools for
