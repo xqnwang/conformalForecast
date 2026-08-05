@@ -55,18 +55,20 @@ process, and \code{scorecastfun} should be given.}
 \code{forecast}. Its first argument must be a univariate time series, and
 it must have an argument \code{h} for the forecast horizon.}
 
-\item{lr}{Initial learning rate used for quantile tracking.}
+\item{lr}{A positive initial learning rate used for quantile tracking.}
 
 \item{Tg}{The time that is set to achieve the target absolute coverage
-guarantee before this. Defaults to the number of cross-validation periods in \code{object}.}
+guarantee before this. It must be greater than 1 when \code{Csat} is not
+supplied. Defaults to the number of cross-validation periods in \code{object}.}
 
-\item{delta}{The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.}
+\item{delta}{A number in \eqn{(0, 1)}. The target absolute coverage guarantee
+is set to \eqn{1-\alpha-\delta}.}
 
 \item{Csat}{A positive constant ensuring that by time \code{Tg}, an absolute
 guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
 and \code{delta} when not supplied.}
 
-\item{KI}{A positive constant to place the integrator on the same scale as
+\item{KI}{A non-negative constant to place the integrator on the same scale as
 the scores. Defaults to the largest absolute forecast error in \code{object}.}
 
 \item{update}{If \code{TRUE}, \code{object} already holds the results of a
@@ -82,8 +84,8 @@ with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
 \item{method}{A character string "pid".}
-\item{cp_times}{The number of times the conformal prediction is performed in
-cross-validation.}
+\item{cp_times}{An integer vector giving the number of conformal predictions
+performed in cross-validation for each forecast horizon.}
 \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 holds the point forecasts for forecast horizon \eqn{h}. The time index
 corresponds to the period for which the forecast is produced.}
