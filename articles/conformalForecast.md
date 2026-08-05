@@ -15,14 +15,16 @@ library(tsibble)
 
 ## Data simulation
 
-Suppose we are interested in forecasting a time series data generated
-from an AR(2) model with \\\phi_1 = 0.8\\, \\\phi_2=-0.5\\, and
-\\\sigma^2 = 1\\.
+Suppose we are interested in forecasting a time series generated from an
+AR(2) model with \\\phi_1 = 0.8\\, \\\phi_2=-0.5\\, and \\\sigma^2 =
+1\\.
 
 ``` r
 
 set.seed(0)
-series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+series_all <- arima.sim(n = 1005, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+series <- head(series_all, 1000)
+new_data <- as.numeric(tail(series_all, 5))
 autoplot(series) +
   labs(
     title = "Time series generated from an AR(2) model"
@@ -36,6 +38,11 @@ autoplot(series) +
 
 We first train a forecasting model AR(2) on a rolling forecast origin to
 generate forecasts and forecast errors on validation sets.
+
+Setting `forward = TRUE` includes an \\h\\-step forecast from the final
+observation. The `window` argument controls the number of recent
+observations used at each forecast origin; setting it to `NULL` uses an
+expanding window.
 
 ``` r
 
@@ -98,9 +105,19 @@ fc |>
 
 ## Conformal prediction
 
-Based on the forecast errors on validation sets, we can train various
-conformal prediction methods to obtain distribution-free uncertainty
-estimation.
+Based on the forecast errors on validation sets, we can apply various
+conformal prediction methods to construct prediction intervals.
+
+Each method can be called directly or through
+[`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md)
+by setting `method` to `"scp"`, `"acp"`, `"pid"`, or `"acmcp"`.
+
+For SCP, ACP, and PID, `ncal` sets the calibration or burn-in length. If
+`rolling = TRUE`, only the most recent `ncal` errors are used where
+applicable; otherwise, the window expands over time. Setting
+`symmetric = TRUE` calibrates absolute errors, while `symmetric = FALSE`
+calibrates the lower and upper tails separately. AcMCP only supports
+asymmetric errors.
 
 ### Classical split conformal prediction (SCP)
 
@@ -109,8 +126,9 @@ estimation.
 
 ``` r
 
-scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
-             weightfun = NULL, kess = FALSE, quantiletype = 1)
+scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 100,
+                   rolling = TRUE, weightfun = NULL, kess = FALSE,
+                   quantiletype = 1)
 
 (scpfc_score <- accuracy(scpfc, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
@@ -162,9 +180,8 @@ scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 ### Adaptive conformal prediction (ACP)
 
-The ACP method uses an online update of \\\alpha\\ to perform the
-calibration so that we can achieve either approximate or exact marginal
-coverage.
+The ACP method updates \\\alpha\\ online to target the desired long-run
+empirical coverage.
 
 ``` r
 
@@ -208,7 +225,7 @@ lr <- 0.1
 # PID without scorecaster
 pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
                  integrate = TRUE, scorecast = FALSE,
-                 lr = lr, KI = KI, Csat = Csat)
+                 lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 
 (pidfc_nsf_score <- accuracy(pidfc_nsf, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
@@ -236,7 +253,7 @@ naivefun <- function(x, h) {
 }
 pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
              integrate = TRUE, scorecast = TRUE, scorecastfun = naivefun,
-             lr = lr, KI = KI, Csat = Csat)
+             lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 
 (pidfc_score <- accuracy(pidfc, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
@@ -256,7 +273,7 @@ pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 #> 5.972480 7.664302 7.656036
 ```
 
-### Multistep-ahead conformal prediction (AcMCP)
+### Autocorrelated multistep-ahead conformal prediction (AcMCP)
 
 Similar to the PID method, the AcMCP method also integrates three
 modules (P, I, and D) to form the final iteration. However, instead of
@@ -288,6 +305,91 @@ acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = T
 #> Median width:
 #>      h=1      h=2      h=3 
 #> 4.068763 5.561382 5.562705
+```
+
+## Updating with new observations
+
+When new observations become available,
+[`update()`](https://rdrr.io/r/stats/update.html) extends the
+cross-validation forecasts and conformal intervals without recomputing
+the existing results. It also reuses the conformal settings stored in
+the fitted object.
+
+``` r
+
+scpfc_updated <- update(scpfc, new_data = new_data, forecastfun = far2)
+length(scpfc_updated$x)
+#> [1] 1005
+scpfc_updated$mean
+#> Time Series:
+#> Start = 1006 
+#> End = 1008 
+#> Frequency = 1 
+#> [1]  0.279596189  0.457719582 -0.001123158
+```
+
+## Forecasting with external regressors
+
+If the forecasting model uses external regressors, `forecastfun` should
+accept `xreg` for the training period and `newxreg` for the forecast
+period. The following smaller example uses the first 300 observations of
+the simulated series and reserves the next five for updating.
+
+``` r
+
+far2_xreg <- function(x, h, level, xreg, newxreg) {
+  Arima(x, order = c(2, 0, 0), xreg = xreg) |>
+    forecast(h = h, level = level, xreg = newxreg)
+}
+
+n <- 300
+h <- 3
+n_update <- 5
+series_xreg <- head(series_all, n)
+new_data_xreg <- as.numeric(series_all[n + seq_len(n_update)])
+xreg_all <- cbind(
+  trend = seq_len(n + h + n_update),
+  cycle = sin(2 * pi * seq_len(n + h + n_update) / 12)
+)
+
+fc_xreg <- cvforecast(
+  series_xreg,
+  forecastfun = far2_xreg,
+  h = h,
+  level = 95,
+  forward = TRUE,
+  window = 100,
+  xreg = xreg_all[seq_len(n + h), ]
+)
+scpfc_xreg <- conformal(
+  fc_xreg,
+  method = "scp",
+  symmetric = FALSE,
+  ncal = 100,
+  rolling = TRUE
+)
+```
+
+With `forward = TRUE`, the stored `xreg` already contains the original
+\\h\\ future rows. Therefore, `new_xreg` supplies the rows immediately
+after the stored predictor matrix, keeping the next forecast horizon
+available after the update. It must have one row per new observation and
+the same columns as the stored `xreg`.
+
+``` r
+
+scpfc_xreg_updated <- update(
+  scpfc_xreg,
+  new_data = new_data_xreg,
+  forecastfun = far2_xreg,
+  new_xreg = xreg_all[n + h + seq_len(n_update), ]
+)
+scpfc_xreg_updated$mean
+#> Time Series:
+#> Start = 306 
+#> End = 308 
+#> Frequency = 1 
+#> [1]  0.9768456  0.3894413 -0.3477063
 ```
 
 ## Coverage and width of prediction intervals
@@ -333,6 +435,10 @@ acmcpfc_wid$rollmean |>
 ![](conformalForecast_files/figure-html/widplot-1.png)
 
 We can also combine all the results and show them in one single plot.
+Here, WCP denotes weighted SCP with exponential weights, and PI denotes
+conformal PID without the scorecasting component. The comparison is
+based on a single simulated series and is intended only to illustrate
+the output; it should not be used to rank the methods.
 
 ``` r
 

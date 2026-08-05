@@ -78,13 +78,14 @@ conformal prediction methods for time series forecasting.</p>
 <div class="section level2">
 <h2 id="data-simulation">Data simulation<a class="anchor" aria-label="anchor" href="#data-simulation"></a>
 </h2>
-<p>Suppose we are interested in forecasting a time series data generated
-from an AR(2) model with <span class="math inline">\(\phi_1 =
-0.8\)</span>, <span class="math inline">\(\phi_2=-0.5\)</span>, and
-<span class="math inline">\(\sigma^2 = 1\)</span>.</p>
+<p>Suppose we are interested in forecasting a time series generated from
+an AR(2) model with <span class="math inline">\(\phi_1 = 0.8\)</span>,
+<span class="math inline">\(\phi_2=-0.5\)</span>, and <span class="math inline">\(\sigma^2 = 1\)</span>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">series_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1005</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">series_all</span>, <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">series_all</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">series</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Time series generated from an AR(2) model"</span></span>
@@ -97,6 +98,10 @@ from an AR(2) model with <span class="math inline">\(\phi_1 =
 </h2>
 <p>We first train a forecasting model AR(2) on a rolling forecast origin
 to generate forecasts and forecast errors on validation sets.</p>
+<p>Setting <code>forward = TRUE</code> includes an <span class="math inline">\(h\)</span>-step forecast from the final
+observation. The <code>window</code> argument controls the number of
+recent observations used at each forecast origin; setting it to
+<code>NULL</code> uses an expanding window.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span>
@@ -150,17 +155,28 @@ to generate forecasts and forecast errors on validation sets.</p>
 <div class="section level2">
 <h2 id="conformal-prediction">Conformal prediction<a class="anchor" aria-label="anchor" href="#conformal-prediction"></a>
 </h2>
-<p>Based on the forecast errors on validation sets, we can train various
-conformal prediction methods to obtain distribution-free uncertainty
-estimation.</p>
+<p>Based on the forecast errors on validation sets, we can apply various
+conformal prediction methods to construct prediction intervals.</p>
+<p>Each method can be called directly or through
+<code><a href="../reference/conformal.html">conformal()</a></code> by setting <code>method</code> to
+<code>"scp"</code>, <code>"acp"</code>, <code>"pid"</code>, or
+<code>"acmcp"</code>.</p>
+<p>For SCP, ACP, and PID, <code>ncal</code> sets the calibration or
+burn-in length. If <code>rolling = TRUE</code>, only the most recent
+<code>ncal</code> errors are used where applicable; otherwise, the
+window expands over time. Setting <code>symmetric = TRUE</code>
+calibrates absolute errors, while <code>symmetric = FALSE</code>
+calibrates the lower and upper tails separately. AcMCP only supports
+asymmetric errors.</p>
 <div class="section level3">
 <h3 id="classical-split-conformal-prediction-scp">Classical split conformal prediction (SCP)<a class="anchor" aria-label="anchor" href="#classical-split-conformal-prediction-scp"></a>
 </h3>
 <p>Here, we perform a SCP method with equal weights in sample quantile
 estimation.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>             weightfun <span class="op">=</span> <span class="cn">NULL</span>, kess <span class="op">=</span> <span class="cn">FALSE</span>, quantiletype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                   rolling <span class="op">=</span> <span class="cn">TRUE</span>, weightfun <span class="op">=</span> <span class="cn">NULL</span>, kess <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                   quantiletype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">scpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
@@ -206,8 +222,8 @@ function to the <code>weightfun</code> argument.</p>
 <div class="section level3">
 <h3 id="adaptive-conformal-prediction-acp">Adaptive conformal prediction (ACP)<a class="anchor" aria-label="anchor" href="#adaptive-conformal-prediction-acp"></a>
 </h3>
-<p>The ACP method uses an online update of <span class="math inline">\(\alpha\)</span> to perform the calibration so that
-we can achieve either approximate or exact marginal coverage.</p>
+<p>The ACP method updates <span class="math inline">\(\alpha\)</span>
+online to target the desired long-run empirical coverage.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acp.html">acp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, gamma <span class="op">=</span> <span class="fl">0.005</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -244,7 +260,7 @@ sequence of quantile estimates used in the prediction sets.</p>
 <code class="sourceCode R"><span><span class="co"># PID without scorecaster</span></span>
 <span><span class="va">pidfc_nsf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pid.html">pid</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                 integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                 lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
+<span>                 lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">pidfc_nsf_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">pidfc_nsf</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
@@ -269,7 +285,7 @@ sequence of quantile estimates used in the prediction sets.</p>
 <span><span class="op">}</span></span>
 <span><span class="va">pidfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pid.html">pid</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>             integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>, scorecastfun <span class="op">=</span> <span class="va">naivefun</span>,</span>
-<span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
+<span>             lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">pidfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">pidfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
@@ -289,7 +305,7 @@ sequence of quantile estimates used in the prediction sets.</p>
 <span><span class="co">#&gt; 5.972480 7.664302 7.656036</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="multistep-ahead-conformal-prediction-acmcp">Multistep-ahead conformal prediction (AcMCP)<a class="anchor" aria-label="anchor" href="#multistep-ahead-conformal-prediction-acmcp"></a>
+<h3 id="autocorrelated-multistep-ahead-conformal-prediction-acmcp">Autocorrelated multistep-ahead conformal prediction (AcMCP)<a class="anchor" aria-label="anchor" href="#autocorrelated-multistep-ahead-conformal-prediction-acmcp"></a>
 </h3>
 <p>Similar to the PID method, the AcMCP method also integrates three
 modules (P, I, and D) to form the final iteration. However, instead of
@@ -323,11 +339,89 @@ error and past errors.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="updating-with-new-observations">Updating with new observations<a class="anchor" aria-label="anchor" href="#updating-with-new-observations"></a>
+</h2>
+<p>When new observations become available, <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> extends
+the cross-validation forecasts and conformal intervals without
+recomputing the existing results. It also reuses the conformal settings
+stored in the fitted object.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scpfc_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scpfc</span>, new_data <span class="op">=</span> <span class="va">new_data</span>, forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scpfc_updated</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1005</span></span>
+<span><span class="va">scpfc_updated</span><span class="op">$</span><span class="va">mean</span></span>
+<span><span class="co">#&gt; Time Series:</span></span>
+<span><span class="co">#&gt; Start = 1006 </span></span>
+<span><span class="co">#&gt; End = 1008 </span></span>
+<span><span class="co">#&gt; Frequency = 1 </span></span>
+<span><span class="co">#&gt; [1]  0.279596189  0.457719582 -0.001123158</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="forecasting-with-external-regressors">Forecasting with external regressors<a class="anchor" aria-label="anchor" href="#forecasting-with-external-regressors"></a>
+</h2>
+<p>If the forecasting model uses external regressors,
+<code>forecastfun</code> should accept <code>xreg</code> for the
+training period and <code>newxreg</code> for the forecast period. The
+following smaller example uses the first 300 observations of the
+simulated series and reserves the next five for updating.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">far2_xreg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span>, <span class="va">xreg</span>, <span class="va">newxreg</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, xreg <span class="op">=</span> <span class="va">xreg</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, level <span class="op">=</span> <span class="va">level</span>, xreg <span class="op">=</span> <span class="va">newxreg</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
+<span><span class="va">h</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
+<span><span class="va">n_update</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="va">series_xreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">series_all</span>, <span class="va">n</span><span class="op">)</span></span>
+<span><span class="va">new_data_xreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">series_all</span><span class="op">[</span><span class="va">n</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_update</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">xreg_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span>  trend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="va">h</span> <span class="op">+</span> <span class="va">n_update</span><span class="op">)</span>,</span>
+<span>  cycle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="va">h</span> <span class="op">+</span> <span class="va">n_update</span><span class="op">)</span> <span class="op">/</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fc_xreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvforecast.html">cvforecast</a></span><span class="op">(</span></span>
+<span>  <span class="va">series_xreg</span>,</span>
+<span>  forecastfun <span class="op">=</span> <span class="va">far2_xreg</span>,</span>
+<span>  h <span class="op">=</span> <span class="va">h</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">95</span>,</span>
+<span>  forward <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  window <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  xreg <span class="op">=</span> <span class="va">xreg_all</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span> <span class="op">+</span> <span class="va">h</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">scpfc_xreg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conformal.html">conformal</a></span><span class="op">(</span></span>
+<span>  <span class="va">fc_xreg</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"scp"</span>,</span>
+<span>  symmetric <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ncal <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  rolling <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>With <code>forward = TRUE</code>, the stored <code>xreg</code>
+already contains the original <span class="math inline">\(h\)</span>
+future rows. Therefore, <code>new_xreg</code> supplies the rows
+immediately after the stored predictor matrix, keeping the next forecast
+horizon available after the update. It must have one row per new
+observation and the same columns as the stored <code>xreg</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scpfc_xreg_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
+<span>  <span class="va">scpfc_xreg</span>,</span>
+<span>  new_data <span class="op">=</span> <span class="va">new_data_xreg</span>,</span>
+<span>  forecastfun <span class="op">=</span> <span class="va">far2_xreg</span>,</span>
+<span>  new_xreg <span class="op">=</span> <span class="va">xreg_all</span><span class="op">[</span><span class="va">n</span> <span class="op">+</span> <span class="va">h</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_update</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">scpfc_xreg_updated</span><span class="op">$</span><span class="va">mean</span></span>
+<span><span class="co">#&gt; Time Series:</span></span>
+<span><span class="co">#&gt; Start = 306 </span></span>
+<span><span class="co">#&gt; End = 308 </span></span>
+<span><span class="co">#&gt; Frequency = 1 </span></span>
+<span><span class="co">#&gt; [1]  0.9768456  0.3894413 -0.3477063</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="coverage-and-width-of-prediction-intervals">Coverage and width of prediction intervals<a class="anchor" aria-label="anchor" href="#coverage-and-width-of-prediction-intervals"></a>
 </h2>
 <p>Taking the AcMCP result as an example, we now show the average
 coverage on validation sets.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc_cov</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>horizon <span class="op">=</span> <span class="va">key</span>, coverage <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -343,7 +437,7 @@ coverage on validation sets.</p>
 <p><img src="conformalForecast_files/figure-html/covplot-1.png" class="r-plt" alt="" width="672"></p>
 <p>We can also show the rolling average interval width on validation
 sets.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc_wid</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>horizon <span class="op">=</span> <span class="va">key</span>, width <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -356,9 +450,12 @@ sets.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean width for AcMCP"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/widplot-1.png" class="r-plt" alt="" width="672"></p>
-<p>We can also combine all the results and show them in one single
-plot.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>We can also combine all the results and show them in one single plot.
+Here, WCP denotes weighted SCP with exponential weights, and PI denotes
+conformal PID without the scorecasting component. The comparison is
+based on a single simulated series and is intended only to illustrate
+the output; it should not be used to rank the methods.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fc"</span>, <span class="st">"scpfc"</span>, <span class="st">"scpfc_exp"</span>, <span class="st">"acpfc"</span>, <span class="st">"pidfc_nsf"</span>, <span class="st">"pidfc"</span>, <span class="st">"acmcpfc"</span><span class="op">)</span></span>
 <span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AR"</span>, <span class="st">"SCP"</span>, <span class="st">"WCP"</span>, <span class="st">"ACP"</span>, <span class="st">"PI"</span>, <span class="st">"PID"</span>, <span class="st">"AcMCP"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -395,7 +492,7 @@ plot.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean coverage"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/bind-cov-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cov_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_cov"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">out_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_score"</span><span class="op">)</span><span class="op">)</span></span>
@@ -439,7 +536,7 @@ plot.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> h=3     PI       0.945    6.96  6.72 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> h=3     PID      0.941   10.0   9.71 -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">05</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> h=3     AcMCP    0.945    6.90  6.66 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">candidates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"_wid"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">out_pivot</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
