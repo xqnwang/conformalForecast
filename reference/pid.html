@@ -230,6 +230,7 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting</span></span></span>
 <span class="r-in"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -246,48 +247,48 @@ Information Processing Systems</em>, <b>36</b>, 23047–23074.</p>
 <span class="r-in"><span><span class="co"># PID without scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">pidfc_nsf</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                 integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                 lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     0.03683588 -2.242931 1.893144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.57458110 -1.382805 3.459214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203     0.59809803 -1.312176 3.390853</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.189121 3.134690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -1.600259 3.730935</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.173248 3.218838</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pidfc_nsf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> PID </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     0.03683588 -2.242931 1.893144</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.57458110 -1.382805 3.459214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203     0.59809803 -1.312176 3.390853</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.189121 3.134690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -1.600259 3.730935</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.173248 3.218838</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       ME  MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.149 0.99 1.531 1.115 -87.991 524.355 0.997 0.873      6.189   6.057</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.339    6.82</span>
 <span class="r-in"><span><span class="co"># PID with a Naive model for the scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">naivefun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/forecast.rw_model.html" class="external-link">naive</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">pidfc</span> <span class="op">&lt;-</span> <span class="fu">pid</span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>             integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>, scorecastfun <span class="op">=</span> <span class="va">naivefun</span>,</span></span>
-<span class="r-in"><span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

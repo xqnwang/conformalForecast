@@ -131,6 +131,7 @@ individual forecast horizon <code>h</code> separately.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting with a rolling window</span></span></span>
@@ -143,30 +144,37 @@ individual forecast horizon <code>h</code> separately.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Out-of-sample forecast accuracy on validation set</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">fc</span>, measures <span class="op">=</span> <span class="va">point_measures</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                ME       MAE      MSE      RMSE       MPE     MAPE      MASE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1 0.02360276 0.8586951 1.133966 0.8586951 110.01436 182.9608 0.7906662</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2 0.05185524 1.1678584 2.006877 1.1678584  63.80171 188.6862 1.0730730</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3 0.05616645 1.1728258 2.021815 1.1728258  46.44065 181.8183 1.0767439</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 ME       MAE      MSE      RMSE       MPE     MAPE     MASE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1  0.02185523 0.8052604 1.017906 0.8052604  35.66722 221.8293 0.844289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2  0.01698001 1.0245970 1.632225 1.0245970 -32.41324 319.0622 1.075412</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3 -0.01246597 1.0183022 1.622138 1.0183022 -17.90026 271.4276 1.067876</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            RMSSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1 0.6306113</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2 0.8562614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3 0.8593417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1 0.6697150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2 0.8532125</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3 0.8477134</span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">fc</span>, measures <span class="op">=</span> <span class="va">interval_measures</span>, level <span class="op">=</span> <span class="fl">95</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Winkler_95  MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1   5.137519 4.708273</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2   5.992869 5.493790</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3   6.157379 5.646547</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1   5.012254 5.296003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2   6.407682 6.768502</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3   6.245013 6.565268</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Accuracy of conformal prediction intervals</span></span></span>
+<span class="r-in"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                   ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc</span>, measures <span class="op">=</span> <span class="va">interval_measures</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
+<span class="r-in"><span>         byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Winkler_95  MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1   5.394495 5.789155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2   6.629521 7.129421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3   6.502841 6.963483</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Out-of-sample forecast accuracy on test set</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">fc</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">interval_measures</span>,</span></span>
-<span class="r-in"><span>         level <span class="op">=</span> <span class="fl">95</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>         CV <span class="op">=</span> <span class="cn">FALSE</span>, level <span class="op">=</span> <span class="fl">95</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Winkler_95  MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=1     5.137519 4.708273</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=2     5.992869 5.493790</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV h=3     6.157379 5.646547</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=1   4.723912 4.386664</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=2   5.809702 5.394939</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=3   5.841090 5.424085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=1   4.079088 4.073511</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=2   5.045214 5.038316</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test h=3   5.050806 5.043901</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

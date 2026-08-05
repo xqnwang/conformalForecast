@@ -124,6 +124,7 @@ of interval width will be returned.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting with a rolling window</span></span></span>
@@ -138,17 +139,23 @@ of interval width will be returned.</p></dd>
 <span class="r-in"><span><span class="va">wid_fc</span> <span class="op">&lt;-</span> <span class="fu">width</span><span class="op">(</span><span class="va">fc</span>, level <span class="op">=</span> <span class="fl">95</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">wid_fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ width   : Time-Series [1:153, 1:3] from 51 to 203: 3.7 3.84 3.82 3.87 3.96 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ width   : Time-Series [1:153, 1:3] from 51 to 203: 3.66 3.67 3.64 3.6 3.59 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dimnames")=List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:3] "h=1" "h=2" "h=3"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ mean    : Named num [1:3] 4.2 5.32 5.37</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ mean    : Named num [1:3] 3.72 4.69 4.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "names")= chr [1:3] "h=1" "h=2" "h=3"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ rollmean: Time-Series [1:104, 1:3] from 100 to 203: 4.05 4.06 4.07 4.08 4.09 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ rollmean: Time-Series [1:104, 1:3] from 100 to 203: 3.65 3.65 3.63 3.63 3.62 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dimnames")=List of 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : NULL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:3] "h=1" "h=2" "h=3"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "class")= chr "width"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Width calculated directly from interval components</span></span></span>
+<span class="r-in"><span><span class="fu">width</span><span class="op">(</span>LOWER <span class="op">=</span> <span class="va">fc</span><span class="op">$</span><span class="va">LOWER</span>, UPPER <span class="op">=</span> <span class="va">fc</span><span class="op">$</span><span class="va">UPPER</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean width:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      h=1      h=2      h=3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3.720038 4.692975 4.757742 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

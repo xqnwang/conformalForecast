@@ -216,6 +216,7 @@ Processing Systems*, **36**, 23047–23074.
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 # Cross-validation forecasting
 far2 <- function(x, h, level) {
@@ -232,46 +233,46 @@ lr <- 0.1
 # PID without scorecaster
 pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
                  integrate = TRUE, scorecast = FALSE,
-                 lr = lr, KI = KI, Csat = Csat)
+                 lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 print(pidfc_nsf)
 #> PID 
 #> 
 #> Call:
 #>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  
+#>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  
 #>      KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     0.03683588 -2.242931 1.893144
-#> 202     0.57458110 -1.382805 3.459214
-#> 203     0.59809803 -1.312176 3.390853
+#> 201      0.6271538 -1.189121 3.134690
+#> 202      0.8607034 -1.600259 3.730935
+#> 203      0.4935805 -2.173248 3.218838
 summary(pidfc_nsf)
 #> PID 
 #> 
 #> Call:
 #>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  
+#>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  
 #>      KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     0.03683588 -2.242931 1.893144
-#> 202     0.57458110 -1.382805 3.459214
-#> 203     0.59809803 -1.312176 3.390853
+#> 201      0.6271538 -1.189121 3.134690
+#> 202      0.8607034 -1.600259 3.730935
+#> 203      0.4935805 -2.173248 3.218838
 #> 
 #> Cross-validation error measures:
-#>       ME  MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.149 0.99 1.531 1.115 -87.991 524.355 0.997 0.873      6.189   6.057
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.339    6.82
 # PID with a Naive model for the scorecaster
 naivefun <- function(x, h) {
   naive(x) |> forecast(h = h)
 }
 pidfc <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
              integrate = TRUE, scorecast = TRUE, scorecastfun = naivefun,
-             lr = lr, KI = KI, Csat = Csat)
+             lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 ```

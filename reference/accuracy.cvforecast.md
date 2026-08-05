@@ -96,6 +96,7 @@ The measures calculated are:
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting with a rolling window
@@ -108,28 +109,35 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
 
 # Out-of-sample forecast accuracy on validation set
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
-#>                ME       MAE      MSE      RMSE       MPE     MAPE      MASE
-#> CV h=1 0.02360276 0.8586951 1.133966 0.8586951 110.01436 182.9608 0.7906662
-#> CV h=2 0.05185524 1.1678584 2.006877 1.1678584  63.80171 188.6862 1.0730730
-#> CV h=3 0.05616645 1.1728258 2.021815 1.1728258  46.44065 181.8183 1.0767439
+#>                 ME       MAE      MSE      RMSE       MPE     MAPE     MASE
+#> CV h=1  0.02185523 0.8052604 1.017906 0.8052604  35.66722 221.8293 0.844289
+#> CV h=2  0.01698001 1.0245970 1.632225 1.0245970 -32.41324 319.0622 1.075412
+#> CV h=3 -0.01246597 1.0183022 1.622138 1.0183022 -17.90026 271.4276 1.067876
 #>            RMSSE
-#> CV h=1 0.6306113
-#> CV h=2 0.8562614
-#> CV h=3 0.8593417
+#> CV h=1 0.6697150
+#> CV h=2 0.8532125
+#> CV h=3 0.8477134
 accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.137519 4.708273
-#> CV h=2   5.992869 5.493790
-#> CV h=3   6.157379 5.646547
+#> CV h=1   5.012254 5.296003
+#> CV h=2   6.407682 6.768502
+#> CV h=3   6.245013 6.565268
+
+# Accuracy of conformal prediction intervals
+scpfc <- conformal(fc, method = "scp", symmetric = FALSE,
+                   ncal = 50, rolling = TRUE)
+accuracy(scpfc, measures = interval_measures, level = 95,
+         byhorizon = TRUE)
+#>        Winkler_95  MSIS_95
+#> CV h=1   5.394495 5.789155
+#> CV h=2   6.629521 7.129421
+#> CV h=3   6.502841 6.963483
 
 # Out-of-sample forecast accuracy on test set
 accuracy(fc, x = c(1, 0.5, 0), measures = interval_measures,
-         level = 95, byhorizon = TRUE)
+         CV = FALSE, level = 95, byhorizon = TRUE)
 #>          Winkler_95  MSIS_95
-#> CV h=1     5.137519 4.708273
-#> CV h=2     5.992869 5.493790
-#> CV h=3     6.157379 5.646547
-#> Test h=1   4.723912 4.386664
-#> Test h=2   5.809702 5.394939
-#> Test h=3   5.841090 5.424085
+#> Test h=1   4.079088 4.073511
+#> Test h=2   5.045214 5.038316
+#> Test h=3   5.050806 5.043901
 ```

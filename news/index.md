@@ -13,11 +13,16 @@
 - [`update()`](https://rdrr.io/r/stats/update.html) now works on
   [`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md),
   [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)
-  and `acp(symmetric = TRUE)` objects, and is much faster: it resumes
-  from the last computed step instead of recomputing the whole history.
-- [`update()`](https://rdrr.io/r/stats/update.html) no longer depends on
-  the calling environment, and no longer silently drops the new
-  forecasts at some frequencies.
+  and `acp(symmetric = TRUE)` objects, and resumes from the last
+  computed step instead of recomputing the whole history.
+- [`update()`](https://rdrr.io/r/stats/update.html) now replays stored
+  arguments, preserves forecasts at all frequencies, validates new data
+  and external regressors, and handles failed final model fits. External
+  regressors are retained by
+  [`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md)
+  and
+  [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md),
+  enabling external-regressor updates for all four conformal methods.
 - [`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md)
   and
   [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)
@@ -50,8 +55,16 @@
   the
   [`lagmatrix()`](https://xqnwang.github.io/conformalForecast/reference/lagmatrix.md)
   error message, and several typos.
-- Vignette: replaced deprecated ggplot2 calls.
-- Fixed several typos.
+- Expanded the vignette with the
+  [`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md)
+  interface, incremental updates, external regressors, clearer method
+  descriptions, and updated ggplot2 calls.
+- Help examples now cover raw inputs to
+  [`coverage()`](https://xqnwang.github.io/conformalForecast/reference/coverage.md)
+  and
+  [`width()`](https://xqnwang.github.io/conformalForecast/reference/width.md)
+  and `cpforecast` accuracy, and use fixed random seeds for
+  reproducibility.
 
 ## conformalForecast 0.1.1
 

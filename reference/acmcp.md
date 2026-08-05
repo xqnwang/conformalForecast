@@ -192,6 +192,7 @@ multi-step time series forecasting", arXiv preprint arXiv:2410.13115.
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting
@@ -211,37 +212,37 @@ lr <- 0.1
 # AcMCP with integrator and scorecaster
 acmcpfc <- acmcp(fc, ncal = 50, rolling = TRUE,
              integrate = TRUE, scorecast = TRUE,
-             lr = lr, KI = KI, Csat = Csat)
+             lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 print(acmcpfc)
 #> ACMCP 
 #> 
 #> Call:
 #>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  
-#>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) 
+#>      scorecast = TRUE, lr = lr, Tg = Tg, Csat = Csat, KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95     Hi 95
-#> 201     -0.7442755 -3.247935 0.9467444
-#> 202     -0.1156008 -3.591203 1.4368668
-#> 203      0.1146270 -3.028541 1.7814660
+#>     Point Forecast     Lo 95    Hi 95
+#> 201      0.6271538 -1.013545 2.673790
+#> 202      0.8607034 -2.090441 4.044708
+#> 203      0.4935805 -2.055964 3.526965
 summary(acmcpfc)
 #> ACMCP 
 #> 
 #> Call:
 #>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  
-#>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) 
+#>      scorecast = TRUE, lr = lr, Tg = Tg, Csat = Csat, KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95     Hi 95
-#> 201     -0.7442755 -3.247935 0.9467444
-#> 202     -0.1156008 -3.591203 1.4368668
-#> 203      0.1146270 -3.028541 1.7814660
+#>     Point Forecast     Lo 95    Hi 95
+#> 201      0.6271538 -1.013545 2.673790
+#> 202      0.8607034 -2.090441 4.044708
+#> 203      0.4935805 -2.055964 3.526965
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.113 0.999 1.551 1.139 -1.965 690.611 0.889 0.815      6.377   5.576
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.618   7.132
 ```

@@ -152,6 +152,7 @@ If `forward` is `FALSE`, the last observation used for training will be
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Example with a rolling window
@@ -171,10 +172,10 @@ print(fc)
 #>  fit_times = 151 (the forward step included) 
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95     Hi 95
-#> 201      1.3320878 -0.267674 2.9318496
-#> 202     -0.7896033 -2.902318 1.3231110
-#> 203     -1.6378374 -3.751157 0.4754822
+#>     Point Forecast     Lo 95    Hi 95
+#> 201      0.6271538 -1.412390 2.666698
+#> 202      0.8607034 -1.661903 3.383310
+#> 203      0.4935805 -2.031823 3.018984
 summary(fc)
 #> Cross-validation
 #> 
@@ -185,14 +186,14 @@ summary(fc)
 #>  fit_times = 151 (the forward step included) 
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95     Hi 95
-#> 201      1.3320878 -0.267674 2.9318496
-#> 202     -0.7896033 -2.902318 1.3231110
-#> 203     -1.6378374 -3.751157 0.4754822
+#>     Point Forecast     Lo 95    Hi 95
+#> 201      0.6271538 -1.412390 2.666698
+#> 202      0.8607034 -1.661903 3.383310
+#> 203      0.4935805 -2.031823 3.018984
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.007 0.984 1.521 1.099 -54.361 323.928 0.908 0.814      5.475   5.035
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      5.875   6.194
 
 # Example with exogenous predictors
 far2_xreg <- function(x, h, level, xreg, newxreg) {

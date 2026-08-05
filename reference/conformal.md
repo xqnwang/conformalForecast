@@ -53,6 +53,7 @@ and
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting
@@ -75,13 +76,13 @@ summary(scpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201    -0.80664167 -2.849224 1.451989
-#> 202    -0.20322450 -2.338135 1.623005
-#> 203     0.05669504 -2.350372 1.900536
+#> 201      0.6271538 -1.023525 3.234253
+#> 202      0.8607034 -1.291456 4.064625
+#> 203      0.4935805 -1.675089 3.691253
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE     MPE    MAPE MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.042 0.997 1.523 1.105 175.173 265.181 0.89  0.78      7.076   6.359
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.123   6.568
 
 # ACP with asymmetric nonconformity scores and rolling calibration sets
 acpfc <- conformal(fc, method = "acp", symmetric = FALSE, gamma = 0.005,
@@ -97,11 +98,11 @@ summary(acpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201    -0.80664167 -2.849224 1.451989
-#> 202    -0.20322450 -4.106364 1.623005
-#> 203     0.05669504 -3.814259      Inf
+#> 201      0.6271538 -1.706076 3.234253
+#> 202      0.8607034 -1.825564      Inf
+#> 203      0.4935805 -2.027163 3.691253
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE     MPE    MAPE MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.042 0.997 1.523 1.105 175.173 265.181 0.89  0.78        Inf     Inf
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882        Inf     Inf
 ```

@@ -192,6 +192,7 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting</span></span></span>
@@ -214,10 +215,10 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast      Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     1.04544596 -0.2976137 2.6441663</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.03086665 -3.1687767 1.9964475</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203    -0.86970091 -3.9953586 0.6926362</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.706076 3.234253</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -1.825564      Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.027163 3.691253</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -228,14 +229,14 @@ distribution shift", <em>Advances in Neural Information Processing Systems</em>,
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast      Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     1.04544596 -0.2976137 2.6441663</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     0.03086665 -3.1687767 1.9964475</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203    -0.86970091 -3.9953586 0.6926362</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.706076 3.234253</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -1.825564      Inf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.027163 3.691253</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE      MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.038 0.937 1.364 1.048 -223.387 423.884 0.965 0.886       5.94   5.925</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882        Inf     Inf</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

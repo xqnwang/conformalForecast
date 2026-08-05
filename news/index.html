@@ -47,9 +47,9 @@
 </ul><div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
-<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now works on <code><a href="../reference/pid.html">pid()</a></code>, <code><a href="../reference/acmcp.html">acmcp()</a></code> and <code>acp(symmetric = TRUE)</code> objects, and is much faster: it resumes from the last computed step instead of recomputing the whole history.</li>
+<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now works on <code><a href="../reference/pid.html">pid()</a></code>, <code><a href="../reference/acmcp.html">acmcp()</a></code> and <code>acp(symmetric = TRUE)</code> objects, and resumes from the last computed step instead of recomputing the whole history.</li>
 <li>
-<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> no longer depends on the calling environment, and no longer silently drops the new forecasts at some frequencies.</li>
+<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now replays stored arguments, preserves forecasts at all frequencies, validates new data and external regressors, and handles failed final model fits. External regressors are retained by <code><a href="../reference/pid.html">pid()</a></code> and <code><a href="../reference/acmcp.html">acmcp()</a></code>, enabling external-regressor updates for all four conformal methods.</li>
 <li>
 <code><a href="../reference/pid.html">pid()</a></code> and <code><a href="../reference/acmcp.html">acmcp()</a></code> can be called with their documented defaults.</li>
 <li>
@@ -68,8 +68,8 @@
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
 <ul><li>The pkgdown site renders mathematics again (<code>math-rendering: mathjax</code>).</li>
 <li>Corrected the documented return classes, the <code>Winkler</code> measure name, the <code><a href="../reference/lagmatrix.html">lagmatrix()</a></code> error message, and several typos.</li>
-<li>Vignette: replaced deprecated ggplot2 calls.</li>
-<li>Fixed several typos.</li>
+<li>Expanded the vignette with the <code><a href="../reference/conformal.html">conformal()</a></code> interface, incremental updates, external regressors, clearer method descriptions, and updated ggplot2 calls.</li>
+<li>Help examples now cover raw inputs to <code><a href="../reference/coverage.html">coverage()</a></code> and <code><a href="../reference/width.html">width()</a></code> and <code>cpforecast</code> accuracy, and use fixed random seeds for reproducibility.</li>
 </ul></div>
 </div>
     <div class="section level2">

@@ -53,6 +53,7 @@ cross-validation forecasts and conformal prediction intervals.
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting
@@ -80,9 +81,9 @@ print(scpfc_update)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast      Lo 95    Hi 95
-#> 204      1.4556158 -0.1611874 5.757134
-#> 205     -0.1328581 -1.8806744 4.738814
-#> 206     -0.8275830 -2.6161373 3.722483
+#> 204      1.3171165 -0.3335623 3.753786
+#> 205     -0.1244955 -2.2766551 3.079426
+#> 206     -0.5533392 -2.7220088 2.644333
 summary(scpfc_update)
 #> SCP 
 #> 
@@ -95,11 +96,11 @@ summary(scpfc_update)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast      Lo 95    Hi 95
-#> 204      1.4556158 -0.1611874 5.757134
-#> 205     -0.1328581 -1.8806744 4.738814
-#> 206     -0.8275830 -2.6161373 3.722483
+#> 204      1.3171165 -0.3335623 3.753786
+#> 205     -0.1244955 -2.2766551 3.079426
+#> 206     -0.5533392 -2.7220088 2.644333
 #> 
 #> Cross-validation error measures:
 #>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.047 1.101 1.909 1.243 26.934 245.167 1.022 0.927       7.66    6.93
+#> CV 0.037 0.957 1.448 1.072 -3.518 265.271 1.002  0.89      6.104   6.536
 ```

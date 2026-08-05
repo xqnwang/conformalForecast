@@ -222,6 +222,7 @@ for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Simulate time series from an AR(2) model</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">200</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cross-validation forecasting</span></span></span>
@@ -241,39 +242,39 @@ for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.</p>
 <span class="r-in"><span><span class="co"># AcMCP with integrator and scorecaster</span></span></span>
 <span class="r-in"><span><span class="va">acmcpfc</span> <span class="op">&lt;-</span> <span class="fu">acmcp</span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>             integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">acmcpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACMCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      scorecast = TRUE, lr = lr, Tg = Tg, Csat = Csat, KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -0.7442755 -3.247935 0.9467444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     -0.1156008 -3.591203 1.4368668</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.1146270 -3.028541 1.7814660</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.013545 2.673790</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -2.090441 4.044708</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.055964 3.526965</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acmcpfc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ACMCP </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      scorecast = TRUE, lr = lr, Tg = Tg, Csat = Csat, KI = KI) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Forecasts of the forward step:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95     Hi 95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 201     -0.7442755 -3.247935 0.9467444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 202     -0.1156008 -3.591203 1.4368668</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.1146270 -3.028541 1.7814660</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Point Forecast     Lo 95    Hi 95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201      0.6271538 -1.013545 2.673790</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202      0.8607034 -2.090441 4.044708</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203      0.4935805 -2.055964 3.526965</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> CV -0.113 0.999 1.551 1.139 -1.965 690.611 0.889 0.815      6.377   5.576</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.618   7.132</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

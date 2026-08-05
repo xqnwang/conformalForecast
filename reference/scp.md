@@ -189,6 +189,7 @@ scores, respectively. Then the prediction intervals will be
 ``` r
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting
@@ -211,9 +212,9 @@ print(scpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.8381597 -1.394258 3.546988
-#> 202     -0.2428663 -2.028303 2.249430
-#> 203     -0.5063254 -2.332521 1.952563
+#> 201      0.6271538 -1.023525 3.234253
+#> 202      0.8607034 -1.291456 4.064625
+#> 203      0.4935805 -1.675089 3.691253
 summary(scpfc)
 #> SCP 
 #> 
@@ -224,13 +225,13 @@ summary(scpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.8381597 -1.394258 3.546988
-#> 202     -0.2428663 -2.028303 2.249430
-#> 203     -0.5063254 -2.332521 1.952563
+#> 201      0.6271538 -1.023525 3.234253
+#> 202      0.8607034 -1.291456 4.064625
+#> 203      0.4935805 -1.675089 3.691253
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.077 1.043 1.685 1.177 -67.952 546.154 1.117  0.98      6.458    6.49
+#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.123   6.568
 
 # Classical conformal prediction with exponential weights
 expweight <- function(n) {
