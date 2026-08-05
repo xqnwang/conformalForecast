@@ -1,8 +1,8 @@
 #' Calculate interval forecast coverage
 #'
-#' Calculate the mean coverage and the ifinn matrix for prediction intervals on
-#' validation set. If \code{window} is not \code{NULL}, a matrix of the rolling
-#' means of interval forecast coverage is also returned.
+#' Calculate the mean coverage and the \code{ifinn} matrix for prediction
+#' intervals on validation set. If \code{window} is not \code{NULL}, a matrix
+#' of the rolling means of interval forecast coverage is also returned.
 #'
 #' @aliases print.coverage
 #'
@@ -15,7 +15,7 @@
 #'
 #' @return A list of class \code{"coverage"} with the following components:
 #' \item{mean}{Mean coverage across the validation set.}
-#' \item{ifinn}{A indicator matrix as a multivariate time series, where the \eqn{h}th column
+#' \item{ifinn}{An indicator matrix as a multivariate time series, where the \eqn{h}th column
 #' holds the coverage for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
 #' \item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means
@@ -43,32 +43,50 @@
 #' @export
 coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
   # Check inputs
-  if (level > 0 && level < 1) {
+  if (length(level) != 1) {
+    stop("only one confidence level can be specified")
+  } else if (level > 0 && level < 1) {
     level <- 100 * level
   } else if (level < 0 || level > 99.99) {
     stop("confidence limit out of range")
   }
   dots <- rlang::dots_list(...)
   if (missing(object)) {
-    if (any(!(c("x", "LOWER", "UPPER") %in% names(dots))))
+    if (any(!(c("x", "LOWER", "UPPER") %in% names(dots)))) {
       stop("x, LOWER, and UPPER are required for coverage calculation")
+    }
+    x <- dots$x
+    lower <- dots$LOWER
+    upper <- dots$UPPER
+    if (is.list(lower)) {
+      lower <- lower[[paste0(level, "%")]]
+    }
+    if (is.list(upper)) {
+      upper <- upper[[paste0(level, "%")]]
+    }
   } else {
-    if (any(!(c("x", "LOWER", "UPPER") %in% names(object))))
+    if (any(!(c("x", "LOWER", "UPPER") %in% names(object)))) {
       stop("x, LOWER, and UPPER are required for coverage calculation")
-    if (!(level %in% object$level))
+    }
+    if (!(level %in% object$level)) {
       stop("no interval forecasts of target confidence level in object")
+    }
     levelname <- paste0(level, "%")
     x <- object$x
-    LOWER <- object$LOWER[[levelname]]
-    UPPER <- object$UPPER[[levelname]]
+    lower <- object$LOWER[[levelname]]
+    upper <- object$UPPER[[levelname]]
   }
-  lower <- LOWER
-  upper <- UPPER
+
+  if (ncol(lower) != ncol(upper)) {
+    stop("LOWER and UPPER should have the same number of columns")
+  }
   horizon <- ncol(lower)
-  period <- frequency(object$x)
-  x <- ts(matrix(rep(object$x, horizon), ncol = horizon, byrow = FALSE),
-          start = start(object$x),
-          frequency = period)
+  period <- frequency(x)
+  x <- ts(
+    matrix(rep(x, horizon), ncol = horizon, byrow = FALSE),
+    start = start(x),
+    frequency = period
+  )
 
   # Match time
   tspx <- tsp(x)
@@ -92,8 +110,11 @@ coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
 
   # Rolling mean coverage
   if (!is.null(window)) {
-    if (window >= n)
-      stop("the `window` argument should be smaller than the total period of interest")
+    if (window >= n) {
+      stop(
+        "the `window` argument should be smaller than the total period of interest"
+      )
+    }
     covrmean <- apply(covmat, 2, zoo::rollmean, k = window, na.rm = na.rm) |>
       ts(end = end, frequency = period)
   }
@@ -102,7 +123,9 @@ coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
     mean = covmean,
     ifinn = covmat
   )
-  if (!is.null(window)) out <- append(out, list(rollmean = covrmean))
+  if (!is.null(window)) {
+    out <- append(out, list(rollmean = covrmean))
+  }
   return(structure(out, class = "coverage"))
 }
 

@@ -12,8 +12,6 @@
 #' to capture the relationship between the \eqn{h}-step ahead forecast error and
 #' past errors.
 #'
-#' @aliases print.acmcp summary.acmcp print.summary.acmcp
-#'
 #' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
 #' point forecasts and \code{ERROR} for forecast errors on validation set.
@@ -32,16 +30,22 @@
 #' update process.
 #' @param scorecast If \code{TRUE}, scorecasting will be included in the update
 #' process.
-#' @param lr Initial learning rate used for quantile tracking.
+#' @param lr Initial learning rate used for quantile tracking (0.1 as default).
 #' @param Tg The time that is set to achieve the target absolute coverage
-#' guarantee before this.
-#' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta}.
+#' guarantee before this. Defaults to the number of cross-validation periods in \code{object}.
+#' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta} (0.01 as default).
 #' @param Csat A positive constant ensuring that by time \code{Tg}, an absolute
-#' guarantee is of at least \eqn{1-\alpha-\delta} coverage.
-#' @param KI A positive constant to place the integrator on the same scale as the scores.
-#' @param ... Other arguments are passed to the function.
+#' guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
+#' and \code{delta} when not supplied.
+#' @param KI A positive constant to place the integrator on the same scale as
+#' the scores. Defaults to the largest absolute forecast error in \code{object}.
+#' @param update If \code{TRUE}, \code{object} already holds the results of a
+#' previous call and only the newly added time steps are computed; the
+#' prediction intervals produced earlier are carried over unchanged. Set by
+#' \code{\link{update.cpforecast}} and not normally set by hand.
+#' @param ... Not used.
 #'
-#' @return A list of class \code{c("acmcp", "cpforecast", "forecast")}
+#' @return A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
@@ -61,7 +65,7 @@
 #' series with the same dimensional characteristics as \code{MEAN}.}
 #' \item{level}{The confidence values associated with the prediction intervals.}
 #' \item{call}{The matched call.}
-#' \item{model}{A list containing information abouth the conformal prediction model.}
+#' \item{model}{A list containing information about the conformal prediction model.}
 #' If \code{mean} is included in the \code{object}, the components \code{mean},
 #' \code{lower}, and \code{upper} will also be returned, showing the information
 #' about the test set forecasts generated using all available observations.
@@ -98,74 +102,194 @@
 #' @importFrom stats lm
 #' @importFrom forecast meanf Arima forecast
 #' @export
-acmcp <- function(object, alpha = 1 - 0.01 * object$level,
-                ncal = 10, rolling = FALSE,
-                integrate = TRUE, scorecast = TRUE,
-                lr = 0.1, Tg = NULL, delta = NULL,
-                Csat = 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg)),
-                KI = abs(object$errors) |> max(na.rm = TRUE), ...) {
+acmcp <- function(
+  object,
+  alpha = 1 - 0.01 * object$level,
+  ncal = 10,
+  rolling = FALSE,
+  integrate = TRUE,
+  scorecast = TRUE,
+  lr = 0.1,
+  Tg = NROW(object$ERROR),
+  delta = 0.01,
+  Csat = NULL,
+  KI = max(abs(object$ERROR), na.rm = TRUE),
+  update = FALSE,
+  ...
+) {
   # Check inputs
-  if (any(alpha >= 1 | alpha <= 0))
+  if (any(alpha >= 1 | alpha <= 0)) {
     stop("alpha should be in (0, 1)")
-  if (ncal < 10)
+  }
+  if (ncal < 10) {
     stop("Length of calibration period should at least be 10")
-  if (!is.null(Tg) && !is.null(delta)) {
-    if (!is.null(Csat))
-      warning("Csat is replaced by calculation using Tg and delta")
+  }
+
+  if (is.null(Csat)) {
     Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
   }
 
   alpha <- sort(alpha, decreasing = TRUE)
   level <- 100 * (1 - alpha)
-  pf <- ts(as.matrix(object$MEAN),
-           start = start(object$MEAN),
-           frequency = frequency(object$MEAN))
-  errors <- ts(as.matrix(object$ERROR),
-               start = start(object$ERROR),
-               frequency = frequency(object$ERROR))
+  nlev <- length(alpha)
+  pf <- ts(
+    as.matrix(object$MEAN),
+    start = start(object$MEAN),
+    frequency = frequency(object$MEAN)
+  )
+  errors <- ts(
+    as.matrix(object$ERROR),
+    start = start(object$ERROR),
+    frequency = frequency(object$ERROR)
+  )
   horizon <- ncol(pf)
   n <- nrow(pf)
 
-  if (ncal > nrow(errors))
-    stop("`ncal` is larger than the number of rows in object$ERROR")
+  if (ncal + horizon - 1L > nrow(errors) - !object$forward) {
+    stop(
+      "`ncal` is too large: `ncal + h - 1` must not exceed ",
+      nrow(errors) - !object$forward,
+      " for h = ",
+      horizon
+    )
+  }
 
-  namatrix <- `colnames<-` (
-    ts(matrix(NA_real_, nrow = n, ncol = horizon),
-       start = start(pf),
-       frequency = frequency(pf)),
-    paste0("h=", seq(horizon)))
-  nalist <- `names<-` (
-    rep(list(namatrix), length(alpha)),
-    paste0(level, "%"))
+  # Warm start: resume the recursion instead of replaying the whole history.
+  # Only valid if the stored state exists and none of the settings changed.
+  warm <- FALSE
+  if (update && !is.null(object$model$state) && !is.null(object$model$t_last)) {
+    settings <- list(
+      alpha = alpha,
+      ncal = ncal,
+      rolling = rolling,
+      integrate = integrate,
+      scorecast = scorecast,
+      lr = lr,
+      Csat = Csat,
+      KI = KI
+    )
+    unchanged <- vapply(
+      names(settings),
+      function(nm) {
+        old <- object$model$args[[nm]]
+        is.null(old) || isTRUE(all.equal(old, settings[[nm]]))
+      },
+      logical(1)
+    )
+    if (all(unchanged)) {
+      warm <- TRUE
+    } else {
+      warning(
+        "cannot warm-start `acmcp`: ",
+        paste(names(settings)[!unchanged], collapse = ", "),
+        " changed since the object was built; recomputing from scratch",
+        call. = FALSE
+      )
+    }
+  }
+
+  namatrix <- `colnames<-`(
+    ts(
+      matrix(NA_real_, nrow = n, ncol = horizon),
+      start = start(pf),
+      frequency = frequency(pf)
+    ),
+    paste0("h=", seq(horizon))
+  )
+  nalist <- `names<-`(
+    rep(list(namatrix), nlev),
+    paste0(level, "%")
+  )
+
+  # Rows already covered by the stored state. Everything carried over from the
+  # object is copied into the top of a freshly allocated full-size matrix, so
+  # the time-series attributes come from `namatrix` and never have to be
+  # rebuilt, and nothing has to be padded.
+  prev <- integer(0)
+  if (warm) {
+    if (nrow(object$model$lr_update) > n) {
+      stop("the stored state is longer than the current series")
+    }
+    prev <- seq_len(nrow(object$model$lr_update))
+  }
 
   lower <- upper <- nalist
   lrmat <- namatrix
-  if (integrate)
+  if (warm) {
+    for (i in seq(nlev)) {
+      lower[[i]][seq_len(nrow(object$LOWER[[i]])), ] <- object$LOWER[[i]]
+      upper[[i]][seq_len(nrow(object$UPPER[[i]])), ] <- object$UPPER[[i]]
+    }
+    lrmat[prev, ] <- object$model$lr_update
+  }
+  if (integrate) {
     integrator_lower <- integrator_upper <- nalist
-  if (scorecast)
+    if (warm) {
+      for (i in seq(nlev)) {
+        integrator_lower[[i]][prev, ] <- object$model$integrator$lower[[i]]
+        integrator_upper[[i]][prev, ] <- object$model$integrator$upper[[i]]
+      }
+    }
+  }
+  if (scorecast) {
     scorecaster_lower <- scorecaster_upper <- namatrix
+    if (warm) {
+      # NB: the linear-regression scorecaster reads back its own past output at
+      # shorter horizons, so this history must be carried over, not rebuilt.
+      scorecaster_lower[prev, ] <- object$model$scorecaster$lower
+      scorecaster_upper[prev, ] <- object$model$scorecaster$upper
+    }
+  }
 
   out <- list(
     x = object$x,
     series = object$series
   )
 
+  t_last <- nrow(errors) - !object$forward
+  t_resume <- if (warm) object$model$t_last + 1L else NA_integer_
+
+  cp_times <- integer(horizon)
+  state <- vector("list", horizon)
   for (h in seq(horizon)) {
-    indx <- seq(h, nrow(errors)-!object$forward, by = 1L)
+    idx_all <- seq(h, t_last, by = 1L)
+    # number of times a conformal prediction has been made, over the whole
+    # history -- not just over the steps replayed in this call
+    cp_times[h] <- sum(idx_all >= ncal + h - 1)
+    indx <- if (warm) idx_all[idx_all >= t_resume] else idx_all
 
     errt_lower_h <- errt_upper_h <-
       integ_lower_h <- integ_upper_h <-
-      q_lo_h <- q_up_h <-
-      matrix(NA_real_, nrow = n, ncol = length(alpha))
+        matrix(NA_real_, nrow = n, ncol = nlev)
     qts_lower_h <- qts_upper_h <-
-      qs_lower_h <- qs_upper_h <- matrix(0, nrow = n, ncol = length(alpha))
+      qs_lower_h <- qs_upper_h <-
+        matrix(0, nrow = n, ncol = nlev)
+
+    if (warm) {
+      st <- object$model$state[[h]]
+      qts_lower_h[prev, ] <- st$qts_lower
+      qts_upper_h[prev, ] <- st$qts_upper
+      qs_lower_h[prev, ] <- st$qs_lower
+      qs_upper_h[prev, ] <- st$qs_upper
+      errt_lower_h[prev, ] <- st$errt_lower
+      errt_upper_h[prev, ] <- st$errt_upper
+      # carry the integrator history over as well, so that writing it back
+      # below does not overwrite the restored rows with NA
+      if (integrate) {
+        for (i in seq(nlev)) {
+          integ_lower_h[, i] <- integrator_lower[[i]][, h]
+          integ_upper_h[, i] <- integrator_upper[[i]][, h]
+        }
+      }
+    }
 
     for (t in indx) {
       t_burnin <- max(t - ncal + 1L, h)
       errors_subset <- subset(
         errors[, h],
         start = ifelse(!rolling, h, t_burnin),
-        end = t)
+        end = t
+      )
 
       # Calculate errt
       errt_lower_h[t, ] <- (-errors[t, h]) > qs_lower_h[t, ]
@@ -175,44 +299,54 @@ acmcp <- function(object, alpha = 1 - 0.01 * object$level,
       lrmat[t, h] <- ifelse(
         length(errors_subset) <= 1,
         lr,
-        lr*(max(errors_subset) - min(errors_subset)))
+        lr *
+          (max(errors_subset, na.rm = TRUE) - min(errors_subset, na.rm = TRUE))
+      )
 
       # Update quantile tracking
-      qts_lower_h[t+h, ] <- qts_lower_h[t+h-1, ] + lrmat[t, h] * (errt_lower_h[t, ] - alpha/2)
-      qts_upper_h[t+h, ] <- qts_upper_h[t+h-1, ] + lrmat[t, h] * (errt_upper_h[t, ] - alpha/2)
+      qts_lower_h[t + h, ] <- qts_lower_h[t + h - 1, ] +
+        lrmat[t, h] * (errt_lower_h[t, ] - alpha / 2)
+      qts_upper_h[t + h, ] <- qts_upper_h[t + h - 1, ] +
+        lrmat[t, h] * (errt_upper_h[t, ] - alpha / 2)
 
       # Update integrator
       if (integrate) {
-        el <- errt_lower_h[h:t, ] |>
-          matrix(ncol = length(alpha))
-        integrator_lower_arg <- apply(el, 2, sum) - nrow(el)*alpha/2
-        integ_lower_h[t+h, ] <- sapply(
-          1:length(alpha),
-          function(i) ifelse(
-            nrow(el) == 1,
-            0,
-            saturation_fn_log(integrator_lower_arg[i], nrow(el), Csat, KI)))
+        el <- errt_lower_h[h:t, ] |> matrix(ncol = nlev)
+        integrator_lower_arg <- apply(el, 2, sum) - nrow(el) * alpha / 2
+        integ_lower_h[t + h, ] <- sapply(
+          seq(nlev),
+          function(i) {
+            ifelse(
+              nrow(el) == 1,
+              0,
+              saturation_fn_log(integrator_lower_arg[i], nrow(el), Csat, KI)
+            )
+          }
+        )
 
-        eu <- errt_upper_h[h:t, ] |>
-          matrix(ncol = length(alpha))
-        integrator_upper_arg <- apply(eu, 2, sum) - nrow(eu)*alpha/2
-        integ_upper_h[t+h, ] <- sapply(
-          1:length(alpha),
-          function(i) ifelse(
-            nrow(eu) == 1,
-            0,
-            saturation_fn_log(integrator_upper_arg[i], nrow(eu), Csat, KI)))
+        eu <- errt_upper_h[h:t, ] |> matrix(ncol = nlev)
+        integrator_upper_arg <- apply(eu, 2, sum) - nrow(eu) * alpha / 2
+        integ_upper_h[t + h, ] <- sapply(
+          seq(nlev),
+          function(i) {
+            ifelse(
+              nrow(eu) == 1,
+              0,
+              saturation_fn_log(integrator_upper_arg[i], nrow(eu), Csat, KI)
+            )
+          }
+        )
       }
 
       # Update scorecaster
-      do_scorecast <- (scorecast && t >= (ncal+h-1))
+      do_scorecast <- (scorecast && t >= (ncal + h - 1))
       if (do_scorecast) {
         if (h == 1) {
           model <- forecast::meanf(errors_subset, h = h)
-          scorecaster_lower[t+h, h] <- -as.numeric(model$mean)
-          scorecaster_upper[t+h, h] <- as.numeric(model$mean)
+          scorecaster_lower[t + h, h] <- -as.numeric(model$mean)
+          scorecaster_upper[t + h, h] <- as.numeric(model$mean)
         } else {
-          model_MA <- forecast::Arima(errors_subset, order = c(0, 0, h-1)) |>
+          model_MA <- forecast::Arima(errors_subset, order = c(0, 0, h - 1)) |>
             forecast::forecast(h = h)
           model_LR <- lm(
             as.formula(paste0("V", h, " ~ .")),
@@ -220,53 +354,98 @@ acmcp <- function(object, alpha = 1 - 0.01 * object$level,
               as.data.frame(sapply(1:h, function(j) {
                 subset(
                   errors[, j],
-                  start = ifelse(!rolling, j, t-ncal+1-h+j),
-                  end = t-h+j)
+                  start = ifelse(!rolling, j, t - ncal + 1 - h + j),
+                  end = t - h + j
+                )
               })),
-              paste0("V", 1:h))
+              paste0("V", 1:h)
+            )
           ) |>
             forecast::forecast(
               newdata = setNames(
-                data.frame(sapply(1:(h-1),
-                                  function(j) scorecaster_upper[t-h+1+j, j]) |> matrix(nrow = 1)),
-                paste0("V", 1:(h-1))))
-          scorecaster_lower[t+h, h] <- -(as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean))/2
-          scorecaster_upper[t+h, h] <- (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean))/2
+                data.frame(
+                  sapply(1:(h - 1), function(j) {
+                    scorecaster_upper[t - h + 1 + j, j]
+                  }) |>
+                    matrix(nrow = 1)
+                ),
+                paste0("V", 1:(h - 1))
+              )
+            )
+          scorecaster_lower[t + h, h] <- -(as.numeric(model_MA$mean[h]) +
+            as.numeric(model_LR$mean)) /
+            2
+          scorecaster_upper[t + h, h] <- (as.numeric(model_MA$mean[h]) +
+            as.numeric(model_LR$mean)) /
+            2
         }
       }
 
       # Update the next quantile
-      qs_lower_h[t+h, ] <- qts_lower_h[t+h, ] +
-        ifelse(rep(integrate, length(alpha)), integ_lower_h[t+h, ], rep(0, length(alpha))) +
-        rep(ifelse(do_scorecast,
-                   ifelse(is.na(scorecaster_lower[t+h, h]), 0, scorecaster_lower[t+h, h]),
-                   0),
-            length(alpha))
-      qs_upper_h[t+h, ] <- qts_upper_h[t+h, ] +
-        ifelse(rep(integrate, length(alpha)), integ_upper_h[t+h, ], rep(0, length(alpha))) +
-        rep(ifelse(do_scorecast,
-                   ifelse(is.na(scorecaster_upper[t+h, h]), 0, scorecaster_upper[t+h, h]),
-                   0),
-            length(alpha))
+      qs_lower_h[t + h, ] <- qts_lower_h[t + h, ] +
+        ifelse(
+          rep(integrate, nlev),
+          integ_lower_h[t + h, ],
+          rep(0, nlev)
+        ) +
+        rep(
+          ifelse(
+            do_scorecast,
+            ifelse(
+              is.na(scorecaster_lower[t + h, h]),
+              0,
+              scorecaster_lower[t + h, h]
+            ),
+            0
+          ),
+          nlev
+        )
+      qs_upper_h[t + h, ] <- qts_upper_h[t + h, ] +
+        ifelse(
+          rep(integrate, nlev),
+          integ_upper_h[t + h, ],
+          rep(0, nlev)
+        ) +
+        rep(
+          ifelse(
+            do_scorecast,
+            ifelse(
+              is.na(scorecaster_upper[t + h, h]),
+              0,
+              scorecaster_upper[t + h, h]
+            ),
+            0
+          ),
+          nlev
+        )
 
       # PIs
-      if (t >= (ncal+h-1)) {
-        for (i in seq(length(alpha))) {
-          lower[[i]][t+h, h] <- pf[t+h, h] - qs_lower_h[t+h, i]
-          upper[[i]][t+h, h] <- pf[t+h, h] + qs_upper_h[t+h, i]
+      if (t >= (ncal + h - 1)) {
+        for (i in seq(nlev)) {
+          lower[[i]][t + h, h] <- pf[t + h, h] - qs_lower_h[t + h, i]
+          upper[[i]][t + h, h] <- pf[t + h, h] + qs_upper_h[t + h, i]
         }
       }
     }
+
     if (integrate) {
-      for (i in seq(length(alpha))) {
+      for (i in seq(nlev)) {
         integrator_lower[[i]][, h] <- integ_lower_h[, i]
         integrator_upper[[i]][, h] <- integ_upper_h[, i]
       }
     }
+    state[[h]] <- list(
+      qts_lower = qts_lower_h,
+      qts_upper = qts_upper_h,
+      qs_lower = qs_lower_h,
+      qs_upper = qs_upper_h,
+      errt_lower = errt_lower_h,
+      errt_upper = errt_upper_h
+    )
   }
 
   out$method <- paste("acmcp")
-  out$cp_times <- length(indx)
+  out$cp_times <- cp_times
   out$MEAN <- object$MEAN
   out$ERROR <- object$ERROR
   out$LOWER <- lower
@@ -275,38 +454,63 @@ acmcp <- function(object, alpha = 1 - 0.01 * object$level,
   out$call <- match.call()
   if ("mean" %in% names(object)) {
     out$mean <- object$mean
-    out$lower <- extract_final(lower, nrow = n, ncol = horizon, bench = out$mean)
-    out$upper <- extract_final(upper, nrow = n, ncol = horizon, bench = out$mean)
+    out$lower <- extract_final(
+      lower,
+      nrow = n,
+      ncol = horizon,
+      bench = out$mean
+    )
+    out$upper <- extract_final(
+      upper,
+      nrow = n,
+      ncol = horizon,
+      bench = out$mean
+    )
   }
   out$model$method <- out$method
   out$model$call <- match.call()
-  out$model$alpha <- alpha
-  out$model$integrate <- integrate
-  out$model$scorecast <- scorecast
-  out$model$lr <- lr
-  out$model$Csat <- Csat
-  out$model$KI <- KI
+  # Every setting is recorded here and nowhere else; `call` is for display
+  # only, and `update.cpforecast()` replays these values.
+  out$model$args <- c(
+    list(
+      alpha = alpha,
+      ncal = ncal,
+      rolling = rolling,
+      integrate = integrate,
+      scorecast = scorecast,
+      lr = lr,
+      Tg = Tg,
+      delta = delta,
+      Csat = Csat,
+      KI = KI
+    ),
+    list(...)
+  )
   out$model$lr_update <- lrmat
-  if (integrate)
-    out$model$integrator <- list(lower = integrator_lower, upper = integrator_upper)
-  if (scorecast)
-    out$model$scorecaster <- list(lower = scorecaster_lower, upper = scorecaster_upper)
+  out$model$t_last <- t_last
+  out$model$state <- state
+  if (update) {
+    out$model$cvforecast$call <- object$model$cvforecast$call
+    out$model$cvforecast$args <- object$model$cvforecast$args
+  } else {
+    out$model$cvforecast$call <- object$call
+    out$model$cvforecast$args <- object$args
+  }
+  if (integrate) {
+    out$model$integrator <- list(
+      lower = integrator_lower,
+      upper = integrator_upper
+    )
+  }
+  if (scorecast) {
+    out$model$scorecaster <- list(
+      lower = scorecaster_lower,
+      upper = scorecaster_upper
+    )
+  }
 
-  return(structure(out, class = c("acmcp", "cpforecast", "forecast")))
-}
-
-
-#' @export
-print.acmcp <- function(x, ...) {
-  NextMethod()
-}
-
-#' @export
-summary.acmcp <- function(object, ...) {
-  NextMethod()
-}
-
-#' @export
-print.summary.acmcp <- function(x, ...) {
-  NextMethod()
+  return(structure(
+    out,
+    class = c("acmcp", "cpforecast", "cvforecast", "forecast")
+  ))
 }

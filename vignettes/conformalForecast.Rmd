@@ -36,8 +36,7 @@ set.seed(0)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 autoplot(series) +
   labs(
-    title = "Time series generated from an AR(2) model",
-    ylab = ""
+    title = "Time series generated from an AR(2) model"
   ) +
   theme_bw()
 ```
@@ -59,8 +58,7 @@ summary(fc)
 fc |>
   autoplot() +
   labs(
-    title = "Forecasts produced using an AR(2) model",
-    ylab = ""
+    title = "Forecasts produced using an AR(2) model"
   ) +
   theme_bw()
 ```
@@ -228,7 +226,7 @@ cov |>
   as_tsibble(index = index, key = c(horizon, method)) |>
   mutate(method = factor(method, levels = methods)) |>
   ggplot(aes(x = index, y = coverage, group = method, colour = method)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   scale_colour_manual(values = cols) +
   geom_hline(yintercept = 0.95, linetype = "dashed", colour = "gray") +
   facet_grid(horizon~.) +
@@ -277,7 +275,7 @@ wid |>
   as_tsibble(index = index, key = c(horizon, method)) |>
   mutate(method = factor(method, levels = methods)) |>
   ggplot(aes(x = index, y = width, group = method, colour = method)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   scale_colour_manual(values = cols) +
   facet_grid(horizon~.) +
   xlab("Time") +

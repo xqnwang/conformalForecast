@@ -2,9 +2,6 @@
 % Please edit documentation in R/scp.R
 \name{scp}
 \alias{scp}
-\alias{print.scp}
-\alias{summary.scp}
-\alias{print.summary.scp}
 \title{Classical split conformal prediction method}
 \usage{
 scp(
@@ -55,8 +52,10 @@ weights are supported.}
 \item{kess}{If \code{TRUE}, Kish's effective sample size is used for sample
 quantile computation.}
 
-\item{update}{If \code{TRUE}, the function will be compatible with the
-\code{update}(\link{update.cpforecast}) function, allowing for easy updates of conformal prediction.}
+\item{update}{If \code{TRUE}, \code{object} already holds the results of a
+previous call and only the newly added time steps are computed; the
+prediction intervals produced earlier are carried over unchanged. Set by
+\code{\link{update.cpforecast}} and not normally set by hand.}
 
 \item{na.rm}{If \code{TRUE}, corresponding entries in sample values and weights
 are removed if either is \code{NA} when calculating sample quantile.}
@@ -64,7 +63,7 @@ are removed if either is \code{NA} when calculating sample quantile.}
 \item{...}{Other arguments are passed to \code{weightfun}.}
 }
 \value{
-A list of class \code{c("scp", "cvforecast", "forecast")}
+A list of class \code{c("scp", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
