@@ -57,6 +57,7 @@
 #' with the following components:
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
+#' \item{xreg}{Exogenous predictor variables used, if applicable.}
 #' \item{method}{A character string "pid".}
 #' \item{cp_times}{An integer vector giving the number of conformal predictions
 #' performed in cross-validation for each forecast horizon.}
@@ -281,9 +282,9 @@ pid <- function(
     }
   }
 
-  out <- list(
-    x = object$x,
-    series = object$series
+  out <- c(
+    list(x = object$x, series = object$series),
+    if ("xreg" %in% names(object)) list(xreg = object$xreg)
   )
 
   t_last <- nrow(errors) - !object$forward

@@ -73,6 +73,7 @@ A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
 with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
+\item{xreg}{Exogenous predictor variables used, if applicable.}
 \item{method}{A character string "acmcp".}
 \item{cp_times}{An integer vector giving the number of conformal predictions
 performed in cross-validation for each forecast horizon.}
