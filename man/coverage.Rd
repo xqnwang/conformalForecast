@@ -10,7 +10,9 @@ coverage(object, ..., level = 95, window = NULL, na.rm = FALSE)
 \arguments{
 \item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
 
-\item{...}{Additional inputs if \code{object} is missing.}
+\item{...}{Arguments \code{x}, \code{LOWER}, and \code{UPPER} if
+\code{object} is missing. Bounds may be time-series matrices or lists keyed
+by confidence level.}
 
 \item{level}{Target confidence level for prediction intervals.}
 

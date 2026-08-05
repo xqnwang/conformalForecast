@@ -7,7 +7,9 @@
 #' @aliases print.coverage
 #'
 #' @param object An object of class \code{"cvforecast"} or \code{"cpforecast"}.
-#' @param ... Additional inputs if \code{object} is missing.
+#' @param ... Arguments \code{x}, \code{LOWER}, and \code{UPPER} if
+#' \code{object} is missing. Bounds may be time-series matrices or lists keyed
+#' by confidence level.
 #' @param level Target confidence level for prediction intervals.
 #' @param window If not \code{NULL}, the rolling mean matrix for coverage is also returned.
 #' @param na.rm A logical indicating whether \code{NA} values should be stripped
@@ -77,6 +79,13 @@ coverage <- function(object, ..., level = 95, window = NULL, na.rm = FALSE) {
     upper <- object$UPPER[[levelname]]
   }
 
+  if (is.null(lower) || is.null(upper)) {
+    stop("no interval forecasts of target confidence level")
+  }
+  if (!(is.ts(lower) && is.matrix(lower) &&
+        is.ts(upper) && is.matrix(upper))) {
+    stop("`LOWER` and `UPPER` should be time-series matrices")
+  }
   if (ncol(lower) != ncol(upper)) {
     stop("LOWER and UPPER should have the same number of columns")
   }
