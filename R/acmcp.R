@@ -30,14 +30,16 @@
 #' update process.
 #' @param scorecast If \code{TRUE}, scorecasting will be included in the update
 #' process.
-#' @param lr Initial learning rate used for quantile tracking (0.1 as default).
+#' @param lr A positive initial learning rate used for quantile tracking.
 #' @param Tg The time that is set to achieve the target absolute coverage
-#' guarantee before this. Defaults to the number of cross-validation periods in \code{object}.
-#' @param delta The target absolute coverage guarantee is set to \eqn{1-\alpha-\delta} (0.01 as default).
+#' guarantee before this. It must be greater than 1 when \code{Csat} is not
+#' supplied. Defaults to the number of cross-validation periods in \code{object}.
+#' @param delta A number in \eqn{(0, 1)}. The target absolute coverage guarantee
+#' is set to \eqn{1-\alpha-\delta}.
 #' @param Csat A positive constant ensuring that by time \code{Tg}, an absolute
 #' guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
 #' and \code{delta} when not supplied.
-#' @param KI A positive constant to place the integrator on the same scale as
+#' @param KI A non-negative constant to place the integrator on the same scale as
 #' the scores. Defaults to the largest absolute forecast error in \code{object}.
 #' @param update If \code{TRUE}, \code{object} already holds the results of a
 #' previous call and only the newly added time steps are computed; the
@@ -50,8 +52,8 @@
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
 #' \item{method}{A character string "acmcp".}
-#' \item{cp_times}{The number of times the conformal prediction is performed in
-#' cross-validation.}
+#' \item{cp_times}{An integer vector giving the number of conformal predictions
+#' performed in cross-validation for each forecast horizon.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 #' holds the point forecasts for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
@@ -124,9 +126,27 @@ acmcp <- function(
   if (ncal < 10) {
     stop("Length of calibration period should at least be 10")
   }
+  is_number <- function(x) {
+    is.numeric(x) && length(x) == 1L && isTRUE(is.finite(x))
+  }
+  if (!is_number(lr) || lr <= 0) {
+    stop("`lr` should be a positive number")
+  }
+  if (!is_number(KI) || KI < 0) {
+    stop("`KI` should be a non-negative number")
+  }
 
   if (is.null(Csat)) {
+    if (!is_number(Tg) || Tg <= 1) {
+      stop("`Tg` should be a number greater than 1")
+    }
+    if (!is_number(delta) || delta <= 0 || delta >= 1) {
+      stop("`delta` should be in (0, 1)")
+    }
     Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
+  }
+  if (!is_number(Csat) || Csat <= 0) {
+    stop("`Csat` should be a positive number")
   }
 
   alpha <- sort(alpha, decreasing = TRUE)
@@ -341,43 +361,46 @@ acmcp <- function(
       # Update scorecaster
       do_scorecast <- (scorecast && t >= (ncal + h - 1))
       if (do_scorecast) {
-        if (h == 1) {
-          model <- forecast::meanf(errors_subset, h = h)
-          scorecaster_lower[t + h, h] <- -as.numeric(model$mean)
-          scorecaster_upper[t + h, h] <- as.numeric(model$mean)
-        } else {
-          model_MA <- forecast::Arima(errors_subset, order = c(0, 0, h - 1)) |>
-            forecast::forecast(h = h)
-          model_LR <- lm(
-            as.formula(paste0("V", h, " ~ .")),
-            data = setNames(
-              as.data.frame(sapply(1:h, function(j) {
-                subset(
-                  errors[, j],
-                  start = ifelse(!rolling, j, t - ncal + 1 - h + j),
-                  end = t - h + j
-                )
-              })),
-              paste0("V", 1:h)
-            )
-          ) |>
-            forecast::forecast(
-              newdata = setNames(
-                data.frame(
-                  sapply(1:(h - 1), function(j) {
-                    scorecaster_upper[t - h + 1 + j, j]
-                  }) |>
-                    matrix(nrow = 1)
-                ),
-                paste0("V", 1:(h - 1))
+        score <- try(suppressWarnings({
+          if (h == 1) {
+            as.numeric(forecast::meanf(errors_subset, h = h)$mean)
+          } else {
+            model_MA <- forecast::Arima(
+              errors_subset,
+              order = c(0, 0, h - 1)
+            ) |>
+              forecast::forecast(h = h)
+            model_LR <- lm(
+              as.formula(paste0("V", h, " ~ .")),
+              data = setNames(
+                as.data.frame(sapply(1:h, function(j) {
+                  subset(
+                    errors[, j],
+                    start = ifelse(!rolling, j, t - ncal + 1 - h + j),
+                    end = t - h + j
+                  )
+                })),
+                paste0("V", 1:h)
               )
-            )
-          scorecaster_lower[t + h, h] <- -(as.numeric(model_MA$mean[h]) +
-            as.numeric(model_LR$mean)) /
-            2
-          scorecaster_upper[t + h, h] <- (as.numeric(model_MA$mean[h]) +
-            as.numeric(model_LR$mean)) /
-            2
+            ) |>
+              forecast::forecast(
+                newdata = setNames(
+                  data.frame(
+                    sapply(1:(h - 1), function(j) {
+                      scorecaster_upper[t - h + 1 + j, j]
+                    }) |>
+                      matrix(nrow = 1)
+                  ),
+                  paste0("V", 1:(h - 1))
+                )
+              )
+            (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean)) / 2
+          }
+        }), silent = TRUE)
+        if (!inherits(score, "try-error") &&
+            length(score) == 1L && is.finite(score)) {
+          scorecaster_lower[t + h, h] <- -score
+          scorecaster_upper[t + h, h] <- score
         }
       }
 
