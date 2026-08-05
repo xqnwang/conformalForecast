@@ -62,8 +62,8 @@
 #' \item{series}{The name of the series \code{x}.}
 #' \item{xreg}{Exogenous predictor variables used, if applicable.}
 #' \item{method}{A character string "scp".}
-#' \item{cp_times}{The number of times the conformal prediction is performed in
-#' cross-validation.}
+#' \item{cp_times}{An integer vector giving the number of conformal predictions
+#' performed in cross-validation for each forecast horizon.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 #' holds the point forecasts for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
@@ -211,8 +211,7 @@ scp <- function(
   cp_times <- integer(horizon)
   for (h in seq(horizon)) {
     indx <- seq(ncal + h - 1, nrow(errors) - !object$forward, by = 1L)
-    # indx where the conformal prediction is performed:
-    cp_times[h] <- sum(indx >= ncal + h - 1)
+    cp_times[h] <- length(indx)
 
     for (t in indx) {
       # Check whether need to skip if update = TRUE
