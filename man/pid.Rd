@@ -124,6 +124,7 @@ by training a scorecaster based on nonconformity scores available at time \eqn{t
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 # Cross-validation forecasting
 far2 <- function(x, h, level) {
@@ -140,7 +141,7 @@ lr <- 0.1
 # PID without scorecaster
 pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
                  integrate = TRUE, scorecast = FALSE,
-                 lr = lr, KI = KI, Csat = Csat)
+                 lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 print(pidfc_nsf)
 summary(pidfc_nsf)
 # PID with a Naive model for the scorecaster
@@ -149,7 +150,7 @@ naivefun <- function(x, h) {
 }
 pidfc <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
              integrate = TRUE, scorecast = TRUE, scorecastfun = naivefun,
-             lr = lr, KI = KI, Csat = Csat)
+             lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 
 }
 \references{

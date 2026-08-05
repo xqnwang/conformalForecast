@@ -26,6 +26,7 @@
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
+#' set.seed(1)
 #' series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 #'
 #' # Cross-validation forecasting with a rolling window
@@ -39,6 +40,9 @@
 #' # Mean and rolling mean coverage for interval forecasts on validation set
 #' cov_fc <- coverage(fc, level = 95, window = 50)
 #' str(cov_fc)
+#'
+#' # Coverage calculated directly from interval components
+#' coverage(x = fc$x, LOWER = fc$LOWER, UPPER = fc$UPPER, level = 95)
 #'
 #' @importFrom stats window
 #' @importFrom zoo rollmean

@@ -62,6 +62,7 @@ The measures calculated are:
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting with a rolling window
@@ -76,9 +77,15 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
 accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 
+# Accuracy of conformal prediction intervals
+scpfc <- conformal(fc, method = "scp", symmetric = FALSE,
+                   ncal = 50, rolling = TRUE)
+accuracy(scpfc, measures = interval_measures, level = 95,
+         byhorizon = TRUE)
+
 # Out-of-sample forecast accuracy on test set
 accuracy(fc, x = c(1, 0.5, 0), measures = interval_measures,
-         level = 95, byhorizon = TRUE)
+         CV = FALSE, level = 95, byhorizon = TRUE)
 
 }
 \seealso{

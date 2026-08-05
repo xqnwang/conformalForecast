@@ -20,6 +20,7 @@ Find a shifted version of a matrix, adjusting the time base backward (lagged)
 or forward (leading) by a specified number of observations for each column.
 }
 \examples{
+set.seed(1)
 x <- matrix(rnorm(20), nrow = 5, ncol = 4)
 
 # Create lags of a matrix

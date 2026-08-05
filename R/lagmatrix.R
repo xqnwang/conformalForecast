@@ -10,6 +10,7 @@
 #' @return A matrix with the same class and size as \code{x}.
 #'
 #' @examples
+#' set.seed(1)
 #' x <- matrix(rnorm(20), nrow = 5, ncol = 4)
 #'
 #' # Create lags of a matrix

@@ -51,6 +51,7 @@ the information of the median interval width will be returned.
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting with a rolling window
@@ -64,5 +65,8 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
 # Mean and rolling mean width for interval forecasts on validation set
 wid_fc <- width(fc, level = 95, window = 50)
 str(wid_fc)
+
+# Width calculated directly from interval components
+width(LOWER = fc$LOWER, UPPER = fc$UPPER, level = 95)
 
 }

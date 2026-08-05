@@ -39,6 +39,7 @@ Update conformal prediction intervals and other information by applying the
 \examples{
 # Simulate time series from an AR(2) model
 library(forecast)
+set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 
 # Cross-validation forecasting
