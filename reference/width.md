@@ -94,13 +94,13 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
 wid_fc <- width(fc, level = 95, window = 50)
 str(wid_fc)
 #> List of 3
-#>  $ width   : Time-Series [1:153, 1:3] from 51 to 203: 3.87 3.96 3.94 3.95 3.95 ...
+#>  $ width   : Time-Series [1:153, 1:3] from 51 to 203: 3.7 3.84 3.82 3.87 3.96 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:3] "h=1" "h=2" "h=3"
-#>  $ mean    : Named num [1:3] 4.21 5.35 5.4
+#>  $ mean    : Named num [1:3] 4.2 5.32 5.37
 #>   ..- attr(*, "names")= chr [1:3] "h=1" "h=2" "h=3"
-#>  $ rollmean: Time-Series [1:104, 1:3] from 100 to 203: 4.08 4.09 4.1 4.1 4.1 ...
+#>  $ rollmean: Time-Series [1:104, 1:3] from 100 to 203: 4.05 4.06 4.07 4.08 4.09 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:3] "h=1" "h=2" "h=3"

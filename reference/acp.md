@@ -67,9 +67,11 @@ acp(
 
 - update:
 
-  If `TRUE`, the function will be compatible with the
-  `update`([update.cpforecast](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md))
-  function, allowing for easy updates of conformal prediction.
+  If `TRUE`, `object` already holds the results of a previous call and
+  only the newly added time steps are computed; the prediction intervals
+  produced earlier are carried over unchanged. Set by
+  [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+  and not normally set by hand.
 
 - na.rm:
 
@@ -84,8 +86,8 @@ acp(
 
 ## Value
 
-A list of class `c("acp", "cpforecast", "forecast")` with the following
-components:
+A list of class `c("acp", "cpforecast", "cvforecast", "forecast")` with
+the following components:
 
 - x:
 
@@ -136,7 +138,7 @@ components:
 
 - model:
 
-  A list containing information abouth the conformal prediction model.
+  A list containing information about the conformal prediction model.
 
 If `mean` is included in the `object`, the components `mean`, `lower`,
 and `upper` will also be returned, showing the information about the
@@ -180,22 +182,13 @@ print(acpfc)
 #>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
 #>      rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
-#>      rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201      0.1969684 -1.055741 1.795689
-#> 202     -0.5275402 -2.526663 1.438041
-#> 203     -0.6180594 -2.402479 1.119214
+#>     Point Forecast      Lo 95     Hi 95
+#> 201     1.04544596 -0.2976137 2.6441663
+#> 202     0.03086665 -3.1687767 1.9964475
+#> 203    -0.86970091 -3.9953586 0.6926362
 summary(acpfc)
 #> ACP 
 #> 
@@ -203,24 +196,15 @@ summary(acpfc)
 #>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
 #>      rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
-#>      rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201      0.1969684 -1.055741 1.795689
-#> 202     -0.5275402 -2.526663 1.438041
-#> 203     -0.6180594 -2.402479 1.119214
+#>     Point Forecast      Lo 95     Hi 95
+#> 201     1.04544596 -0.2976137 2.6441663
+#> 202     0.03086665 -3.1687767 1.9964475
+#> 203    -0.86970091 -3.9953586 0.6926362
 #> 
 #> Cross-validation error measures:
-#>        ME  MAE   MSE RMSE      MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.038 0.93 1.341 1.04 -220.016 425.573 0.958 0.875      6.023   6.002
+#>        ME   MAE   MSE  RMSE      MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV -0.038 0.937 1.364 1.048 -223.387 423.884 0.965 0.886       5.94   5.925
 ```

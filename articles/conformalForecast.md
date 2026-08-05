@@ -4,6 +4,7 @@ The *conformalForecast* package provides some commonly used conformal
 prediction methods for time series forecasting.
 
 ``` r
+
 library(conformalForecast)
 library(forecast)
 library(ggplot2)
@@ -15,16 +16,16 @@ library(tsibble)
 ## Data simulation
 
 Suppose we are interested in forecasting a time series data generated
-from an AR(2) model with $\phi_{1} = 0.8$, $\phi_{2} = - 0.5$, and
-$\sigma^{2} = 1$.
+from an AR(2) model with \\\phi_1 = 0.8\\, \\\phi_2=-0.5\\, and
+\\\sigma^2 = 1\\.
 
 ``` r
+
 set.seed(0)
 series <- arima.sim(n = 1000, list(ar = c(0.8, -0.5)), sd = sqrt(1))
 autoplot(series) +
   labs(
-    title = "Time series generated from an AR(2) model",
-    ylab = ""
+    title = "Time series generated from an AR(2) model"
   ) +
   theme_bw()
 ```
@@ -37,6 +38,7 @@ We first train a forecasting model AR(2) on a rolling forecast origin to
 generate forecasts and forecast errors on validation sets.
 
 ``` r
+
 far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |> forecast(h = h, level)
 }
@@ -63,11 +65,11 @@ summary(fc)
 ```
 
 ``` r
+
 fc |>
   autoplot() +
   labs(
-    title = "Forecasts produced using an AR(2) model",
-    ylab = ""
+    title = "Forecasts produced using an AR(2) model"
   ) +
   theme_bw()
 ```
@@ -75,6 +77,7 @@ fc |>
 ![](conformalForecast_files/figure-html/cvplot-1.png)
 
 ``` r
+
 (fc_score <- accuracy(fc, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
 #> CV h=1   4.784124 4.659562
@@ -105,6 +108,7 @@ Here, we perform a SCP method with equal weights in sample quantile
 estimation.
 
 ``` r
+
 scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
              weightfun = NULL, kess = FALSE, quantiletype = 1)
 
@@ -133,6 +137,7 @@ estimation by passing a weight calculation function to the `weightfun`
 argument.
 
 ``` r
+
 expweight <- function(n) 0.99^{n+1-(1:n)}
 scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
                  weightfun = expweight, kess = FALSE, quantiletype = 1)
@@ -157,11 +162,12 @@ scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 ### Adaptive conformal prediction (ACP)
 
-The ACP method uses an online update of $\alpha$ to perform the
+The ACP method uses an online update of \\\alpha\\ to perform the
 calibration so that we can achieve either approximate or exact marginal
 coverage.
 
 ``` r
+
 acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
 
 (acpfc_score <- accuracy(acpfc, byhorizon = TRUE))
@@ -189,6 +195,7 @@ integration, and scorecasting) to make an iteration to produce a
 sequence of quantile estimates used in the prediction sets.
 
 ``` r
+
 # PID setup
 Tg <- 1000; delta <- 0.01
 Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
@@ -197,6 +204,7 @@ lr <- 0.1
 ```
 
 ``` r
+
 # PID without scorecaster
 pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
                  integrate = TRUE, scorecast = FALSE,
@@ -221,6 +229,7 @@ pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 ```
 
 ``` r
+
 # PID with a Naive method as the scorecaster
 naivefun <- function(x, h) {
   naive(x) |> forecast(h = h)
@@ -251,14 +260,15 @@ pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 Similar to the PID method, the AcMCP method also integrates three
 modules (P, I, and D) to form the final iteration. However, instead of
-performing conformal prediction for each individual forecast horizon $h$
-separately, AcMCP employs a combination of an MA($h - 1$) model and a
-linear regression model of $e_{t + h|t}$ on
-$e_{t + h - 1|t},\ldots,e_{t + 1|t}$ as the scorecaster. This allows the
-AcMCP method to capture the relationship between the $h$-step ahead
+performing conformal prediction for each individual forecast horizon
+\\h\\ separately, AcMCP employs a combination of an MA(\\h-1\\) model
+and a linear regression model of \\e\_{t+h\|t}\\ on
+\\e\_{t+h-1\|t},\dots,e\_{t+1\|t}\\ as the scorecaster. This allows the
+AcMCP method to capture the relationship between the \\h\\-step ahead
 forecast error and past errors.
 
 ``` r
+
 acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
              lr = lr, KI = KI, Csat = Csat)
 
@@ -286,6 +296,7 @@ Taking the AcMCP result as an example, we now show the average coverage
 on validation sets.
 
 ``` r
+
 acmcpfc_cov$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, coverage = value) |>
@@ -305,6 +316,7 @@ acmcpfc_cov$rollmean |>
 We can also show the rolling average interval width on validation sets.
 
 ``` r
+
 acmcpfc_wid$rollmean |>
   as_tsibble() |>
   mutate(horizon = key, width = value) |>
@@ -323,6 +335,7 @@ acmcpfc_wid$rollmean |>
 We can also combine all the results and show them in one single plot.
 
 ``` r
+
 candidates <- c("fc", "scpfc", "scpfc_exp", "acpfc", "pidfc_nsf", "pidfc", "acmcpfc")
 methods <- c("AR", "SCP", "WCP", "ACP", "PI", "PID", "AcMCP")
 for (i in 1:length(candidates)) {
@@ -351,7 +364,7 @@ cov |>
   as_tsibble(index = index, key = c(horizon, method)) |>
   mutate(method = factor(method, levels = methods)) |>
   ggplot(aes(x = index, y = coverage, group = method, colour = method)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   scale_colour_manual(values = cols) +
   geom_hline(yintercept = 0.95, linetype = "dashed", colour = "gray") +
   facet_grid(horizon~.) +
@@ -363,6 +376,7 @@ cov |>
 ![](conformalForecast_files/figure-html/bind-cov-1.png)
 
 ``` r
+
 cov_mean <- lapply(1:length(candidates), function(i) {
   out_cov <- get(paste0(candidates[i], "_cov"))
   out_score <- get(paste0(candidates[i], "_score"))
@@ -409,6 +423,7 @@ print(cov_mean, n = nrow(cov_mean))
 ```
 
 ``` r
+
 for (i in 1:length(candidates)) {
   out <- get(paste0(candidates[i], "_wid"))
   out_pivot <- out$rollmean |>
@@ -426,7 +441,7 @@ wid |>
   as_tsibble(index = index, key = c(horizon, method)) |>
   mutate(method = factor(method, levels = methods)) |>
   ggplot(aes(x = index, y = width, group = method, colour = method)) +
-  geom_line(size = 0.8, alpha = 0.8) +
+  geom_line(linewidth = 0.8, alpha = 0.8) +
   scale_colour_manual(values = cols) +
   facet_grid(horizon~.) +
   xlab("Time") +

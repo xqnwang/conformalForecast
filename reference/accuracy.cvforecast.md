@@ -82,7 +82,7 @@ The measures calculated are:
 
 - RMSSE: Root Mean Squared Scaled Error
 
-- winkler_score: Winkler Score
+- Winkler: Winkler Score
 
 - MSIS: Mean Scaled Interval Score
 
@@ -108,28 +108,28 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
 
 # Out-of-sample forecast accuracy on validation set
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
-#>                ME       MAE      MSE      RMSE       MPE     MAPE     MASE
-#> CV h=1 0.03097937 0.8513179 1.119499 0.8513179 111.45557 184.4020 0.778602
-#> CV h=2 0.05953212 1.1602238 1.998144 1.1602238  63.31647 188.2276 1.058245
-#> CV h=3 0.04710356 1.1675812 2.014782 1.1675812  47.17800 182.5556 1.063932
+#>                ME       MAE      MSE      RMSE       MPE     MAPE      MASE
+#> CV h=1 0.02360276 0.8586951 1.133966 0.8586951 110.01436 182.9608 0.7906662
+#> CV h=2 0.05185524 1.1678584 2.006877 1.1678584  63.80171 188.6862 1.0730730
+#> CV h=3 0.05616645 1.1728258 2.021815 1.1728258  46.44065 181.8183 1.0767439
 #>            RMSSE
-#> CV h=1 0.6228594
-#> CV h=2 0.8471084
-#> CV h=3 0.8518445
+#> CV h=1 0.6306113
+#> CV h=2 0.8562614
+#> CV h=3 0.8593417
 accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.141322 4.677845
-#> CV h=2   5.997589 5.458960
-#> CV h=3   6.161738 5.610096
+#> CV h=1   5.137519 4.708273
+#> CV h=2   5.992869 5.493790
+#> CV h=3   6.157379 5.646547
 
 # Out-of-sample forecast accuracy on test set
 accuracy(fc, x = c(1, 0.5, 0), measures = interval_measures,
          level = 95, byhorizon = TRUE)
 #>          Winkler_95  MSIS_95
-#> CV h=1     5.141322 4.677845
-#> CV h=2     5.997589 5.458960
-#> CV h=3     6.161738 5.610096
-#> Test h=1   4.678008 4.341244
-#> Test h=2   5.807041 5.389000
-#> Test h=3   5.850943 5.429741
+#> CV h=1     5.137519 4.708273
+#> CV h=2     5.992869 5.493790
+#> CV h=3     6.157379 5.646547
+#> Test h=1   4.723912 4.386664
+#> Test h=2   5.809702 5.394939
+#> Test h=3   5.841090 5.424085
 ```

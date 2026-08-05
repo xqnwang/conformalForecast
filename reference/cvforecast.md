@@ -40,8 +40,7 @@ cvforecast(
 
 - level:
 
-  Confidence level for prediction intervals. If `NULL`, prediction
-  intervals will not be generated.
+  Confidence level for prediction intervals.
 
 - forward:
 
@@ -172,10 +171,10 @@ print(fc)
 #>  fit_times = 151 (the forward step included) 
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201     -1.1554197 -2.740135 0.429296
-#> 202      0.2822432 -1.902485 2.466971
-#> 203      1.0323863 -1.174433 3.239206
+#>     Point Forecast     Lo 95     Hi 95
+#> 201      1.3320878 -0.267674 2.9318496
+#> 202     -0.7896033 -2.902318 1.3231110
+#> 203     -1.6378374 -3.751157 0.4754822
 summary(fc)
 #> Cross-validation
 #> 
@@ -186,14 +185,14 @@ summary(fc)
 #>  fit_times = 151 (the forward step included) 
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201     -1.1554197 -2.740135 0.429296
-#> 202      0.2822432 -1.902485 2.466971
-#> 203      1.0323863 -1.174433 3.239206
+#>     Point Forecast     Lo 95     Hi 95
+#> 201      1.3320878 -0.267674 2.9318496
+#> 202     -0.7896033 -2.902318 1.3231110
+#> 203     -1.6378374 -3.751157 0.4754822
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.02 0.997 1.552 1.112 -18.514 291.627 0.941  0.84      5.526     5.2
+#>        ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV -0.007 0.984 1.521 1.099 -54.361 323.928 0.908 0.814      5.475   5.035
 
 # Example with exogenous predictors
 far2_xreg <- function(x, h, level, xreg, newxreg) {
@@ -203,4 +202,5 @@ far2_xreg <- function(x, h, level, xreg, newxreg) {
 fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = 95,
                       forward = TRUE, xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
                       initial = 1, window = 50)
+#> Warning: the final (forward) model fit failed; `mean`, `lower`, `upper` and `model` are not available
 ```

@@ -16,10 +16,11 @@ acmcp(
   integrate = TRUE,
   scorecast = TRUE,
   lr = 0.1,
-  Tg = NULL,
-  delta = NULL,
-  Csat = 2/pi * (ceiling(log(Tg) * delta) - 1/log(Tg)),
-  KI = max(abs(object$errors), na.rm = TRUE),
+  Tg = NROW(object$ERROR),
+  delta = 0.01,
+  Csat = NULL,
+  KI = max(abs(object$ERROR), na.rm = TRUE),
+  update = FALSE,
   ...
 )
 ```
@@ -65,35 +66,46 @@ acmcp(
 
 - lr:
 
-  Initial learning rate used for quantile tracking.
+  Initial learning rate used for quantile tracking (0.1 as default).
 
 - Tg:
 
   The time that is set to achieve the target absolute coverage guarantee
-  before this.
+  before this. Defaults to the number of cross-validation periods in
+  `object`.
 
 - delta:
 
-  The target absolute coverage guarantee is set to \\1-\alpha-\delta\\.
+  The target absolute coverage guarantee is set to \\1-\alpha-\delta\\
+  (0.01 as default).
 
 - Csat:
 
   A positive constant ensuring that by time `Tg`, an absolute guarantee
-  is of at least \\1-\alpha-\delta\\ coverage.
+  is of at least \\1-\alpha-\delta\\ coverage. Derived from `Tg` and
+  `delta` when not supplied.
 
 - KI:
 
   A positive constant to place the integrator on the same scale as the
-  scores.
+  scores. Defaults to the largest absolute forecast error in `object`.
+
+- update:
+
+  If `TRUE`, `object` already holds the results of a previous call and
+  only the newly added time steps are computed; the prediction intervals
+  produced earlier are carried over unchanged. Set by
+  [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+  and not normally set by hand.
 
 - ...:
 
-  Other arguments are passed to the function.
+  Not used.
 
 ## Value
 
-A list of class `c("acmcp", "cpforecast", "forecast")` with the
-following components:
+A list of class `c("acmcp", "cpforecast", "cvforecast", "forecast")`
+with the following components:
 
 - x:
 
@@ -144,7 +156,7 @@ following components:
 
 - model:
 
-  A list containing information abouth the conformal prediction model.
+  A list containing information about the conformal prediction model.
 
 If `mean` is included in the `object`, the components `mean`, `lower`,
 and `upper` will also be returned, showing the information about the
@@ -202,13 +214,13 @@ print(acmcpfc)
 #>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  
 #>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) 
 #> 
-#>  cp_times = 148 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201      0.5094989 -1.732309 2.155511
-#> 202      0.4044399 -3.233107 2.002388
-#> 203     -0.1040782 -3.529078 1.363847
+#>     Point Forecast     Lo 95     Hi 95
+#> 201     -0.7442755 -3.247935 0.9467444
+#> 202     -0.1156008 -3.591203 1.4368668
+#> 203      0.1146270 -3.028541 1.7814660
 summary(acmcpfc)
 #> ACMCP 
 #> 
@@ -216,15 +228,15 @@ summary(acmcpfc)
 #>  acmcp(object = fc, ncal = 50, rolling = TRUE, integrate = TRUE,  
 #>      scorecast = TRUE, lr = lr, Csat = Csat, KI = KI) 
 #> 
-#>  cp_times = 148 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 201      0.5094989 -1.732309 2.155511
-#> 202      0.4044399 -3.233107 2.002388
-#> 203     -0.1040782 -3.529078 1.363847
+#>     Point Forecast     Lo 95     Hi 95
+#> 201     -0.7442755 -3.247935 0.9467444
+#> 202     -0.1156008 -3.591203 1.4368668
+#> 203      0.1146270 -3.028541 1.7814660
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE   MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.109 1.003 1.566 1.143 -4.17 689.961 0.905 0.826      6.258   5.532
+#>        ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV -0.113 0.999 1.551 1.139 -1.965 690.611 0.889 0.815      6.377   5.576
 ```

@@ -41,7 +41,7 @@
 - [`scp()`](https://xqnwang.github.io/conformalForecast/reference/scp.md)
   : Classical split conformal prediction method
 - [`update(`*`<cpforecast>`*`)`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
-  : Update and repeform cross-validation forecasting and conformal
+  : Update and reperform cross-validation forecasting and conformal
   prediction
 - [`width()`](https://xqnwang.github.io/conformalForecast/reference/width.md)
   : Calculate interval forecast width

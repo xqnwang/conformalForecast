@@ -77,9 +77,11 @@ scp(
 
 - update:
 
-  If `TRUE`, the function will be compatible with the
-  `update`([update.cpforecast](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md))
-  function, allowing for easy updates of conformal prediction.
+  If `TRUE`, `object` already holds the results of a previous call and
+  only the newly added time steps are computed; the prediction intervals
+  produced earlier are carried over unchanged. Set by
+  [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+  and not normally set by hand.
 
 - na.rm:
 
@@ -92,8 +94,8 @@ scp(
 
 ## Value
 
-A list of class `c("scp", "cvforecast", "forecast")` with the following
-components:
+A list of class `c("scp", "cpforecast", "cvforecast", "forecast")` with
+the following components:
 
 - x:
 
@@ -205,46 +207,30 @@ print(scpfc)
 #> Call:
 #>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     -0.6049760 -2.837393 2.103852
-#> 202     -0.5913297 -2.376767 1.900967
-#> 203     -0.1246454 -1.950841 2.334243
+#> 201      0.8381597 -1.394258 3.546988
+#> 202     -0.2428663 -2.028303 2.249430
+#> 203     -0.5063254 -2.332521 1.952563
 summary(scpfc)
 #> SCP 
 #> 
 #> Call:
 #>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  scp(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     -0.6049760 -2.837393 2.103852
-#> 202     -0.5913297 -2.376767 1.900967
-#> 203     -0.1246454 -1.950841 2.334243
+#> 201      0.8381597 -1.394258 3.546988
+#> 202     -0.2428663 -2.028303 2.249430
+#> 203     -0.5063254 -2.332521 1.952563
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.077 1.036 1.672 1.169 -69.16 546.408 1.112 0.973       6.45   6.492
+#>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.077 1.043 1.685 1.177 -67.952 546.154 1.117  0.98      6.458    6.49
 
 # Classical conformal prediction with exponential weights
 expweight <- function(n) {

@@ -12,6 +12,7 @@ You can install the development version of conformalForecast from
 [GitHub](https://github.com/xqnwang/conformalForecast) with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("xqnwang/conformalForecast")
 ```
@@ -19,6 +20,7 @@ remotes::install_github("xqnwang/conformalForecast")
 You can also get the official release version from CRAN:
 
 ``` r
+
 install.packages("conformalForecast")
 ```
 
@@ -31,6 +33,7 @@ This is a basic example which shows you how to perform a classical
 conformal prediction method:
 
 ``` r
+
 library(conformalForecast)
 library(forecast)
 

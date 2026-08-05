@@ -71,25 +71,17 @@ summary(scpfc)
 #> Call:
 #>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.3481845 -1.694398 2.606816
-#> 202     -0.4556896 -2.590600 1.370540
-#> 203     -0.7068473 -3.113914 1.136993
+#> 201    -0.80664167 -2.849224 1.451989
+#> 202    -0.20322450 -2.338135 1.623005
+#> 203     0.05669504 -2.350372 1.900536
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.001 0.994 1.501  1.1 177.356 266.543 0.902 0.784      7.043   6.409
+#>        ME   MAE   MSE  RMSE     MPE    MAPE MASE RMSSE Winkler_95 MSIS_95
+#> CV -0.042 0.997 1.523 1.105 175.173 265.181 0.89  0.78      7.076   6.359
 
 # ACP with asymmetric nonconformity scores and rolling calibration sets
 acpfc <- conformal(fc, method = "acp", symmetric = FALSE, gamma = 0.005,
@@ -101,24 +93,15 @@ summary(acpfc)
 #>  acp(object = object, gamma = 0.005, symmetric = FALSE, ncal = 50,  
 #>      rolling = TRUE) 
 #> 
-#>  cp_times = 99 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  acp(object = object, gamma = 0.005, symmetric = FALSE, ncal = 50,  
-#>      rolling = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.3481845 -1.694398 2.606816
-#> 202     -0.4556896 -4.358829 1.370540
-#> 203     -0.7068473 -4.577801      Inf
+#> 201    -0.80664167 -2.849224 1.451989
+#> 202    -0.20322450 -4.106364 1.623005
+#> 203     0.05669504 -3.814259      Inf
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.001 0.994 1.501  1.1 177.356 266.543 0.902 0.784        Inf     Inf
+#>        ME   MAE   MSE  RMSE     MPE    MAPE MASE RMSSE Winkler_95 MSIS_95
+#> CV -0.042 0.997 1.523 1.105 175.173 265.181 0.89  0.78        Inf     Inf
 ```

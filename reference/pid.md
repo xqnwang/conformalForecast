@@ -16,10 +16,11 @@ pid(
   scorecast = !symmetric,
   scorecastfun = NULL,
   lr = 0.1,
-  Tg = NULL,
-  delta = NULL,
-  Csat = 2/pi * (ceiling(log(Tg) * delta) - 1/log(Tg)),
-  KI = max(abs(object$errors), na.rm = TRUE),
+  Tg = NROW(object$ERROR),
+  delta = 0.01,
+  Csat = NULL,
+  KI = max(abs(object$ERROR), na.rm = TRUE),
+  update = FALSE,
   ...
 )
 ```
@@ -37,7 +38,7 @@ pid(
 - alpha:
 
   A numeric vector of significance levels to achieve a desired coverage
-  level \\1-\alpha\\.
+  level \\1-\alpha\\. Defaults to the levels used in `object`.
 
 - symmetric:
 
@@ -83,7 +84,8 @@ pid(
 - Tg:
 
   The time that is set to achieve the target absolute coverage guarantee
-  before this.
+  before this. Defaults to the number of cross-validation periods in
+  `object`.
 
 - delta:
 
@@ -92,12 +94,21 @@ pid(
 - Csat:
 
   A positive constant ensuring that by time `Tg`, an absolute guarantee
-  is of at least \\1-\alpha-\delta\\ coverage.
+  is of at least \\1-\alpha-\delta\\ coverage. Derived from `Tg` and
+  `delta` when not supplied.
 
 - KI:
 
   A positive constant to place the integrator on the same scale as the
-  scores.
+  scores. Defaults to the largest absolute forecast error in `object`.
+
+- update:
+
+  If `TRUE`, `object` already holds the results of a previous call and
+  only the newly added time steps are computed; the prediction intervals
+  produced earlier are carried over unchanged. Set by
+  [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+  and not normally set by hand.
 
 - ...:
 
@@ -105,8 +116,8 @@ pid(
 
 ## Value
 
-A list of class `c("pid", "cpforecast", "forecast")` with the following
-components:
+A list of class `c("pid", "cpforecast", "cvforecast", "forecast")` with
+the following components:
 
 - x:
 
@@ -157,7 +168,7 @@ components:
 
 - model:
 
-  A list containing information abouth the conformal prediction model.
+  A list containing information about the conformal prediction model.
 
 If `mean` is included in the `object`, the components `mean`, `lower`,
 and `upper` will also be returned, showing the information about the
@@ -224,13 +235,13 @@ print(pidfc_nsf)
 #>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  
 #>      KI = KI) 
 #> 
-#>  cp_times = 148 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     0.78863033 -1.494426 2.585959
-#> 202     0.19240047 -1.821271 2.751143
-#> 203    -0.02560772 -1.919723 2.370350
+#> 201     0.03683588 -2.242931 1.893144
+#> 202     0.57458110 -1.382805 3.459214
+#> 203     0.59809803 -1.312176 3.390853
 summary(pidfc_nsf)
 #> PID 
 #> 
@@ -239,17 +250,17 @@ summary(pidfc_nsf)
 #>      integrate = TRUE, scorecast = FALSE, lr = lr, Csat = Csat,  
 #>      KI = KI) 
 #> 
-#>  cp_times = 148 (the forward step included) 
+#>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201     0.78863033 -1.494426 2.585959
-#> 202     0.19240047 -1.821271 2.751143
-#> 203    -0.02560772 -1.919723 2.370350
+#> 201     0.03683588 -2.242931 1.893144
+#> 202     0.57458110 -1.382805 3.459214
+#> 203     0.59809803 -1.312176 3.390853
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.144 0.979 1.508 1.105 -89.391 522.845 0.993 0.866      6.066   5.969
+#>       ME  MAE   MSE  RMSE     MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.149 0.99 1.531 1.115 -87.991 524.355 0.997 0.873      6.189   6.057
 # PID with a Naive model for the scorecaster
 naivefun <- function(x, h) {
   naive(x) |> forecast(h = h)

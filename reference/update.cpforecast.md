@@ -1,4 +1,4 @@
-# Update and repeform cross-validation forecasting and conformal prediction
+# Update and reperform cross-validation forecasting and conformal prediction
 
 Update conformal prediction intervals and other information by applying
 the `cvforecast` and `conformal` functions.
@@ -71,50 +71,34 @@ print(scpfc_update)
 #> SCP 
 #> 
 #> Call:
-#>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      update = TRUE) 
+#>  scp(object = object, alpha = 0.0499999999999999, symmetric = FALSE,  
+#>      ncal = 50, rolling = TRUE, quantiletype = 1, weightfun = ..6,  
+#>      kess = FALSE, update = TRUE, na.rm = TRUE) 
 #> 
-#>  cp_times = 102 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      update = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 104 (h=1), 103 (h=2), 102 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 204      1.2910976 -1.249629 5.592616
-#> 205     -0.3496234 -3.679947 4.522049
-#> 206     -0.9708415 -4.416003 3.579224
+#>     Point Forecast      Lo 95    Hi 95
+#> 204      1.4556158 -0.1611874 5.757134
+#> 205     -0.1328581 -1.8806744 4.738814
+#> 206     -0.8275830 -2.6161373 3.722483
 summary(scpfc_update)
 #> SCP 
 #> 
 #> Call:
-#>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      update = TRUE) 
+#>  scp(object = object, alpha = 0.0499999999999999, symmetric = FALSE,  
+#>      ncal = 50, rolling = TRUE, quantiletype = 1, weightfun = ..6,  
+#>      kess = FALSE, update = TRUE, na.rm = TRUE) 
 #> 
-#>  cp_times = 102 (the forward step included) 
-#> 
-#> Forecasts of the forward step:
-#> Cross-validation
-#> 
-#> Call:
-#>  scp(object = object, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      update = TRUE) 
-#> 
-#>  fit_times =  (the forward step included) 
+#>  cp_times (the forward step included): 104 (h=1), 103 (h=2), 102 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast     Lo 95    Hi 95
-#> 204      1.2910976 -1.249629 5.592616
-#> 205     -0.3496234 -3.679947 4.522049
-#> 206     -0.9708415 -4.416003 3.579224
+#>     Point Forecast      Lo 95    Hi 95
+#> 204      1.4556158 -0.1611874 5.757134
+#> 205     -0.1328581 -1.8806744 4.738814
+#> 206     -0.8275830 -2.6161373 3.722483
 #> 
 #> Cross-validation error measures:
-#>        ME   MAE   MSE  RMSE    MPE    MAPE MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.001 1.131 2.037 1.276 26.357 239.353 1.04 0.943      8.998   7.994
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.047 1.101 1.909 1.243 26.934 245.167 1.022 0.927       7.66    6.93
 ```
