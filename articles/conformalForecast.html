@@ -316,6 +316,12 @@ a linear regression model of <span class="math inline">\(e_{t+h|t}\)</span> on <
 scorecaster. This allows the AcMCP method to capture the relationship
 between the <span class="math inline">\(h\)</span>-step ahead forecast
 error and past errors.</p>
+<p>The MA scorecaster uses CSS-ML estimation by default, matching the
+reference implementation. For longer forecast horizons,
+<code>ma_method = "CSS"</code> may be faster, although it can produce
+different estimates. Scorecasts are constructed recursively, so the
+first scorecast for horizon <span class="math inline">\(h\)</span>
+becomes available at cross-validation error index <span class="math inline">\(n_{\mathrm{cal}} + h(h-1)/2\)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acmcp.html">acmcp</a></span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>

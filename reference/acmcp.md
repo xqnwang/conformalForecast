@@ -21,6 +21,7 @@ acmcp(
   Csat = NULL,
   KI = max(abs(object$ERROR), na.rm = TRUE),
   update = FALSE,
+  ma_method = c("CSS-ML", "CSS"),
   ...
 )
 ```
@@ -99,6 +100,14 @@ acmcp(
   [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
   and not normally set by hand.
 
+- ma_method:
+
+  Estimation method for the MA\\(h-1)\\ scorecaster. `"CSS-ML"` uses
+  conditional sum of squares for starting values followed by maximum
+  likelihood. `"CSS"` uses conditional sum of squares only and may be
+  faster, especially for longer forecast horizons, but can produce
+  different estimates.
+
 - ...:
 
   Not used.
@@ -128,6 +137,11 @@ with the following components:
 
   An integer vector giving the number of conformal predictions performed
   in cross-validation for each forecast horizon.
+
+- scorecast_times:
+
+  An integer vector giving the number of successful scorecasts for each
+  forecast horizon. Returned when `scorecast = TRUE`.
 
 - MEAN:
 
@@ -176,7 +190,11 @@ separately, AcMCP employs a combination of an MA\\(h-1)\\ model and a
 linear regression model of \\e\_{t+h\|t}\\ on
 \\e\_{t+h-1\|t},\dots,e\_{t+1\|t}\\ as the scorecaster. This allows the
 AcMCP method to capture the relationship between the \\h\\-step ahead
-forecast error and past errors.
+forecast error and past errors. Scorecasts are constructed recursively,
+so longer forecast horizons require more history before all scorecaster
+inputs are available. For horizon \\h\\, the first scorecast can be
+computed at cross-validation error index `ncal` + \\h(h-1)/2\\. The
+number of successful scorecasts is reported in `scorecast_times`.
 
 ## References
 
@@ -245,4 +263,6 @@ summary(acmcpfc)
 #> Cross-validation error measures:
 #>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
 #> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.618   7.132
+acmcpfc$scorecast_times
+#> [1] 101 100  98
 ```

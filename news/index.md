@@ -7,9 +7,16 @@
   `model$KI` are now collected in `model$args`.
 - `forecast` moved from `Imports` to `Depends`, so it is attached
   together with `conformalForecast`.
+- [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)
+  now accepts `ma_method = "CSS"` for faster MA scorecaster fitting at
+  longer forecast horizons, while retaining `"CSS-ML"` as the default,
+  and reports successful scorecasts in `scorecast_times`.
 
 ### Bug fixes
 
+- [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)
+  no longer fits MA models before its recursive scorecaster inputs are
+  available.
 - [`update()`](https://rdrr.io/r/stats/update.html) now works on
   [`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md),
   [`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md)

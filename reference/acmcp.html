@@ -65,6 +65,7 @@ deal with asymmetric nonconformity scores, i.e., forecast errors.</p>
 <span>  Csat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  KI <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">ERROR</span><span class="op">)</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  update <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ma_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CSS-ML"</span>, <span class="st">"CSS"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -142,6 +143,14 @@ prediction intervals produced earlier are carried over unchanged. Set by
 <code><a href="update.cpforecast.html">update.cpforecast</a></code> and not normally set by hand.</p></dd>
 
 
+<dt id="arg-ma-method">ma_method<a class="anchor" aria-label="anchor" href="#arg-ma-method"></a></dt>
+<dd><p>Estimation method for the MA\((h-1)\) scorecaster.
+<code>"CSS-ML"</code> uses conditional sum of squares for starting values followed
+by maximum likelihood. <code>"CSS"</code> uses conditional sum of squares only and
+may be faster, especially for longer forecast horizons, but can produce
+different estimates.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Not used.</p></dd>
 
@@ -165,6 +174,10 @@ with the following components:</p>
 <dt>cp_times</dt>
 <dd><p>An integer vector giving the number of conformal predictions
 performed in cross-validation for each forecast horizon.</p></dd>
+
+<dt>scorecast_times</dt>
+<dd><p>An integer vector giving the number of successful
+scorecasts for each forecast horizon. Returned when <code>scorecast = TRUE</code>.</p></dd>
 
 <dt>MEAN</dt>
 <dd><p>Point forecasts as a multivariate time series, where the \(h\)th column
@@ -206,7 +219,12 @@ for each individual forecast horizon <code>h</code> separately, AcMCP employs a 
 of an MA\((h-1)\) model and a linear regression model of \(e_{t+h|t}\) on
 \(e_{t+h-1|t},\dots,e_{t+1|t}\) as the scorecaster. This allows the AcMCP method
 to capture the relationship between the \(h\)-step ahead forecast error and
-past errors.</p>
+past errors.
+Scorecasts are constructed recursively, so longer forecast horizons require
+more history before all scorecaster inputs are available. For horizon
+\(h\), the first scorecast can be computed at cross-validation error index
+<code>ncal</code> + \(h(h-1)/2\). The number of successful scorecasts is reported
+in <code>scorecast_times</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -275,6 +293,8 @@ for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation error measures:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.618   7.132</span>
+<span class="r-in"><span><span class="va">acmcpfc</span><span class="op">$</span><span class="va">scorecast_times</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 101 100  98</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -284,6 +284,13 @@ and a linear regression model of \\e\_{t+h\|t}\\ on
 AcMCP method to capture the relationship between the \\h\\-step ahead
 forecast error and past errors.
 
+The MA scorecaster uses CSS-ML estimation by default, matching the
+reference implementation. For longer forecast horizons,
+`ma_method = "CSS"` may be faster, although it can produce different
+estimates. Scorecasts are constructed recursively, so the first
+scorecast for horizon \\h\\ becomes available at cross-validation error
+index \\n\_{\mathrm{cal}} + h(h-1)/2\\.
+
 ``` r
 
 acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,

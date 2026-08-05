@@ -44,9 +44,13 @@
 <ul><li>Settings previously stored as <code>model$alpha</code>, <code>model$symmetric</code>, <code>model$integrate</code>, <code>model$scorecast</code>, <code>model$lr</code>, <code>model$Csat</code> and <code>model$KI</code> are now collected in <code>model$args</code>.</li>
 <li>
 <code>forecast</code> moved from <code>Imports</code> to <code>Depends</code>, so it is attached together with <code>conformalForecast</code>.</li>
+<li>
+<code><a href="../reference/acmcp.html">acmcp()</a></code> now accepts <code>ma_method = "CSS"</code> for faster MA scorecaster fitting at longer forecast horizons, while retaining <code>"CSS-ML"</code> as the default, and reports successful scorecasts in <code>scorecast_times</code>.</li>
 </ul><div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/acmcp.html">acmcp()</a></code> no longer fits MA models before its recursive scorecaster inputs are available.</li>
+<li>
 <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now works on <code><a href="../reference/pid.html">pid()</a></code>, <code><a href="../reference/acmcp.html">acmcp()</a></code> and <code>acp(symmetric = TRUE)</code> objects, and resumes from the last computed step instead of recomputing the whole history.</li>
 <li>
 <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now replays stored arguments, preserves forecasts at all frequencies, validates new data and external regressors, and handles failed final model fits. External regressors are retained by <code><a href="../reference/pid.html">pid()</a></code> and <code><a href="../reference/acmcp.html">acmcp()</a></code>, enabling external-regressor updates for all four conformal methods.</li>
