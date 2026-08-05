@@ -41,8 +41,8 @@ install.packages("conformalForecast")
 For a detailed tutorial and examples, please see the
 [vignette](https://xqnwang.github.io/conformalForecast/articles/conformalForecast.html).
 
-This is a basic example which shows you how to perform a classical
-conformal prediction method:
+This basic example shows how to perform classical conformal prediction
+and update the results when new observations become available:
 
 ``` r
 library(conformalForecast)
@@ -60,16 +60,21 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
                  forward = TRUE, initial = 1, window = 100)
 
 # Classical conformal prediction
-scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE)
+scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 100,
+                   rolling = TRUE)
+
+# Update conformal prediction with newly available observations
+scpfc_updated <- update(scpfc, new_data = c(1.5, 0.8, 2.3),
+                        forecastfun = far2)
 
 # Interval forecast accuracy
-accuracy(scpfc, byhorizon = TRUE)
+accuracy(scpfc_updated, byhorizon = TRUE)
 
 # Mean coverage
-coverage(scpfc, window = 500, level = 95)
+coverage(scpfc_updated, window = 500, level = 95)
 
 # Mean and median interval width
-width(scpfc, window = 500, level = 95, includemedian = TRUE)
+width(scpfc_updated, window = 500, level = 95, includemedian = TRUE)
 ```
 
 ## License
