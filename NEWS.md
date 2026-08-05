@@ -5,9 +5,14 @@
   are now collected in `model$args`.
 * `forecast` moved from `Imports` to `Depends`, so it is attached together with
   `conformalForecast`.
+* `acmcp()` now accepts `ma_method = "CSS"` for faster MA scorecaster fitting at
+  longer forecast horizons, while retaining `"CSS-ML"` as the default, and
+  reports successful scorecasts in `scorecast_times`.
 
 ## Bug fixes
 
+* `acmcp()` no longer fits MA models before its recursive scorecaster inputs are
+  available.
 * `update()` now works on `pid()`, `acmcp()` and `acp(symmetric = TRUE)`
   objects, and resumes from the last computed step instead of recomputing the
   whole history.

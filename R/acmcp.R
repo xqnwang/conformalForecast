@@ -11,6 +11,11 @@
 #' \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the AcMCP method
 #' to capture the relationship between the \eqn{h}-step ahead forecast error and
 #' past errors.
+#' Scorecasts are constructed recursively, so longer forecast horizons require
+#' more history before all scorecaster inputs are available. For horizon
+#' \eqn{h}, the first scorecast can be computed at cross-validation error index
+#' \code{ncal} + \eqn{h(h-1)/2}. The number of successful scorecasts is reported
+#' in \code{scorecast_times}.
 #'
 #' @param object An object of class \code{"cvforecast"}. It must have an argument
 #' \code{x} for original univariate time series, an argument \code{MEAN} for
@@ -45,6 +50,11 @@
 #' previous call and only the newly added time steps are computed; the
 #' prediction intervals produced earlier are carried over unchanged. Set by
 #' \code{\link{update.cpforecast}} and not normally set by hand.
+#' @param ma_method Estimation method for the MA\eqn{(h-1)} scorecaster.
+#' \code{"CSS-ML"} uses conditional sum of squares for starting values followed
+#' by maximum likelihood. \code{"CSS"} uses conditional sum of squares only and
+#' may be faster, especially for longer forecast horizons, but can produce
+#' different estimates.
 #' @param ... Not used.
 #'
 #' @return A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
@@ -55,6 +65,8 @@
 #' \item{method}{A character string "acmcp".}
 #' \item{cp_times}{An integer vector giving the number of conformal predictions
 #' performed in cross-validation for each forecast horizon.}
+#' \item{scorecast_times}{An integer vector giving the number of successful
+#' scorecasts for each forecast horizon. Returned when \code{scorecast = TRUE}.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 #' holds the point forecasts for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
@@ -102,6 +114,7 @@
 #'              lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 #' print(acmcpfc)
 #' summary(acmcpfc)
+#' acmcpfc$scorecast_times
 #'
 #' @importFrom stats lm
 #' @importFrom forecast meanf Arima forecast
@@ -119,9 +132,11 @@ acmcp <- function(
   Csat = NULL,
   KI = max(abs(object$ERROR), na.rm = TRUE),
   update = FALSE,
+  ma_method = c("CSS-ML", "CSS"),
   ...
 ) {
   # Check inputs
+  ma_method <- match.arg(ma_method)
   if (any(alpha >= 1 | alpha <= 0)) {
     stop("alpha should be in (0, 1)")
   }
@@ -186,14 +201,19 @@ acmcp <- function(
       rolling = rolling,
       integrate = integrate,
       scorecast = scorecast,
+      ma_method = ma_method,
       lr = lr,
       Csat = Csat,
       KI = KI
     )
+    old_args <- object$model$args
+    if (is.null(old_args$ma_method)) {
+      old_args$ma_method <- "CSS-ML"
+    }
     unchanged <- vapply(
       names(settings),
       function(nm) {
-        old <- object$model$args[[nm]]
+        old <- old_args[[nm]]
         is.null(old) || isTRUE(all.equal(old, settings[[nm]]))
       },
       logical(1)
@@ -363,42 +383,46 @@ acmcp <- function(
       # Update scorecaster
       do_scorecast <- (scorecast && t >= (ncal + h - 1))
       if (do_scorecast) {
-        score <- try(suppressWarnings({
-          if (h == 1) {
+        score <- NA_real_
+        if (h == 1) {
+          score <- try(suppressWarnings(
             as.numeric(forecast::meanf(errors_subset, h = h)$mean)
-          } else {
-            model_MA <- forecast::Arima(
-              errors_subset,
-              order = c(0, 0, h - 1)
-            ) |>
-              forecast::forecast(h = h)
-            model_LR <- lm(
-              as.formula(paste0("V", h, " ~ .")),
-              data = setNames(
-                as.data.frame(sapply(1:h, function(j) {
-                  subset(
-                    errors[, j],
-                    start = ifelse(!rolling, j, t - ncal + 1 - h + j),
-                    end = t - h + j
-                  )
-                })),
-                paste0("V", 1:h)
-              )
-            ) |>
-              forecast::forecast(
-                newdata = setNames(
-                  data.frame(
-                    sapply(1:(h - 1), function(j) {
-                      scorecaster_upper[t - h + 1 + j, j]
-                    }) |>
-                      matrix(nrow = 1)
-                  ),
-                  paste0("V", 1:(h - 1))
+          ), silent = TRUE)
+        } else {
+          score_inputs <- sapply(seq_len(h - 1L), function(j) {
+            scorecaster_upper[t - h + 1L + j, j]
+          })
+          if (all(is.finite(score_inputs))) {
+            score <- try(suppressWarnings({
+              model_MA <- forecast::Arima(
+                errors_subset,
+                order = c(0, 0, h - 1),
+                method = ma_method
+              ) |>
+                forecast::forecast(h = h)
+              model_LR <- lm(
+                as.formula(paste0("V", h, " ~ .")),
+                data = setNames(
+                  as.data.frame(sapply(seq_len(h), function(j) {
+                    subset(
+                      errors[, j],
+                      start = ifelse(!rolling, j, t - ncal + 1L - h + j),
+                      end = t - h + j
+                    )
+                  })),
+                  paste0("V", seq_len(h))
                 )
-              )
-            (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean)) / 2
+              ) |>
+                forecast::forecast(
+                  newdata = setNames(
+                    data.frame(matrix(score_inputs, nrow = 1L)),
+                    paste0("V", seq_len(h - 1L))
+                  )
+                )
+              (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean)) / 2
+            }), silent = TRUE)
           }
-        }), silent = TRUE)
+        }
         if (!inherits(score, "try-error") &&
             length(score) == 1L && is.finite(score)) {
           scorecaster_lower[t + h, h] <- -score
@@ -471,6 +495,9 @@ acmcp <- function(
 
   out$method <- paste("acmcp")
   out$cp_times <- cp_times
+  if (scorecast) {
+    out$scorecast_times <- as.integer(colSums(is.finite(scorecaster_upper)))
+  }
   out$MEAN <- object$MEAN
   out$ERROR <- object$ERROR
   out$LOWER <- lower
@@ -503,6 +530,7 @@ acmcp <- function(
       rolling = rolling,
       integrate = integrate,
       scorecast = scorecast,
+      ma_method = ma_method,
       lr = lr,
       Tg = Tg,
       delta = delta,

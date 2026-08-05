@@ -17,6 +17,7 @@ acmcp(
   Csat = NULL,
   KI = max(abs(object$ERROR), na.rm = TRUE),
   update = FALSE,
+  ma_method = c("CSS-ML", "CSS"),
   ...
 )
 }
@@ -66,6 +67,12 @@ previous call and only the newly added time steps are computed; the
 prediction intervals produced earlier are carried over unchanged. Set by
 \code{\link{update.cpforecast}} and not normally set by hand.}
 
+\item{ma_method}{Estimation method for the MA\eqn{(h-1)} scorecaster.
+\code{"CSS-ML"} uses conditional sum of squares for starting values followed
+by maximum likelihood. \code{"CSS"} uses conditional sum of squares only and
+may be faster, especially for longer forecast horizons, but can produce
+different estimates.}
+
 \item{...}{Not used.}
 }
 \value{
@@ -77,6 +84,8 @@ with the following components:
 \item{method}{A character string "acmcp".}
 \item{cp_times}{An integer vector giving the number of conformal predictions
 performed in cross-validation for each forecast horizon.}
+\item{scorecast_times}{An integer vector giving the number of successful
+scorecasts for each forecast horizon. Returned when \code{scorecast = TRUE}.}
 \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 holds the point forecasts for forecast horizon \eqn{h}. The time index
 corresponds to the period for which the forecast is produced.}
@@ -108,6 +117,11 @@ of an MA\eqn{(h-1)} model and a linear regression model of \eqn{e_{t+h|t}} on
 \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the AcMCP method
 to capture the relationship between the \eqn{h}-step ahead forecast error and
 past errors.
+Scorecasts are constructed recursively, so longer forecast horizons require
+more history before all scorecaster inputs are available. For horizon
+\eqn{h}, the first scorecast can be computed at cross-validation error index
+\code{ncal} + \eqn{h(h-1)/2}. The number of successful scorecasts is reported
+in \code{scorecast_times}.
 }
 \examples{
 # Simulate time series from an AR(2) model
@@ -135,6 +149,7 @@ acmcpfc <- acmcp(fc, ncal = 50, rolling = TRUE,
              lr = lr, Tg = Tg, KI = KI, Csat = Csat)
 print(acmcpfc)
 summary(acmcpfc)
+acmcpfc$scorecast_times
 
 }
 \references{

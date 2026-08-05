@@ -160,6 +160,8 @@ pidfc <- pid(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 Similar to the PID method, the AcMCP method also integrates three modules (P, I, and D) to form the final iteration. However, instead of performing conformal prediction for each individual forecast horizon $h$ separately, AcMCP employs a combination of an MA($h-1$) model and a linear regression model of $e_{t+h|t}$ on $e_{t+h-1|t},\dots,e_{t+1|t}$ as the scorecaster. This allows the AcMCP method to capture the relationship between the $h$-step ahead forecast error and past errors.
 
+The MA scorecaster uses CSS-ML estimation by default, matching the reference implementation. For longer forecast horizons, `ma_method = "CSS"` may be faster, although it can produce different estimates. Scorecasts are constructed recursively, so the first scorecast for horizon $h$ becomes available at cross-validation error index $n_{\mathrm{cal}} + h(h-1)/2$.
+
 ```{r acmcp}
 acmcpfc <- acmcp(fc, ncal = 100, rolling = TRUE, integrate = TRUE, scorecast = TRUE,
              lr = lr, KI = KI, Csat = Csat)
