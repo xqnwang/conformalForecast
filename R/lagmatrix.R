@@ -4,8 +4,8 @@
 #' or forward (leading) by a specified number of observations for each column.
 #'
 #' @param x A matrix or multivariate time series.
-#' @param lag A vector of lags (positive values) or leads (negative values) with
-#' a length equal to the number of columns of \code{x}.
+#' @param lag A vector of finite integer lags (positive values) or leads
+#' (negative values) with a length equal to the number of columns of \code{x}.
 #'
 #' @return A matrix with the same class and size as \code{x}.
 #'
@@ -30,9 +30,13 @@ lagmatrix <- function(x, lag) {
   if (ncol(x) != k) {
     stop("`lag` must have one element per column of `x`")
   }
+  if (!is.numeric(lag) || anyNA(lag) || any(!is.finite(lag)) ||
+      any(lag != trunc(lag))) {
+    stop("`lag` should contain finite integers")
+  }
 
   lmat <- x
-  for (i in 1:k) {
+  for (i in seq_len(k)) {
     if (lag[i] == 0) {
       lmat[, i] <- x[, i]
     } else if (abs(lag[i]) >= n) {

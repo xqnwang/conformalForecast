@@ -9,8 +9,8 @@ lagmatrix(x, lag)
 \arguments{
 \item{x}{A matrix or multivariate time series.}
 
-\item{lag}{A vector of lags (positive values) or leads (negative values) with
-a length equal to the number of columns of \code{x}.}
+\item{lag}{A vector of finite integer lags (positive values) or leads
+(negative values) with a length equal to the number of columns of \code{x}.}
 }
 \value{
 A matrix with the same class and size as \code{x}.
