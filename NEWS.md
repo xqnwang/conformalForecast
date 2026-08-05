@@ -9,10 +9,12 @@
 ## Bug fixes
 
 * `update()` now works on `pid()`, `acmcp()` and `acp(symmetric = TRUE)`
-  objects, and is much faster: it resumes from the last computed step instead of
-  recomputing the whole history.
-* `update()` no longer depends on the calling environment, and no longer
-  silently drops the new forecasts at some frequencies.
+  objects, and resumes from the last computed step instead of recomputing the
+  whole history.
+* `update()` now replays stored arguments, preserves forecasts at all
+  frequencies, validates new data and external regressors, and handles failed
+  final model fits. External regressors are retained by `pid()` and `acmcp()`,
+  enabling external-regressor updates for all four conformal methods.
 * `pid()` and `acmcp()` can be called with their documented defaults.
 * `print()` and `summary()` no longer repeat the cross-validation header.
 * `cvforecast()` no longer warns about arguments legitimately passed to
@@ -28,8 +30,10 @@
 * The pkgdown site renders mathematics again (`math-rendering: mathjax`).
 * Corrected the documented return classes, the `Winkler` measure name, the
   `lagmatrix()` error message, and several typos.
-* Vignette: replaced deprecated ggplot2 calls.
-* Fixed several typos.
+* Expanded the vignette with the `conformal()` interface, incremental updates,
+  external regressors, clearer method descriptions, and updated ggplot2 calls.
+* Help examples now cover raw inputs to `coverage()` and `width()` and
+  `cpforecast` accuracy, and use fixed random seeds for reproducibility.
 
 # conformalForecast 0.1.1
 
