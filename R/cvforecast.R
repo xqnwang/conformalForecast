@@ -101,25 +101,24 @@ cvforecast <- function(
   window = NULL,
   ...
 ) {
-  # Check whether there are non-existent arguments
-  args_fun <- list(...)
-  all.args <- union(names(formals()), names(formals(forecastfun)))
-  user.args <- names(match.call())[-1L]
-  bad <- setdiff(user.args, all.args)
-  if (length(bad) && !"..." %in% names(formals(forecastfun))) {
-    warning(
-      "Unused argument(s) will be ignored: ",
-      paste(bad, collapse = ", "),
-      call. = FALSE
-    )
-  }
-  args_fun <- args_fun[-which(names(args_fun) %in% bad)]
-
   # Check forecast function
   if (missing(forecastfun)) {
     stop("`forecastfun` is missing, with no default")
   }
   forecastfun <- match.fun(forecastfun)
+  args_fun <- list(...)
+  fun_args <- names(formals(forecastfun))
+  if (!"..." %in% fun_args) {
+    bad <- setdiff(names(args_fun)[nzchar(names(args_fun))], fun_args)
+    if (length(bad)) {
+      warning(
+        "Unused argument(s) will be ignored: ",
+        paste(bad, collapse = ", "),
+        call. = FALSE
+      )
+      args_fun[bad] <- NULL
+    }
+  }
 
   # Check input univariate time series
   if (any(class(y) %in% c("data.frame", "list", "matrix", "mts"))) {
@@ -227,12 +226,12 @@ cvforecast <- function(
     )
 
     if (!is.null(xreg)) {
-      args_fun$xreg_subset <- subset(
+      args_fun$xreg <- subset(
         xreg,
         start = ifelse(is.null(window), 1L, i - window + 1L),
         end = i
       )
-      args_fun$xreg_future <- subset(
+      args_fun$newxreg <- subset(
         xreg,
         start = i + 1L,
         end = i + h
@@ -242,7 +241,7 @@ cvforecast <- function(
     fc <- try(
       suppressWarnings(do.call(
         forecastfun,
-        c(list(x = y_subset, h = h, level = level), args_fun)
+        c(list(y_subset, h = h, level = level), args_fun)
       )),
       silent = TRUE
     )
