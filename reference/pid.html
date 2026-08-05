@@ -121,16 +121,18 @@ it must have an argument <code>h</code> for the forecast horizon.</p></dd>
 
 
 <dt id="arg-lr">lr<a class="anchor" aria-label="anchor" href="#arg-lr"></a></dt>
-<dd><p>Initial learning rate used for quantile tracking.</p></dd>
+<dd><p>A positive initial learning rate used for quantile tracking.</p></dd>
 
 
 <dt id="arg-tg">Tg<a class="anchor" aria-label="anchor" href="#arg-tg"></a></dt>
 <dd><p>The time that is set to achieve the target absolute coverage
-guarantee before this. Defaults to the number of cross-validation periods in <code>object</code>.</p></dd>
+guarantee before this. It must be greater than 1 when <code>Csat</code> is not
+supplied. Defaults to the number of cross-validation periods in <code>object</code>.</p></dd>
 
 
 <dt id="arg-delta">delta<a class="anchor" aria-label="anchor" href="#arg-delta"></a></dt>
-<dd><p>The target absolute coverage guarantee is set to \(1-\alpha-\delta\).</p></dd>
+<dd><p>A number in \((0, 1)\). The target absolute coverage guarantee
+is set to \(1-\alpha-\delta\).</p></dd>
 
 
 <dt id="arg-csat">Csat<a class="anchor" aria-label="anchor" href="#arg-csat"></a></dt>
@@ -140,7 +142,7 @@ and <code>delta</code> when not supplied.</p></dd>
 
 
 <dt id="arg-ki">KI<a class="anchor" aria-label="anchor" href="#arg-ki"></a></dt>
-<dd><p>A positive constant to place the integrator on the same scale as
+<dd><p>A non-negative constant to place the integrator on the same scale as
 the scores. Defaults to the largest absolute forecast error in <code>object</code>.</p></dd>
 
 
@@ -169,8 +171,8 @@ with the following components:</p>
 <dd><p>A character string "pid".</p></dd>
 
 <dt>cp_times</dt>
-<dd><p>The number of times the conformal prediction is performed in
-cross-validation.</p></dd>
+<dd><p>An integer vector giving the number of conformal predictions
+performed in cross-validation for each forecast horizon.</p></dd>
 
 <dt>MEAN</dt>
 <dd><p>Point forecasts as a multivariate time series, where the \(h\)th column

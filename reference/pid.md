@@ -79,17 +79,18 @@ pid(
 
 - lr:
 
-  Initial learning rate used for quantile tracking.
+  A positive initial learning rate used for quantile tracking.
 
 - Tg:
 
   The time that is set to achieve the target absolute coverage guarantee
-  before this. Defaults to the number of cross-validation periods in
-  `object`.
+  before this. It must be greater than 1 when `Csat` is not supplied.
+  Defaults to the number of cross-validation periods in `object`.
 
 - delta:
 
-  The target absolute coverage guarantee is set to \\1-\alpha-\delta\\.
+  A number in \\(0, 1)\\. The target absolute coverage guarantee is set
+  to \\1-\alpha-\delta\\.
 
 - Csat:
 
@@ -99,8 +100,9 @@ pid(
 
 - KI:
 
-  A positive constant to place the integrator on the same scale as the
-  scores. Defaults to the largest absolute forecast error in `object`.
+  A non-negative constant to place the integrator on the same scale as
+  the scores. Defaults to the largest absolute forecast error in
+  `object`.
 
 - update:
 
@@ -133,8 +135,8 @@ the following components:
 
 - cp_times:
 
-  The number of times the conformal prediction is performed in
-  cross-validation.
+  An integer vector giving the number of conformal predictions performed
+  in cross-validation for each forecast horizon.
 
 - MEAN:
 
