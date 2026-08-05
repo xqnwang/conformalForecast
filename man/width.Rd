@@ -17,7 +17,8 @@ width(
 \arguments{
 \item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
 
-\item{...}{Additional inputs if \code{object} is missing.}
+\item{...}{Time-series matrices \code{LOWER} and \code{UPPER} if
+\code{object} is missing.}
 
 \item{level}{Target confidence level for prediction intervals.}
 

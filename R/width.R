@@ -8,7 +8,8 @@
 #' @aliases print.width
 #'
 #' @param object An object of class \code{"cvforecast"} or \code{"cpforecast"}.
-#' @param ... Additional inputs if \code{object} is missing.
+#' @param ... Time-series matrices \code{LOWER} and \code{UPPER} if
+#' \code{object} is missing.
 #' @param level Target confidence level for prediction intervals.
 #' @param includemedian If \code{TRUE}, the median interval width will also be returned.
 #' @param window If not \code{NULL}, the rolling mean (and rolling median if applicable)
@@ -62,28 +63,29 @@ width <- function(
     stop("confidence limit out of range")
   }
   dots <- rlang::dots_list(...)
-  if (missing(object)) {
-    if (any(!(c("LOWER", "UPPER") %in% names(dots)))) {
-      stop("LOWER, and UPPER are required for coverage calculation")
-    }
-    lower <- dots$LOWER
-    upper <- dots$UPPER
-    if (is.list(lower)) {
-      lower <- lower[[paste0(level, "%")]]
-    }
-    if (is.list(upper)) {
-      upper <- upper[[paste0(level, "%")]]
-    }
-  } else {
-    if (any(!(c("LOWER", "UPPER") %in% names(object)))) {
-      stop("LOWER, and UPPER are required for coverage calculation")
-    }
-    if (!(level %in% object$level)) {
-      stop("no interval forecasts of target confidence level in object")
-    }
-    levelname <- paste0(level, "%")
-    lower <- object$LOWER[[levelname]]
-    upper <- object$UPPER[[levelname]]
+  input <- if (missing(object)) dots else object
+  if (any(!(c("LOWER", "UPPER") %in% names(input)))) {
+    stop("`LOWER` and `UPPER` are required for interval width calculation")
+  }
+  if (!missing(object) && !(level %in% object$level)) {
+    stop("no interval forecasts of target confidence level in object")
+  }
+
+  levelname <- paste0(level, "%")
+  lower <- input$LOWER
+  upper <- input$UPPER
+  if (is.list(lower)) {
+    lower <- lower[[levelname]]
+  }
+  if (is.list(upper)) {
+    upper <- upper[[levelname]]
+  }
+  if (is.null(lower) || is.null(upper)) {
+    stop("no interval forecasts of target confidence level")
+  }
+  if (!is.ts(lower) || !is.ts(upper) ||
+      !is.matrix(lower) || !is.matrix(upper)) {
+    stop("`LOWER` and `UPPER` should be time-series matrices")
   }
 
   if (ncol(lower) != ncol(upper)) {
@@ -101,6 +103,9 @@ width <- function(
   lower <- window(lower, start = start, end = end)
   upper <- window(upper, start = start, end = end)
   n <- nrow(lower)
+  if (!is.null(window) && window >= n) {
+    stop("the `window` argument should be smaller than the total period of interest")
+  }
 
   # Width matrix
   widmat <- (upper - lower) |>
@@ -116,11 +121,6 @@ width <- function(
 
   # Rolling mean width
   if (!is.null(window)) {
-    if (window >= n) {
-      stop(
-        "the `window` argument should be smaller than the total period of interest"
-      )
-    }
     out$rollmean <- apply(
       widmat,
       2,
@@ -138,17 +138,12 @@ width <- function(
 
     # Rolling median width
     if (!is.null(window)) {
-      if (window >= n) {
-        stop(
-          "the `window` argument should be smaller than the total period of interest"
-        )
-      }
       out$rollmedian <- apply(
         widmat,
         2,
-        zoo::rollmedian,
-        k = window,
-        na.rm = na.rm
+        function(x) {
+          zoo::rollapply(x, window, median, na.rm = na.rm)
+        }
       ) |>
         ts(end = end, frequency = period)
     }
