@@ -196,13 +196,27 @@ acp <- function(
       }
     }
 
-    for (t in indx) {
-      if (update) {
-        if (!t %in% tail(indx, n - nrow(errors) + 1)) {
-          next
-        }
+    run_indx <- indx
+    if (update) {
+      rows <- indx + h
+      missing_alpha <- if (symmetric) {
+        rowSums(is.na(alphat_h[rows, , drop = FALSE])) > 0
+      } else {
+        rowSums(
+          is.na(alphat_lower_h[rows, , drop = FALSE]) |
+            is.na(alphat_upper_h[rows, , drop = FALSE])
+        ) > 0
       }
+      first <- which(missing_alpha)[1L]
+      if (is.na(first)) {
+        run_indx <- integer()
+      } else {
+        first <- max(1L, first - 1L)
+        run_indx <- indx[seq.int(first, length(indx))]
+      }
+    }
 
+    for (t in run_indx) {
       errors_subset <- subset(
         errors[, h],
         start = ifelse(!rolling, 1, t - ncal + 1L),
