@@ -61,8 +61,8 @@ with the following components:
 \item{x}{The original time series.}
 \item{series}{The name of the series \code{x}.}
 \item{method}{A character string "acp".}
-\item{cp_times}{The number of times the conformal prediction is performed in
-cross-validation.}
+\item{cp_times}{An integer vector giving the number of conformal predictions
+performed in cross-validation for each forecast horizon.}
 \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 holds the point forecasts for forecast horizon \eqn{h}. The time index
 corresponds to the period for which the forecast is produced.}

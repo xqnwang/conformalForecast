@@ -42,8 +42,8 @@
 #' \item{x}{The original time series.}
 #' \item{series}{The name of the series \code{x}.}
 #' \item{method}{A character string "acp".}
-#' \item{cp_times}{The number of times the conformal prediction is performed in
-#' cross-validation.}
+#' \item{cp_times}{An integer vector giving the number of conformal predictions
+#' performed in cross-validation for each forecast horizon.}
 #' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
 #' holds the point forecasts for forecast horizon \eqn{h}. The time index
 #' corresponds to the period for which the forecast is produced.}
@@ -101,7 +101,7 @@ acp <- function(
   if (any(alpha >= 1 | alpha <= 0)) {
     stop("alpha should be in (0, 1)")
   }
-  if (gamma < 0) {
+  if (gamma <= 0) {
     stop("the step size parameter gamma should be positive")
   }
   if (ncal < 10) {
@@ -168,8 +168,7 @@ acp <- function(
   cp_times <- integer(horizon)
   for (h in seq(horizon)) {
     indx <- seq(ncal + h - 1, nrow(errors) - !object$forward, by = 1L)
-    # indx where the conformal prediction is performed:
-    cp_times[h] <- sum(indx >= ncal + h - 1)
+    cp_times[h] <- length(indx)
 
     alphat_h <- alphat_lower_h <- alphat_upper_h <-
       errt_h <- errt_lower_h <- errt_upper_h <-
