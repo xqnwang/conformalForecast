@@ -13,3 +13,4 @@ docs
 
 /.quarto/
 **/*.quarto_ipynb
+conformalForecast_*.tar.gz
