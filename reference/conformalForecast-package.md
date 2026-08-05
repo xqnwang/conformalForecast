@@ -28,3 +28,6 @@ Authors:
 
 - Rob Hyndman <Rob.Hyndman@monash.edu>
   ([ORCID](https://orcid.org/0000-0002-2140-5352))
+
+- Daniele Girolimetto <daniele.girolimetto@unipd.it>
+  ([ORCID](https://orcid.org/0000-0001-9387-1232))
