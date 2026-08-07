@@ -1,69 +1,85 @@
 #' Time series cross-validation forecasting
 #'
-#' Compute forecasts and other information by applying
-#' \code{forecastfun} to subsets of the time series \code{y} using a
-#' rolling forecast origin.
+#' Compute forecasts and other information by applying \code{forecastfun} to
+#' subsets of the time series \code{y} using a rolling forecast origin.
 #'
-#' Let \code{y} denote the time series \eqn{y_1,\dots,y_T}{y[1:T]} and
-#' let \eqn{t_0} denote the initial period.
+#' Let \code{y} denote the time series \eqn{y_1,\dots,y_T}{y[1:T]} and let
+#' \eqn{t_0} denote the initial period.
 #'
 #' Suppose \code{forward = TRUE}. If \code{window} is \code{NULL},
 #' \code{forecastfun} is applied successively to the subset time series
-#' \eqn{y_{1},\dots,y_t}{y[1:t]}, for \eqn{t=t_0,\dots,T},
-#' generating forecasts \eqn{\hat{y}_{t+1|t},\dots,\hat{y}_{t+h|t}}{f[t+1:h]}. If \code{window} is not
-#' \code{NULL} and has a length of \eqn{t_w}, then \code{forecastfun} is applied
-#' successively to the subset time series \eqn{y_{t-t_w+1},\dots,y_{t}}{y[(t-t_w+1):t)]},
-#' for \eqn{t=\max(t_0, t_w),\dots,T}.
+#' \eqn{y_{1},\dots,y_t}{y[1:t]}, for \eqn{t=t_0,\dots,T}, generating forecasts
+#' \eqn{\hat{y}_{t+1|t},\dots,\hat{y}_{t+h|t}}{f[t+1:h]}. If \code{window} is
+#' not \code{NULL} and has a length of \eqn{t_w}, then \code{forecastfun} is
+#' applied successively to the subset time series
+#' \eqn{y_{t-t_w+1},\dots,y_{t}}{y[(t-t_w+1):t)]}, for
+#' \eqn{t=\max(t_0, t_w),\dots,T}.
 #'
-#' If \code{forward} is \code{FALSE}, the last observation used for training will
-#' be \eqn{y_{T-1}}.
+#' If \code{forward} is \code{FALSE}, the last observation used for training
+#' will be \eqn{y_{T-1}}.
 #'
 #' @aliases print.cvforecast summary.cvforecast print.summary.cvforecast
 #'
 #' @param y Univariate time series.
 #' @param forecastfun Function to return an object of class \code{"forecast"}.
-#' Its first argument must be a univariate time series, and it must have an
-#' argument \code{h} for the forecast horizon and an argument \code{level} for
-#' the confidence level for prediction intervals. If exogenous predictors are used,
-#' then it must also have \code{xreg} and \code{newxreg} arguments corresponding
-#' to the training and test periods, respectively.
-#' @param h Forecast horizon.
-#' @param level Confidence level for prediction intervals.
+#'   Its first argument must be a univariate time series, and it must have an
+#'   argument \code{h} for the forecast horizon and an argument \code{level}
+#'   for the confidence level for prediction intervals. If exogenous
+#'   predictors are used, then it must also have \code{xreg} and
+#'   \code{newxreg} arguments corresponding to the training and the test
+#'   periods, respectively.
+#' @param h Forecast horizon. Defaults to \code{1}.
+#' @param level Confidence level for prediction intervals, as a numeric vector
+#'   of percentages. It must not be \code{NULL}, since the conformal methods
+#'   need at least one interval to start from. Defaults to \code{c(80, 95)}.
 #' @param forward If \code{TRUE}, the final forecast origin for forecasting is
-#' \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.
-#' @param xreg Exogenous predictor variables passed to \code{forecastfun} if required.
-#' It should be of the same size as \code{y}+\code{forward}*\code{h}, otherwise,
-#' \code{NA} padding or subsetting will be applied.
+#'   \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.
+#'   Defaults to \code{TRUE}.
+#' @param xreg Exogenous predictor variables passed to \code{forecastfun} if
+#'   required. It should be of the same size as
+#'   \code{y}+\code{forward}*\code{h}, otherwise, \code{NA} padding or
+#'   subsetting will be applied. Defaults to \code{NULL}.
 #' @param initial Initial period of the time series where no cross-validation
-#' forecasting is performed.
-#' @param window Length of the rolling window. If \code{NULL}, a rolling window
-#' will not be used.
+#'   forecasting is performed. Defaults to \code{1}.
+#' @param window Length of the rolling window. Defaults to \code{NULL}, in
+#'   which case a rolling window will not be used.
 #' @param ... Other arguments are passed to \code{forecastfun}.
 #'
 #' @return A list of class \code{c("cvforecast", "forecast")} with components:
-#' \item{x}{The original time series.}
-#' \item{series}{The name of the series \code{x}.}
-#' \item{xreg}{Exogenous predictor variables used in the model, if applicable.}
-#' \item{method}{A character string "cvforecast".}
-#' \item{fit_times}{The number of times the model is fitted in cross-validation.}
-#' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
-#' holds the point forecasts for forecast horizon \eqn{h}. The time index
-#' corresponds to the period for which the forecast is produced.}
-#' \item{ERROR}{Forecast errors given by
-#' \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
-#' \item{LOWER}{A list containing lower bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{UPPER}{A list containing upper bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{level}{The confidence values associated with the prediction intervals.}
-#' \item{call}{The matched call.}
-#' \item{forward}{Whether \code{forward} is applied.}
-#' If \code{forward} is \code{TRUE}, the components \code{mean}, \code{lower},
-#' \code{upper}, and \code{model} will also be returned, showing the information
-#' about the final fitted model and forecasts using all available observations, see
-#' e.g. \code{\link[forecast]{forecast.ets}} for more details.
+#'   \item{x}{The original time series.}
+#'   \item{series}{The name of the series \code{x}.}
+#'   \item{xreg}{Exogenous predictor variables used in the model, if
+#'     applicable.}
+#'   \item{method}{A character string "cvforecast".}
+#'   \item{fit_times}{The number of times the model is fitted in
+#'     cross-validation.}
+#'   \item{MEAN}{Point forecasts as a multivariate time series, where the
+#'     \eqn{h}th column holds the point forecasts for forecast horizon
+#'     \eqn{h}. The time index corresponds to the period for which the
+#'     forecast is produced.}
+#'   \item{ERROR}{Forecast errors given by
+#'     \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
+#'   \item{LOWER}{A list containing lower bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{UPPER}{A list containing upper bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{level}{The confidence values associated with the prediction
+#'     intervals.}
+#'   \item{call}{The matched call.}
+#'   \item{forward}{Whether \code{forward} is applied.}
+#'   If \code{forward} is \code{TRUE}, the components \code{mean},
+#'   \code{lower}, \code{upper}, and \code{model} will also be returned,
+#'   showing the information about the final fitted model and the forecasts
+#'   using all available observations, see e.g.
+#'   \code{\link[forecast]{forecast.ets}} for more details.
+#'
+#' @seealso \code{\link{conformal}} and the conformal methods
+#'   \code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}} and
+#'   \code{\link{acmcp}}, which all take the result of \code{cvforecast()} as
+#'   their input; \code{\link{update.cpforecast}} to extend the results with
+#'   new observations.
 #'
 #' @examples
 #' # Simulate time series from an AR(2) model
@@ -76,19 +92,18 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #' print(fc)
 #' summary(fc)
 #'
 #' # Example with exogenous predictors
 #' far2_xreg <- function(x, h, level, xreg, newxreg) {
-#'   Arima(x, order=c(2, 0, 0), xreg = xreg) |>
+#'   Arima(x, order = c(2, 0, 0), xreg = xreg) |>
 #'     forecast(h = h, level = level, xreg = newxreg)
 #' }
 #' fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = 95,
-#'                       forward = TRUE, xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
-#'                       initial = 1, window = 50)
+#'                       xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
+#'                       window = 50)
 #'
 #' @export
 cvforecast <- function(

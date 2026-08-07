@@ -1,13 +1,18 @@
 #' Create lags or leads of a matrix
 #'
-#' Find a shifted version of a matrix, adjusting the time base backward (lagged)
-#' or forward (leading) by a specified number of observations for each column.
+#' Find a shifted version of a matrix, adjusting the time base backward
+#' (lagged) or forward (leading) by a specified number of observations for
+#' each column.
 #'
-#' @param x A matrix or multivariate time series.
+#' @param x A matrix or a multivariate time series.
 #' @param lag A vector of finite integer lags (positive values) or leads
-#' (negative values) with a length equal to the number of columns of \code{x}.
+#'   (negative values) with a length equal to the number of columns of
+#'   \code{x}.
 #'
 #' @return A matrix with the same class and size as \code{x}.
+#'
+#' @seealso \code{\link{cvforecast}}, which uses this function to align the
+#'   forecasts and the forecast errors by horizon.
 #'
 #' @examples
 #' set.seed(1)
@@ -31,8 +36,12 @@ lagmatrix <- function(x, lag) {
   if (ncol(x) != k) {
     stop("`lag` must have one element per column of `x`")
   }
-  if (!is.numeric(lag) || anyNA(lag) || any(!is.finite(lag)) ||
-      any(lag != trunc(lag))) {
+  if (
+    !is.numeric(lag) ||
+      anyNA(lag) ||
+      any(!is.finite(lag)) ||
+      any(lag != trunc(lag))
+  ) {
     stop("`lag` should contain finite integers")
   }
 

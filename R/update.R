@@ -1,28 +1,29 @@
 #' Update and reperform cross-validation forecasting and conformal prediction
 #'
 #' Update conformal prediction intervals and other information by applying the
-#' \code{cvforecast} and \code{conformal} functions.
+#' \code{cvforecast} and \code{conformal} functions. Only the newly added time
+#' steps are computed: the prediction intervals produced earlier are carried
+#' over unchanged.
 #'
-#' @param object An object of class \code{"cpforecast"}.
+#' @inheritParams cvforecast
+#' @param object An object of class \code{"cpforecast"}, as returned by one of
+#'   the conformal prediction methods.
 #' @param new_data A non-empty numeric vector of newly available data.
-#' @param forecastfun Function to return an object of class \code{"forecast"}.
-#' Its first argument must be a univariate time series, and it must have an
-#' argument \code{h} for the forecast horizon and an argument \code{level} for
-#' the confidence level for prediction intervals. If exogenous predictors are used,
-#' then it must also have \code{xreg} and \code{newxreg} arguments corresponding
-#' to the training and test periods, respectively.
 #' @param new_xreg Newly available exogenous predictor variables passed to
-#' \code{forecastfun} if required. The number of rows should match the length of
-#' \code{new_data}, and the number of columns should match the dimensions of
-#' the \code{xreg} argument in \code{object}. These rows extend
-#' \code{object$xreg} and correspond to the periods immediately following it.
-#' @param ... Other arguments are passed to \code{forecastfun}.
+#'   \code{forecastfun} if required. The number of rows should match the
+#'   length of \code{new_data}, and the number of columns should match the
+#'   dimensions of the \code{xreg} argument in \code{object}. These rows
+#'   extend \code{object$xreg} and correspond to the periods immediately
+#'   following it. Defaults to \code{NULL}.
 #'
-#' @return
-#' A refreshed object of class \code{"cpforecast"} with updated fields (e.g.,
-#' \code{x}, \code{MEAN}, \code{ERROR}, \code{LOWER}, \code{UPPER}, and any
-#' method-specific components), reflecting newly appended data and re-computed
-#' cross-validation forecasts and conformal prediction intervals.
+#' @return A refreshed object of class \code{"cpforecast"} with updated fields
+#'   (e.g., \code{x}, \code{MEAN}, \code{ERROR}, \code{LOWER}, \code{UPPER},
+#'   and any method-specific components), reflecting the newly appended data
+#'   and the re-computed cross-validation forecasts and conformal prediction
+#'   intervals.
+#'
+#' @seealso \code{\link{cvforecast}} and \code{\link{conformal}}, which
+#'   produce the object to be updated.
 #'
 #' @examples
 #' # Simulate time series from an AR(2) model
@@ -35,14 +36,14 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # Classical conformal prediction with equal weights
-#' scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 50, rolling = TRUE)
+#' scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 #'
 #' # Update conformal prediction using newly available data
-#' scpfc_update <- update(scpfc, forecastfun = far2, new_data = c(1.5, 0.8, 2.3))
+#' scpfc_update <- update(scpfc, forecastfun = far2,
+#'                        new_data = c(1.5, 0.8, 2.3))
 #' print(scpfc_update)
 #' summary(scpfc_update)
 #'

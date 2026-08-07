@@ -3,7 +3,8 @@
 \name{accuracy.cvforecast}
 \alias{accuracy.cvforecast}
 \alias{accuracy.cpforecast}
-\title{Accuracy measures for a cross-validation model and a conformal prediction model}
+\title{Accuracy measures for a cross-validation model and a conformal prediction
+model}
 \usage{
 \method{accuracy}{cvforecast}(
   object,
@@ -18,20 +19,25 @@
 \method{accuracy}{cpforecast}(object, ...)
 }
 \arguments{
-\item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
+\item{object}{An object of class \code{"cvforecast"} or
+\code{"cpforecast"}.}
 
-\item{x}{An optional numerical vector containing actual values of the same
-length as \code{mean} in \code{object}.}
+\item{x}{An optional numerical vector containing the actual values of the
+same length as \code{mean} in \code{object}.}
 
-\item{CV}{If \code{TRUE}, the cross-validation forecast accuracy will be returned.}
+\item{CV}{If \code{TRUE}, the cross-validation forecast accuracy will be
+returned. Defaults to \code{TRUE}.}
 
-\item{period}{The seasonal period of the data.}
+\item{period}{The seasonal period of the data. Defaults to \code{NULL}, in
+which case it is taken from the frequency of the series.}
 
 \item{measures}{A list of accuracy measure functions to compute (such as
-\link{point_measures} or \link{interval_measures}).}
+\link{point_measures} or \link{interval_measures}). Defaults to
+\code{interval_measures}.}
 
-\item{byhorizon}{If \code{TRUE}, accuracy measures will be calculated for each
-individual forecast horizon \code{h} separately.}
+\item{byhorizon}{If \code{TRUE}, accuracy measures will be calculated for
+each individual forecast horizon \code{h} separately. Defaults to
+\code{FALSE}.}
 
 \item{...}{Additional arguments depending on the specific measure.}
 }
@@ -39,10 +45,10 @@ individual forecast horizon \code{h} separately.}
 A matrix giving mean out-of-sample forecast accuracy measures.
 }
 \description{
-Return range of summary measures of the out-of-sample forecast accuracy.
-If \code{x} is given, the function also measures test set forecast accuracy.
-If \code{x} is not given, the function only produces accuracy measures on
-validation set.
+Return a range of summary measures of the out-of-sample forecast accuracy.
+If \code{x} is given, the function also measures the test set forecast
+accuracy. If \code{x} is not given, the function only produces accuracy
+measures on the validation set.
 }
 \details{
 The measures calculated are:
@@ -70,16 +76,14 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Out-of-sample forecast accuracy on validation set
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
 accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 
 # Accuracy of conformal prediction intervals
-scpfc <- conformal(fc, method = "scp", symmetric = FALSE,
-                   ncal = 50, rolling = TRUE)
+scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 accuracy(scpfc, measures = interval_measures, level = 95,
          byhorizon = TRUE)
 
@@ -89,5 +93,11 @@ accuracy(fc, x = c(1, 0.5, 0), measures = interval_measures,
 
 }
 \seealso{
-\code{\link{point_measures}}, \code{\link{interval_measures}}
+\code{\link{point_measures}} and \code{\link{interval_measures}}
+for the measures that can be supplied through \code{measures}.
+
+Other evaluation functions: 
+\code{\link{coverage}()},
+\code{\link{width}()}
 }
+\concept{evaluation functions}

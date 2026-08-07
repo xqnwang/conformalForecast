@@ -8,32 +8,38 @@
 coverage(object, ..., level = 95, window = NULL, na.rm = FALSE)
 }
 \arguments{
-\item{object}{An object of class \code{"cvforecast"} or \code{"cpforecast"}.}
+\item{object}{An object of class \code{"cvforecast"} or
+\code{"cpforecast"}.}
 
 \item{...}{Arguments \code{x}, \code{LOWER}, and \code{UPPER} if
-\code{object} is missing. Bounds may be time-series matrices or lists keyed
-by confidence level.}
+\code{object} is missing. Bounds may be time-series matrices or lists
+keyed by confidence level.}
 
-\item{level}{Target confidence level for prediction intervals.}
+\item{level}{Target confidence level for the prediction intervals. Only one
+level can be specified. Defaults to \code{95}.}
 
-\item{window}{If not \code{NULL}, the rolling mean matrix for coverage is also returned.}
+\item{window}{If not \code{NULL}, the rolling mean matrix for the coverage
+is also returned. Defaults to \code{NULL}.}
 
-\item{na.rm}{A logical indicating whether \code{NA} values should be stripped
-before the rolling mean computation proceeds.}
+\item{na.rm}{A logical indicating whether \code{NA} values should be
+stripped before the rolling mean computation proceeds. Defaults to
+\code{FALSE}.}
 }
 \value{
 A list of class \code{"coverage"} with the following components:
 \item{mean}{Mean coverage across the validation set.}
-\item{ifinn}{An indicator matrix as a multivariate time series, where the \eqn{h}th column
-holds the coverage for forecast horizon \eqn{h}. The time index
-corresponds to the period for which the forecast is produced.}
-\item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means
-of interval forecast coverage will be returned.}
+\item{ifinn}{An indicator matrix as a multivariate time series, where the
+\eqn{h}th column holds the coverage for forecast horizon \eqn{h}. The
+time index corresponds to the period for which the forecast is
+produced.}
+\item{rollmean}{If \code{window} is not \code{NULL}, a matrix of the
+rolling means of the interval forecast coverage will be returned.}
 }
 \description{
-Calculate the mean coverage and the \code{ifinn} matrix for prediction
-intervals on validation set. If \code{window} is not \code{NULL}, a matrix
-of the rolling means of interval forecast coverage is also returned.
+Calculate the mean coverage and the \code{ifinn} matrix for the prediction
+intervals on the validation set. If \code{window} is not \code{NULL}, a
+matrix of the rolling means of the interval forecast coverage is also
+returned.
 }
 \examples{
 # Simulate time series from an AR(2) model
@@ -46,8 +52,7 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Mean and rolling mean coverage for interval forecasts on validation set
 cov_fc <- coverage(fc, level = 95, window = 50)
@@ -57,3 +62,12 @@ str(cov_fc)
 coverage(x = fc$x, LOWER = fc$LOWER, UPPER = fc$UPPER, level = 95)
 
 }
+\seealso{
+\code{\link{cvforecast}} and the conformal methods, which produce
+\code{object}.
+
+Other evaluation functions: 
+\code{\link{accuracy.cvforecast}()},
+\code{\link{width}()}
+}
+\concept{evaluation functions}

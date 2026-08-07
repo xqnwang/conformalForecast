@@ -28,32 +28,39 @@ winkler_score(lower, upper, actual, level = 95, na.rm = TRUE, ...)
 interval_measures
 }
 \arguments{
-\item{lower}{A numeric vector of lower bounds of interval forecasts.}
+\item{lower}{A numeric vector of lower bounds of the interval forecasts.}
 
-\item{upper}{A numeric vector of upper bounds of interval forecasts.}
+\item{upper}{A numeric vector of upper bounds of the interval forecasts.}
 
 \item{actual}{A numeric vector of realised values.}
 
-\item{train}{A numeric vector of responses used to train the model (for scaled scores).}
+\item{train}{A numeric vector of responses used to train the model.
+Required by the scaled scores.}
 
-\item{level}{The nominal level of the forecast interval (e.g., 95 or 0.95).}
+\item{level}{The nominal level of the forecast interval (e.g., 95 or 0.95).
+Defaults to \code{95}.}
 
-\item{period}{The seasonal period of the data.}
+\item{period}{The seasonal period of the data. Required by the scaled
+scores.}
 
-\item{d}{Should the response model include a first difference?}
+\item{d}{Should the response model include a first difference? Defaults to
+\code{period == 1}.}
 
-\item{D}{Should the response model include a seasonal difference?}
+\item{D}{Should the response model include a seasonal difference? Defaults
+to \code{period > 1}.}
 
-\item{na.rm}{If \code{TRUE}, remove missing values before calculating the measure.}
+\item{na.rm}{If \code{TRUE}, remove missing values before calculating the
+measure. Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments for each measure.}
 }
 \value{
-For \code{winkler_score} and \code{MSIS}, returns a single numeric scalar giving
-the average interval score (Winkler or mean scaled interval score).
+For \code{winkler_score} and \code{MSIS}, a single numeric scalar
+giving the average interval score (Winkler or mean scaled interval
+score).
 
-For the exported object \code{interval_measures}, returns a \strong{named list of functions}
-that can be supplied to higher-level accuracy routines.
+For the exported object \code{interval_measures}, a named list of
+functions that can be supplied to higher-level accuracy routines.
 }
 \description{
 Accuracy measures for interval forecasts.
@@ -71,5 +78,10 @@ winkler_score(lower, upper, actual, level = 95)
 # Mean scaled interval score (needs training data and period)
 MSIS(lower, upper, actual, train, level = 95, period = 1)
 
+}
+\seealso{
+\code{\link{point_measures}} for the point counterparts, and
+\code{\link{accuracy.cvforecast}}, which applies these measures to a
+cross-validation or a conformal prediction object.
 }
 \keyword{datasets}

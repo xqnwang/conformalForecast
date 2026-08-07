@@ -1,32 +1,41 @@
 #' Calculate interval forecast width
 #'
-#' Calculate the mean width of prediction intervals on the validation set.
-#' If \code{window} is not \code{NULL}, a matrix of the rolling means of interval
-#' width is also returned. If \code{includemedian} is \code{TRUE},
+#' Calculate the mean width of the prediction intervals on the validation set.
+#' If \code{window} is not \code{NULL}, a matrix of the rolling means of the
+#' interval width is also returned. If \code{includemedian} is \code{TRUE},
 #' the information of the median interval width will be returned.
 #'
 #' @aliases print.width
 #'
-#' @param object An object of class \code{"cvforecast"} or \code{"cpforecast"}.
+#' @inheritParams coverage
 #' @param ... Time-series matrices \code{LOWER} and \code{UPPER} if
-#' \code{object} is missing.
-#' @param level Target confidence level for prediction intervals.
-#' @param includemedian If \code{TRUE}, the median interval width will also be returned.
-#' @param window If not \code{NULL}, the rolling mean (and rolling median if applicable)
-#' matrix for interval width will also be returned.
-#' @param na.rm A logical indicating whether \code{NA} values should be stripped
-#' before the rolling mean and rolling median computation proceeds.
+#'   \code{object} is missing. They may also be lists keyed by confidence
+#'   level.
+#' @param includemedian If \code{TRUE}, the median interval width will also be
+#'   returned. Defaults to \code{FALSE}.
+#' @param window If not \code{NULL}, the rolling mean (and the rolling median
+#'   if applicable) matrix for the interval width will also be returned.
+#'   Defaults to \code{NULL}.
+#' @param na.rm A logical indicating whether \code{NA} values should be
+#'   stripped before the rolling mean and rolling median computation proceeds.
+#'   Defaults to \code{FALSE}.
 #'
 #' @return A list of class \code{"width"} with the following components:
-#' \item{width}{Forecast interval width as a multivariate time series, where the \eqn{h}th
-#' column holds the interval width for the forecast horizon \eqn{h}. The time index
-#' corresponds to the period for which the forecast is produced.}
-#' \item{mean}{Mean interval width across the validation set.}
-#' \item{rollmean}{If \code{window} is not NULL, a matrix of the rolling means
-#' of interval width will be returned.}
-#' \item{median}{Median interval width across the validation set.}
-#' \item{rollmedian}{If \code{window} is not NULL, a matrix of the rolling medians
-#' of interval width will be returned.}
+#'   \item{width}{Forecast interval width as a multivariate time series, where
+#'     the \eqn{h}th column holds the interval width for the forecast horizon
+#'     \eqn{h}. The time index corresponds to the period for which the
+#'     forecast is produced.}
+#'   \item{mean}{Mean interval width across the validation set.}
+#'   \item{rollmean}{If \code{window} is not \code{NULL}, a matrix of the
+#'     rolling means of the interval width will be returned.}
+#'   \item{median}{Median interval width across the validation set.}
+#'   \item{rollmedian}{If \code{window} is not \code{NULL}, a matrix of the
+#'     rolling medians of the interval width will be returned.}
+#'
+#' @family evaluation functions
+#'
+#' @seealso \code{\link{cvforecast}} and the conformal methods, which produce
+#'   \code{object}.
 #'
 #' @examples
 #' # Simulate time series from an AR(2) model
@@ -39,8 +48,7 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # Mean and rolling mean width for interval forecasts on validation set
 #' wid_fc <- width(fc, level = 95, window = 50)
@@ -87,8 +95,9 @@ width <- function(
   if (is.null(lower) || is.null(upper)) {
     stop("no interval forecasts of target confidence level")
   }
-  if (!is.ts(lower) || !is.ts(upper) ||
-      !is.matrix(lower) || !is.matrix(upper)) {
+  if (
+    !is.ts(lower) || !is.ts(upper) || !is.matrix(lower) || !is.matrix(upper)
+  ) {
     stop("`LOWER` and `UPPER` should be time-series matrices")
   }
 
@@ -108,7 +117,9 @@ width <- function(
   upper <- window(upper, start = start, end = end)
   n <- nrow(lower)
   if (!is.null(window) && window >= n) {
-    stop("the `window` argument should be smaller than the total period of interest")
+    stop(
+      "the `window` argument should be smaller than the total period of interest"
+    )
   }
 
   # Width matrix

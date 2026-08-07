@@ -1,70 +1,73 @@
 #' Adaptive conformal prediction method
 #'
-#' Compute prediction intervals and other information by
-#' applying the adaptive conformal prediction (ACP) method.
+#' Compute prediction intervals and other information by applying the adaptive
+#' conformal prediction (ACP) method.
 #'
 #' The ACP method considers the online update:
 #' \deqn{\alpha_{t+h|t}:=\alpha_{t+h-1|t-1}+\gamma(\alpha-\mathrm{err}_{t|t-h}),}
-#' for each individual forecast horizon \code{h}, respectively,
-#' where \eqn{\mathrm{err}_{t|t-h}=1} if \eqn{s_{t|t-h}>q_{t|t-h}}, and
+#' for each individual forecast horizon \code{h}, respectively, where
+#' \eqn{\mathrm{err}_{t|t-h}=1} if \eqn{s_{t|t-h}>q_{t|t-h}}, and
 #' \eqn{\mathrm{err}_{t|t-h}=0} if \eqn{s_{t|t-h} \leq q_{t|t-h}}.
 #'
-#' @param object An object of class \code{"cvforecast"}. It must have an argument
-#' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors on validation set.
-#' See the results of a call to \code{\link{cvforecast}}.
-#' @param alpha A numeric vector of significance levels to achieve a desired
-#' coverage level \eqn{1-\alpha}.
-#' @param gamma The step size parameter \eqn{\gamma>0} for \eqn{\alpha} updating.
-#' @param symmetric If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
-#' are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
-#' are used, and then upper bounds and lower bounds are produced separately.
-#' @param ncal Length of the calibration set. If \code{rolling = FALSE}, it denotes
-#' the initial period of calibration sets. Otherwise, it indicates
-#' the period of every rolling calibration set.
-#' @param rolling If \code{TRUE}, a rolling window strategy will be adopted to
-#' form the calibration set. Otherwise, expanding window strategy will be used.
-#' @param quantiletype An integer between 1 and 9 determining the type of
-#' quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
-#' types 4 to 9 are for continuous quantiles. See the
-#' \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
-#' @param update If \code{TRUE}, \code{object} already holds the results of a
-#' previous call and only the newly added time steps are computed; the
-#' prediction intervals produced earlier are carried over unchanged. Set by
-#' \code{\link{update.cpforecast}} and not normally set by hand.
-#' @param na.rm If \code{TRUE}, corresponding entries in sample values are removed
-#' if it is \code{NA} when calculating sample quantile.
+#' @inheritParams scp
+#' @param gamma The step size parameter \eqn{\gamma>0} for the \eqn{\alpha}
+#'   updating. Defaults to \code{0.005}.
+#' @param na.rm If \code{TRUE}, corresponding entries in the sample values are
+#'   removed if they are \code{NA} when calculating the sample quantile.
+#'   Defaults to \code{TRUE}.
 #' @param ... Other arguments are passed to the
-#' \code{\link[ggdist]{weighted_quantile}} function for quantile computation.
+#'   \code{\link[ggdist]{weighted_quantile}} function for the quantile
+#'   computation.
 #'
-#' @return A list of class \code{c("acp", "cpforecast", "cvforecast", "forecast")}
-#' with the following components:
-#' \item{x}{The original time series.}
-#' \item{series}{The name of the series \code{x}.}
-#' \item{method}{A character string "acp".}
-#' \item{cp_times}{An integer vector giving the number of conformal predictions
-#' performed in cross-validation for each forecast horizon.}
-#' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
-#' holds the point forecasts for forecast horizon \eqn{h}. The time index
-#' corresponds to the period for which the forecast is produced.}
-#' \item{ERROR}{Forecast errors given by
-#' \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
-#' \item{LOWER}{A list containing lower bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{UPPER}{A list containing upper bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{level}{The confidence values associated with the prediction intervals.}
-#' \item{call}{The matched call.}
-#' \item{model}{A list containing information about the conformal prediction model.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean},
-#' \code{lower}, and \code{upper} will also be returned, showing the information
-#' about the forecasts generated using all available observations.
+#' @return A list of class
+#'   \code{c("acp", "cpforecast", "cvforecast", "forecast")} with the
+#'   following components:
+#'   \item{x}{The original time series.}
+#'   \item{series}{The name of the series \code{x}.}
+#'   \item{xreg}{Exogenous predictor variables used, if applicable.}
+#'   \item{method}{A character string "acp".}
+#'   \item{cp_times}{An integer vector giving the number of conformal
+#'     predictions performed in cross-validation for each forecast horizon.}
+#'   \item{MEAN}{Point forecasts as a multivariate time series, where the
+#'     \eqn{h}th column holds the point forecasts for forecast horizon
+#'     \eqn{h}. The time index corresponds to the period for which the
+#'     forecast is produced.}
+#'   \item{ERROR}{Forecast errors given by
+#'     \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
+#'   \item{LOWER}{A list containing lower bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{UPPER}{A list containing upper bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{level}{The confidence values associated with the prediction
+#'     intervals.}
+#'   \item{call}{The matched call.}
+#'   \item{model}{A list containing information about the conformal prediction
+#'     model: the resolved arguments in \code{model$args}, the call and the
+#'     arguments of the underlying cross-validation in
+#'     \code{model$cvforecast}, and the sequence of updated significance
+#'     levels in \code{model$alpha_update}. The latter holds a single element
+#'     \code{alpha} when \code{symmetric = TRUE}, and the two elements
+#'     \code{lower} and \code{upper} when \code{symmetric = FALSE}; each is a
+#'     list with one multivariate time series per confidence level, laid out
+#'     like \code{MEAN}.}
+#'   If \code{mean} is included in the \code{object}, the components
+#'   \code{mean}, \code{lower}, and \code{upper} will also be returned, showing
+#'   the information about the forecasts generated using all available
+#'   observations.
 #'
-#' @references Gibbs, I., and Candes, E. (2021). "Adaptive conformal inference under
-#' distribution shift", \emph{Advances in Neural Information Processing Systems},
-#' \bold{34}, 1660--1672.
+#' @family conformal prediction methods
+#'
+#' @seealso \code{\link{cvforecast}} to produce \code{object}, and
+#'   \code{\link{update.cpforecast}} to extend the results with new
+#'   observations.
+#'
+#' @references
+#' Gibbs, I., and Candes, E. (2021). "Adaptive conformal inference under
+#'   distribution shift", \emph{Advances in Neural Information Processing
+#'   Systems}, \bold{34}, 1660--1672.
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
@@ -76,11 +79,10 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # ACP with asymmetric nonconformity scores and rolling calibration sets
-#' acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 50, rolling = TRUE)
+#' acpfc <- acp(fc, ncal = 50, rolling = TRUE)
 #' print(acpfc)
 #' summary(acpfc)
 #'
@@ -206,7 +208,8 @@ acp <- function(
         rowSums(
           is.na(alphat_lower_h[rows, , drop = FALSE]) |
             is.na(alphat_upper_h[rows, , drop = FALSE])
-        ) > 0
+        ) >
+          0
       }
       first <- which(missing_alpha)[1L]
       if (is.na(first)) {
