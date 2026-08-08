@@ -91,6 +91,7 @@ cps_list[["pid"]] <- conformal(fc0, method = "pid", ncal = ncal, rolling = TRUE,
                                scorecastfun = naivefun, Tg = Tg, KI = KI)
 cps_list[["acmcp"]] <- conformal(fc0, method = "acmcp", ncal = ncal, rolling = TRUE, 
                                  KI = KI, Tg = Tg)
+scp_initial <- cps_list$scp
 ```
 
 Each element of `cps_list` holds the state of one pipeline after the initial 200 observations. Nothing here is update-specific: `conformal(fc0, method = "scp", ...)` is the same call as `scp(fc0, ...)`, and likewise for the other three.
@@ -163,7 +164,7 @@ Three points are worth keeping in mind when calling `update()`.
 
 The object being updated has to come from one of the conformal methods in the package. `update()` reads the settings recorded when the object was built, and reports an error if they are not available rather than falling back on defaults.
 
-Calibration settings should be left as they are. Passing different values of `ncal`, `lr`, `KI` or any other calibration argument at update time causes the intervals to be recomputed from the beginning rather than continued, so the call then costs as much as a fresh fit.
+`update()` preserves the calibration settings stored in the fitted object. Arguments supplied through `...` are forwarded to `forecastfun`; they do not override the conformal configuration. Consequently, calibration parameters such as `ncal`, `lr` and `KI` should not be supplied to `update()`. A different calibration specification requires refitting the conformal method with the desired parameter values.
 
 ## Exogenous regressors
 
@@ -185,7 +186,7 @@ fc_x <- cvforecast(y_x, forecastfun = lm_fun, h = 2, level = 95, window = 30,
 cp_x <- scp(fc_x, ncal = 20, rolling = TRUE)
 ```
 
-`cp_x$xreg` has `r nrow(cp_x$xreg)` rows: the `r n_x` historical values, plus the 2 future values needed for the last `h = 2` forecast. Updating with 5 new observations therefore requires 5 new rows of history together with enough further values to cover the new forecast horizon, which here is again 5 rows, since the horizon does not change.
+`cp_x$xreg` has `r nrow(cp_x$xreg)` rows: the `r n_x` historical values, plus the 2 future values needed for the last `h = 2` forecast. When 5 observations are appended, these 2 stored future values become the regressors for the first 2 new observations. Therefore, `new_xreg` supplies exactly 5 subsequent rows: the first 3 complete the regressor history for the new observations, and the final 2 preserve the future `h = 2` forecast horizon.
 
 ```{r xreg-update}
 new_y <- as.numeric(arima.sim(n = 5, list(ar = 0.5))) + 2 * xreg_full[(n_x + 1):(n_x + 5), 1]
@@ -199,8 +200,8 @@ cp_x_upd <- update(cp_x, new_data = new_y, forecastfun = lm_fun, new_xreg = new_
 When the original `cvforecast()` object was built with `forward = TRUE`, which is the default, it carries `mean`, `lower` and `upper` components holding the out-of-sample forecast from the most recent origin. After the new data have been appended, `update()` refits the model at the new final origin, so that these components describe a forecast made from all the data now available.
 
 ```{r forward-refresh}
-cps_list$scp$mean
-scp_upd <- update(cps_list$scp, new_data = batches[[1]], forecastfun = far2)
+scp_initial$mean
+scp_upd <- update(scp_initial, new_data = batches[[1]], forecastfun = far2)
 scp_upd$mean
 ```
 

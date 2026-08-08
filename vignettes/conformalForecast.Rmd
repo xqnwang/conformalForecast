@@ -100,7 +100,7 @@ data.frame(
     "Same P+I+D structure as PID, but the scorecaster exploits correlation across horizons"
   )
 ) |>
-  knitr::kable(col.names = c("`method =`", "function", "core idea"))
+  knitr::kable(col.names = c("`method`", "function", "core idea"))
 ```
 
 `conformal(fc, method = "scp", ...)` is exactly equivalent to `scp(fc, ...)`: `conformal()` forwards `object` and `...` to the chosen function and returns its result unchanged. The rest of this vignette calls `scp()`, `acp()`, `pid()` and `acmcp()` directly, to keep the method-specific arguments explicit.
