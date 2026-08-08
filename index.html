@@ -39,6 +39,12 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="articles/conformalForecast.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/update.html">Updating conformal forecasts with new data</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -66,46 +72,70 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"xqnwang/conformalForecast"</span><span class="op">)</span></span></code></pre></div>
-<p>You can also get the official release version from CRAN:</p>
+<p>You can also get the official release version from <a href="https://CRAN.R-project.org/package=conformalForecast" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"conformalForecast"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>For a detailed tutorial and examples, please see the <a href="https://xqnwang.github.io/conformalForecast/articles/conformalForecast.html">vignette</a>.</p>
-<p>This basic example shows how to perform classical conformal prediction and update the results when new observations become available:</p>
+<p>This basic example shows how to perform classical conformal prediction and update the results when new observations become available.</p>
+<p>We simulate a series from an AR(2) model, holding back the last five observations to stand in for data that arrives later:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/xqnwang/conformalForecast" class="external-link">conformalForecast</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Simulate time series from an AR(2) model</span></span>
-<span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Time series cross-validation</span></span>
-<span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="co">#&gt; Loading required package: forecast</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">series_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1005</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">series</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">series_all</span>, <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">series_all</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Conformal calibration needs a record of past forecast errors. We obtain one with <code><a href="reference/cvforecast.html">cvforecast()</a></code>, which refits the model on a rolling forecast origin and stores the out-of-sample errors at every horizon:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, level <span class="op">=</span> <span class="va">level</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
+<span></span>
 <span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cvforecast.html">cvforecast</a></span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">95</span><span class="op">)</span>,</span>
-<span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Classical conformal prediction</span></span>
-<span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                   rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Update conformal prediction with newly available observations</span></span>
-<span><span class="va">scpfc_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scpfc</span>, new_data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">0.8</span>, <span class="fl">2.3</span><span class="op">)</span>,</span>
-<span>                        forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Interval forecast accuracy</span></span>
+<span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<p>Now calibrate intervals with split conformal prediction, on a rolling window of 100 calibration scores:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>When the five held-back observations arrive, <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> extends the fit incrementally. Intervals that were already issued do not change:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scpfc_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scpfc</span>, new_data <span class="op">=</span> <span class="va">new_data</span>, forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, evaluate the intervals by forecast horizon:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Interval forecast accuracy</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
+<span><span class="co">#&gt; CV h=1   5.002887 4.830049</span></span>
+<span><span class="co">#&gt; CV h=2   6.523012 6.297515</span></span>
+<span><span class="co">#&gt; CV h=3   6.630259 6.397788</span></span>
 <span></span>
 <span><span class="co"># Mean coverage</span></span>
-<span><span class="fu"><a href="reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       h=1       h=2       h=3 </span></span>
+<span><span class="co">#&gt; 0.9503106 0.9476961 0.9400749</span></span>
 <span></span>
 <span><span class="co"># Mean and median interval width</span></span>
-<span><span class="fu"><a href="reference/width.html">width</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, window <span class="op">=</span> <span class="fl">500</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/width.html">width</a></span><span class="op">(</span><span class="va">scpfc_updated</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Mean width:</span></span>
+<span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
+<span><span class="co">#&gt; 4.119936 5.371825 5.406426 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Median width:</span></span>
+<span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
+<span><span class="co">#&gt; 4.074733 5.334842 5.326651</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+</h2>
+<ul>
+<li>
+<a href="https://xqnwang.github.io/conformalForecast/articles/conformalForecast.html">Introduction to conformalForecast</a>: conformal methods, their formulas and tuning arguments, with a comparison of coverage and interval width.</li>
+<li>
+<a href="https://xqnwang.github.io/conformalForecast/articles/update.html">Updating conformal forecasts with new data</a>: how <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> extends a fitted pipeline as observations arrive, and when it is equivalent to refitting.</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>

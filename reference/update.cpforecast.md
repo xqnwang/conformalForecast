@@ -1,7 +1,9 @@
 # Update and reperform cross-validation forecasting and conformal prediction
 
 Update conformal prediction intervals and other information by applying
-the `cvforecast` and `conformal` functions.
+the `cvforecast` and `conformal` functions. Only the newly added time
+steps are computed: the prediction intervals produced earlier are
+carried over unchanged.
 
 ## Usage
 
@@ -14,7 +16,8 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
 
 - object:
 
-  An object of class `"cpforecast"`.
+  An object of class `"cpforecast"`, as returned by one of the conformal
+  prediction methods.
 
 - new_data:
 
@@ -27,7 +30,7 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
   the forecast horizon and an argument `level` for the confidence level
   for prediction intervals. If exogenous predictors are used, then it
   must also have `xreg` and `newxreg` arguments corresponding to the
-  training and test periods, respectively.
+  training and the test periods, respectively.
 
 - new_xreg:
 
@@ -35,7 +38,7 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
   if required. The number of rows should match the length of `new_data`,
   and the number of columns should match the dimensions of the `xreg`
   argument in `object`. These rows extend `object$xreg` and correspond
-  to the periods immediately following it.
+  to the periods immediately following it. Defaults to `NULL`.
 
 - ...:
 
@@ -45,8 +48,15 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
 
 A refreshed object of class `"cpforecast"` with updated fields (e.g.,
 `x`, `MEAN`, `ERROR`, `LOWER`, `UPPER`, and any method-specific
-components), reflecting newly appended data and re-computed
+components), reflecting the newly appended data and the re-computed
 cross-validation forecasts and conformal prediction intervals.
+
+## See also
+
+[`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
+and
+[`conformal`](https://xqnwang.github.io/conformalForecast/reference/conformal.md),
+which produce the object to be updated.
 
 ## Examples
 
@@ -61,14 +71,14 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Classical conformal prediction with equal weights
-scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 50, rolling = TRUE)
+scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 
 # Update conformal prediction using newly available data
-scpfc_update <- update(scpfc, forecastfun = far2, new_data = c(1.5, 0.8, 2.3))
+scpfc_update <- update(scpfc, forecastfun = far2,
+                       new_data = c(1.5, 0.8, 2.3))
 print(scpfc_update)
 #> SCP 
 #> 

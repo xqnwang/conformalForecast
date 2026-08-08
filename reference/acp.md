@@ -25,37 +25,40 @@ acp(
 - object:
 
   An object of class `"cvforecast"`. It must have an argument `x` for
-  original univariate time series, an argument `MEAN` for point
-  forecasts and `ERROR` for forecast errors on validation set. See the
-  results of a call to
+  the original univariate time series, an argument `MEAN` for the point
+  forecasts and `ERROR` for the forecast errors on the validation set.
+  See the results of a call to
   [`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md).
 
 - alpha:
 
   A numeric vector of significance levels to achieve a desired coverage
-  level \\1-\alpha\\.
+  level \\1-\alpha\\. Defaults to `1 - 0.01 * object$level`, the levels
+  used in `object`.
 
 - gamma:
 
-  The step size parameter \\\gamma\>0\\ for \\\alpha\\ updating.
+  The step size parameter \\\gamma\>0\\ for the \\\alpha\\ updating.
+  Defaults to `0.005`.
 
 - symmetric:
 
   If `TRUE`, symmetric nonconformity scores (i.e. \\\|e\_{t+h\|t}\|\\)
   are used. If `FALSE`, asymmetric nonconformity scores (i.e.
   \\e\_{t+h\|t}\\) are used, and then upper bounds and lower bounds are
-  produced separately.
+  produced separately. Defaults to `FALSE`.
 
 - ncal:
 
   Length of the calibration set. If `rolling = FALSE`, it denotes the
-  initial period of calibration sets. Otherwise, it indicates the period
-  of every rolling calibration set.
+  initial period of the calibration sets. Otherwise, it indicates the
+  period of every rolling calibration set. Defaults to `10`.
 
 - rolling:
 
   If `TRUE`, a rolling window strategy will be adopted to form the
-  calibration set. Otherwise, expanding window strategy will be used.
+  calibration set. Otherwise, an expanding window strategy will be used.
+  Defaults to `FALSE`.
 
 - quantiletype:
 
@@ -63,7 +66,7 @@ acp(
   to be used. Types 1 to 3 are for discontinuous quantiles, types 4 to 9
   are for continuous quantiles. See the
   [`weighted_quantile`](https://mjskay.github.io/ggdist/reference/weighted_quantile.html)
-  function in the ggdist package.
+  function in the ggdist package. Defaults to `1`.
 
 - update:
 
@@ -71,18 +74,19 @@ acp(
   only the newly added time steps are computed; the prediction intervals
   produced earlier are carried over unchanged. Set by
   [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
-  and not normally set by hand.
+  and not normally set by hand. Defaults to `FALSE`.
 
 - na.rm:
 
-  If `TRUE`, corresponding entries in sample values are removed if it is
-  `NA` when calculating sample quantile.
+  If `TRUE`, corresponding entries in the sample values are removed if
+  they are `NA` when calculating the sample quantile. Defaults to
+  `TRUE`.
 
 - ...:
 
   Other arguments are passed to the
   [`weighted_quantile`](https://mjskay.github.io/ggdist/reference/weighted_quantile.html)
-  function for quantile computation.
+  function for the quantile computation.
 
 ## Value
 
@@ -96,6 +100,10 @@ the following components:
 - series:
 
   The name of the series `x`.
+
+- xreg:
+
+  Exogenous predictor variables used, if applicable.
 
 - method:
 
@@ -138,7 +146,14 @@ the following components:
 
 - model:
 
-  A list containing information about the conformal prediction model.
+  A list containing information about the conformal prediction model:
+  the resolved arguments in `model$args`, the call and the arguments of
+  the underlying cross-validation in `model$cvforecast`, and the
+  sequence of updated significance levels in `model$alpha_update`. The
+  latter holds a single element `alpha` when `symmetric = TRUE`, and the
+  two elements `lower` and `upper` when `symmetric = FALSE`; each is a
+  list with one multivariate time series per confidence level, laid out
+  like `MEAN`.
 
 If `mean` is included in the `object`, the components `mean`, `lower`,
 and `upper` will also be returned, showing the information about the
@@ -158,6 +173,19 @@ Gibbs, I., and Candes, E. (2021). "Adaptive conformal inference under
 distribution shift", *Advances in Neural Information Processing
 Systems*, **34**, 1660–1672.
 
+## See also
+
+[`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
+to produce `object`, and
+[`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+to extend the results with new observations.
+
+Other conformal prediction methods:
+[`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md),
+[`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md),
+[`pid()`](https://xqnwang.github.io/conformalForecast/reference/pid.md),
+[`scp()`](https://xqnwang.github.io/conformalForecast/reference/scp.md)
+
 ## Examples
 
 ``` r
@@ -171,17 +199,15 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # ACP with asymmetric nonconformity scores and rolling calibration sets
-acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 50, rolling = TRUE)
+acpfc <- acp(fc, ncal = 50, rolling = TRUE)
 print(acpfc)
 #> ACP 
 #> 
 #> Call:
-#>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
-#>      rolling = TRUE) 
+#>  acp(object = fc, ncal = 50, rolling = TRUE) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
@@ -194,8 +220,7 @@ summary(acpfc)
 #> ACP 
 #> 
 #> Call:
-#>  acp(object = fc, gamma = 0.005, symmetric = FALSE, ncal = 50,  
-#>      rolling = TRUE) 
+#>  acp(object = fc, ncal = 50, rolling = TRUE) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 

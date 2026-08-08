@@ -11,6 +11,10 @@
   now accepts `ma_method = "CSS"` for faster MA scorecaster fitting at
   longer forecast horizons, while retaining `"CSS-ML"` as the default,
   and reports successful scorecasts in `scorecast_times`.
+- New unit-test suite covering all four conformal methods,
+  [`cvforecast()`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md),
+  [`update()`](https://rdrr.io/r/stats/update.html), and the evaluation
+  functions.
 
 ### Bug fixes
 
@@ -66,6 +70,15 @@
   [`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md)
   interface, incremental updates, external regressors, clearer method
   descriptions, and updated ggplot2 calls.
+- New
+  [`vignette("update")`](https://xqnwang.github.io/conformalForecast/articles/update.md),
+  on extending a fitted conformal pipeline with newly arrived
+  observations instead of refitting it from scratch.
+- The introductory vignette now documents
+  [`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md),
+  and describes each method, its key formula and its tuning arguments in
+  more detail.
+- The pkgdown site indexes both vignettes under “Articles”.
 - Help examples now cover raw inputs to
   [`coverage()`](https://xqnwang.github.io/conformalForecast/reference/coverage.md)
   and

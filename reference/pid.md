@@ -30,79 +30,86 @@ pid(
 - object:
 
   An object of class `"cvforecast"`. It must have an argument `x` for
-  original univariate time series, an argument `MEAN` for point
-  forecasts and `ERROR` for forecast errors on validation set. See the
-  results of a call to
+  the original univariate time series, an argument `MEAN` for the point
+  forecasts and `ERROR` for the forecast errors on the validation set.
+  See the results of a call to
   [`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md).
 
 - alpha:
 
   A numeric vector of significance levels to achieve a desired coverage
-  level \\1-\alpha\\. Defaults to the levels used in `object`.
+  level \\1-\alpha\\. Defaults to `1 - 0.01 * object$level`, the levels
+  used in `object`.
 
 - symmetric:
 
   If `TRUE`, symmetric nonconformity scores (i.e. \\\|e\_{t+h\|t}\|\\)
   are used. If `FALSE`, asymmetric nonconformity scores (i.e.
   \\e\_{t+h\|t}\\) are used, and then upper bounds and lower bounds are
-  produced separately.
+  produced separately. Defaults to `FALSE`.
 
 - ncal:
 
   Length of the burn-in period for training the scorecaster. If
   `rolling = TRUE`, it is also used as the length of the trailing
-  windows for learning rate calculation and the windows for the
-  calibration set. If `rolling = FALSE`, it is used as initial period of
-  calibration sets and trailing windows for learning rate calculation.
+  windows for the learning rate calculation and of the windows for the
+  calibration set. If `rolling = FALSE`, it is used as the initial
+  period of the calibration sets and of the trailing windows for the
+  learning rate calculation. Defaults to `10`.
 
 - rolling:
 
   If `TRUE`, a rolling window strategy will be adopted to form the
-  trailing window for learning rate calculation and the calibration set
-  for scorecaster if applicable. Otherwise, expanding window strategy
-  will be used.
+  trailing window for the learning rate calculation and the calibration
+  set for the scorecaster if applicable. Otherwise, an expanding window
+  strategy will be used. Defaults to `FALSE`.
 
 - integrate:
 
   If `TRUE`, error integration will be included in the update process.
+  Defaults to `TRUE`.
 
 - scorecast:
 
   If `TRUE`, scorecasting will be included in the update process, and
-  `scorecastfun` should be given.
+  `scorecastfun` should be given. Defaults to `!symmetric`.
 
 - scorecastfun:
 
   A scorecaster function to return an object of class `forecast`. Its
   first argument must be a univariate time series, and it must have an
-  argument `h` for the forecast horizon.
+  argument `h` for the forecast horizon. Defaults to `NULL`, which is
+  only allowed when `scorecast = FALSE`.
 
 - lr:
 
-  A positive initial learning rate used for quantile tracking.
+  A positive initial learning rate used for quantile tracking. Defaults
+  to `0.1`.
 
 - Tg:
 
   The time that is set to achieve the target absolute coverage guarantee
   before this. It must be greater than 1 when `Csat` is not supplied.
-  Defaults to the number of cross-validation periods in `object`.
+  Defaults to `NROW(object$ERROR)`, the number of cross-validation
+  periods in `object`.
 
 - delta:
 
   A number in \\(0, 1)\\. The target absolute coverage guarantee is set
-  to \\1-\alpha-\delta\\.
+  to \\1-\alpha-\delta\\. Defaults to `0.01`.
 
 - Csat:
 
   A positive constant ensuring that by time `Tg`, an absolute guarantee
-  is of at least \\1-\alpha-\delta\\ coverage. Derived from `Tg` and
-  `delta` when not supplied.
+  is of at least \\1-\alpha-\delta\\ coverage. Defaults to `NULL`, in
+  which case it is derived from `Tg` and `delta` as
+  `2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))`.
 
 - KI:
 
   A non-negative constant to place the integrator on the same scale as
-  the scores. Defaults to the largest absolute forecast error in
-  `object`.
+  the scores. Defaults to `max(abs(object$ERROR), na.rm = TRUE)`, the
+  largest absolute forecast error in `object`.
 
 - update:
 
@@ -110,7 +117,7 @@ pid(
   only the newly added time steps are computed; the prediction intervals
   produced earlier are carried over unchanged. Set by
   [`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
-  and not normally set by hand.
+  and not normally set by hand. Defaults to `FALSE`.
 
 - ...:
 
@@ -174,7 +181,15 @@ the following components:
 
 - model:
 
-  A list containing information about the conformal prediction model.
+  A list containing information about the conformal prediction model:
+  the resolved arguments in `model$args`, the call and the arguments of
+  the underlying cross-validation in `model$cvforecast`, the learning
+  rates actually used in `model$lr_update`, and the recursion state
+  needed to extend the results in `model$state` and `model$t_last`. The
+  integrator and scorecaster series are returned in `model$integrator`
+  and `model$scorecaster` when `integrate` and `scorecast` are `TRUE`;
+  when `symmetric = FALSE` each of the two holds a `lower` and an
+  `upper` element.
 
 If `mean` is included in the `object`, the components `mean`, `lower`,
 and `upper` will also be returned, showing the information about the
@@ -201,15 +216,28 @@ for each individual forecast horizon `h`, respectively, where
   \notin\[-\pi / 2, \pi / 2\]\\, and \\C\_{\text {sat }},
   K\_{\mathrm{I}}\>0\\ are constants that we choose heuristically.
 
-- Scorecasting part (D) is \\\hat{s}\_{t+h\|t}\\ is forecast generated
-  by training a scorecaster based on nonconformity scores available at
-  time \\t\\.
+- Scorecasting part (D) is \\\hat{s}\_{t+h\|t}\\, the forecast generated
+  by training a scorecaster based on the nonconformity scores available
+  at time \\t\\.
 
 ## References
 
 Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024). "Conformal
 PID control for time series prediction", *Advances in Neural Information
 Processing Systems*, **36**, 23047–23074.
+
+## See also
+
+[`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
+to produce `object`, and
+[`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+to extend the results with new observations.
+
+Other conformal prediction methods:
+[`acmcp()`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md),
+[`acp()`](https://xqnwang.github.io/conformalForecast/reference/acp.md),
+[`conformal()`](https://xqnwang.github.io/conformalForecast/reference/conformal.md),
+[`scp()`](https://xqnwang.github.io/conformalForecast/reference/scp.md)
 
 ## Examples
 
@@ -218,29 +246,28 @@ Processing Systems*, **36**, 23047–23074.
 library(forecast)
 set.seed(1)
 series <- arima.sim(n = 200, list(ar = c(0.8, -0.5)), sd = sqrt(1))
+
 # Cross-validation forecasting
 far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
+
 # PID setup
 Tg <- 200; delta <- 0.01
 Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
 KI <- 2
-lr <- 0.1
+
 # PID without scorecaster
-pidfc_nsf <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
-                 integrate = TRUE, scorecast = FALSE,
-                 lr = lr, Tg = Tg, KI = KI, Csat = Csat)
+pidfc_nsf <- pid(fc, ncal = 50, rolling = TRUE, scorecast = FALSE,
+                 KI = KI, Csat = Csat)
 print(pidfc_nsf)
 #> PID 
 #> 
 #> Call:
-#>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  
-#>      KI = KI) 
+#>  pid(object = fc, ncal = 50, rolling = TRUE, scorecast = FALSE,  
+#>      Csat = Csat, KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
@@ -253,9 +280,8 @@ summary(pidfc_nsf)
 #> PID 
 #> 
 #> Call:
-#>  pid(object = fc, symmetric = FALSE, ncal = 50, rolling = TRUE,  
-#>      integrate = TRUE, scorecast = FALSE, lr = lr, Tg = Tg, Csat = Csat,  
-#>      KI = KI) 
+#>  pid(object = fc, ncal = 50, rolling = TRUE, scorecast = FALSE,  
+#>      Csat = Csat, KI = KI) 
 #> 
 #>  cp_times (the forward step included): 101 (h=1), 100 (h=2), 99 (h=3)
 #> 
@@ -268,11 +294,11 @@ summary(pidfc_nsf)
 #> Cross-validation error measures:
 #>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
 #> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.339    6.82
+
 # PID with a Naive model for the scorecaster
 naivefun <- function(x, h) {
   naive(x) |> forecast(h = h)
 }
-pidfc <- pid(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
-             integrate = TRUE, scorecast = TRUE, scorecastfun = naivefun,
-             lr = lr, Tg = Tg, KI = KI, Csat = Csat)
+pidfc <- pid(fc, ncal = 50, rolling = TRUE, scorecastfun = naivefun,
+             KI = KI, Csat = Csat)
 ```

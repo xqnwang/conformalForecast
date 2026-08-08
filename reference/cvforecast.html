@@ -5,11 +5,9 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Time series cross-validation forecasting — cvforecast"><meta name="description" content="Compute forecasts and other information by applying
-forecastfun to subsets of the time series y using a
-rolling forecast origin."><meta property="og:description" content="Compute forecasts and other information by applying
-forecastfun to subsets of the time series y using a
-rolling forecast origin."></head><body>
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Time series cross-validation forecasting — cvforecast"><meta name="description" content="Compute forecasts and other information by applying forecastfun to
+subsets of the time series y using a rolling forecast origin."><meta property="og:description" content="Compute forecasts and other information by applying forecastfun to
+subsets of the time series y using a rolling forecast origin."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -27,6 +25,10 @@ rolling forecast origin."></head><body>
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/conformalForecast.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/update.html">Updating conformal forecasts with new data</a></li>
+  </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -45,9 +47,8 @@ rolling forecast origin."></head><body>
     </div>
 
     <div class="ref-description section level2">
-    <p>Compute forecasts and other information by applying
-<code>forecastfun</code> to subsets of the time series <code>y</code> using a
-rolling forecast origin.</p>
+    <p>Compute forecasts and other information by applying <code>forecastfun</code> to
+subsets of the time series <code>y</code> using a rolling forecast origin.</p>
     </div>
 
     <div class="section level2">
@@ -76,39 +77,44 @@ rolling forecast origin.</p>
 <dt id="arg-forecastfun">forecastfun<a class="anchor" aria-label="anchor" href="#arg-forecastfun"></a></dt>
 <dd><p>Function to return an object of class <code>"forecast"</code>.
 Its first argument must be a univariate time series, and it must have an
-argument <code>h</code> for the forecast horizon and an argument <code>level</code> for
-the confidence level for prediction intervals. If exogenous predictors are used,
-then it must also have <code>xreg</code> and <code>newxreg</code> arguments corresponding
-to the training and test periods, respectively.</p></dd>
+argument <code>h</code> for the forecast horizon and an argument <code>level</code>
+for the confidence level for prediction intervals. If exogenous
+predictors are used, then it must also have <code>xreg</code> and
+<code>newxreg</code> arguments corresponding to the training and the test
+periods, respectively.</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>
-<dd><p>Forecast horizon.</p></dd>
+<dd><p>Forecast horizon. Defaults to <code>1</code>.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
-<dd><p>Confidence level for prediction intervals.</p></dd>
+<dd><p>Confidence level for prediction intervals, as a numeric vector
+of percentages. It must not be <code>NULL</code>, since the conformal methods
+need at least one interval to start from. Defaults to <code>c(80, 95)</code>.</p></dd>
 
 
 <dt id="arg-forward">forward<a class="anchor" aria-label="anchor" href="#arg-forward"></a></dt>
 <dd><p>If <code>TRUE</code>, the final forecast origin for forecasting is
-\(y_T\). Otherwise, the final forecast origin is \(y_{T-1}\).</p></dd>
+\(y_T\). Otherwise, the final forecast origin is \(y_{T-1}\).
+Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-xreg">xreg<a class="anchor" aria-label="anchor" href="#arg-xreg"></a></dt>
-<dd><p>Exogenous predictor variables passed to <code>forecastfun</code> if required.
-It should be of the same size as <code>y</code>+<code>forward</code>*<code>h</code>, otherwise,
-<code>NA</code> padding or subsetting will be applied.</p></dd>
+<dd><p>Exogenous predictor variables passed to <code>forecastfun</code> if
+required. It should be of the same size as
+<code>y</code>+<code>forward</code>*<code>h</code>, otherwise, <code>NA</code> padding or
+subsetting will be applied. Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-initial">initial<a class="anchor" aria-label="anchor" href="#arg-initial"></a></dt>
 <dd><p>Initial period of the time series where no cross-validation
-forecasting is performed.</p></dd>
+forecasting is performed. Defaults to <code>1</code>.</p></dd>
 
 
 <dt id="arg-window">window<a class="anchor" aria-label="anchor" href="#arg-window"></a></dt>
-<dd><p>Length of the rolling window. If <code>NULL</code>, a rolling window
-will not be used.</p></dd>
+<dd><p>Length of the rolling window. Defaults to <code>NULL</code>, in
+which case a rolling window will not be used.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -125,18 +131,21 @@ will not be used.</p></dd>
 <dd><p>The name of the series <code>x</code>.</p></dd>
 
 <dt>xreg</dt>
-<dd><p>Exogenous predictor variables used in the model, if applicable.</p></dd>
+<dd><p>Exogenous predictor variables used in the model, if
+applicable.</p></dd>
 
 <dt>method</dt>
 <dd><p>A character string "cvforecast".</p></dd>
 
 <dt>fit_times</dt>
-<dd><p>The number of times the model is fitted in cross-validation.</p></dd>
+<dd><p>The number of times the model is fitted in
+cross-validation.</p></dd>
 
 <dt>MEAN</dt>
-<dd><p>Point forecasts as a multivariate time series, where the \(h\)th column
-holds the point forecasts for forecast horizon \(h\). The time index
-corresponds to the period for which the forecast is produced.</p></dd>
+<dd><p>Point forecasts as a multivariate time series, where the
+\(h\)th column holds the point forecasts for forecast horizon
+\(h\). The time index corresponds to the period for which the
+forecast is produced.</p></dd>
 
 <dt>ERROR</dt>
 <dd><p>Forecast errors given by
@@ -144,16 +153,17 @@ corresponds to the period for which the forecast is produced.</p></dd>
 
 <dt>LOWER</dt>
 <dd><p>A list containing lower bounds for prediction intervals for
-each <code>level</code>. Each element within the list will be a multivariate time
-series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
+each <code>level</code>. Each element within the list will be a multivariate
+time series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
 
 <dt>UPPER</dt>
 <dd><p>A list containing upper bounds for prediction intervals for
-each <code>level</code>. Each element within the list will be a multivariate time
-series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
+each <code>level</code>. Each element within the list will be a multivariate
+time series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
 
 <dt>level</dt>
-<dd><p>The confidence values associated with the prediction intervals.</p></dd>
+<dd><p>The confidence values associated with the prediction
+intervals.</p></dd>
 
 <dt>call</dt>
 <dd><p>The matched call.</p></dd>
@@ -161,24 +171,34 @@ series with the same dimensional characteristics as <code>MEAN</code>.</p></dd>
 <dt>forward</dt>
 <dd><p>Whether <code>forward</code> is applied.</p></dd>
 
-</dl><p>If <code>forward</code> is <code>TRUE</code>, the components <code>mean</code>, <code>lower</code>,
-<code>upper</code>, and <code>model</code> will also be returned, showing the information
-about the final fitted model and forecasts using all available observations, see
-e.g. <code><a href="https://pkg.robjhyndman.com/forecast/reference/forecast.ets.html" class="external-link">forecast.ets</a></code> for more details.</p>
+</dl><p>If <code>forward</code> is <code>TRUE</code>, the components <code>mean</code>,
+<code>lower</code>, <code>upper</code>, and <code>model</code> will also be returned,
+showing the information about the final fitted model and the forecasts
+using all available observations, see e.g.
+<code><a href="https://pkg.robjhyndman.com/forecast/reference/forecast.ets.html" class="external-link">forecast.ets</a></code> for more details.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Let <code>y</code> denote the time series \(y_1,\dots,y_T\) and
-let \(t_0\) denote the initial period.</p>
+    <p>Let <code>y</code> denote the time series \(y_1,\dots,y_T\) and let
+\(t_0\) denote the initial period.</p>
 <p>Suppose <code>forward = TRUE</code>. If <code>window</code> is <code>NULL</code>,
 <code>forecastfun</code> is applied successively to the subset time series
-\(y_{1},\dots,y_t\), for \(t=t_0,\dots,T\),
-generating forecasts \(\hat{y}_{t+1|t},\dots,\hat{y}_{t+h|t}\). If <code>window</code> is not
-<code>NULL</code> and has a length of \(t_w\), then <code>forecastfun</code> is applied
-successively to the subset time series \(y_{t-t_w+1},\dots,y_{t}\),
-for \(t=\max(t_0, t_w),\dots,T\).</p>
-<p>If <code>forward</code> is <code>FALSE</code>, the last observation used for training will
-be \(y_{T-1}\).</p>
+\(y_{1},\dots,y_t\), for \(t=t_0,\dots,T\), generating forecasts
+\(\hat{y}_{t+1|t},\dots,\hat{y}_{t+h|t}\). If <code>window</code> is
+not <code>NULL</code> and has a length of \(t_w\), then <code>forecastfun</code> is
+applied successively to the subset time series
+\(y_{t-t_w+1},\dots,y_{t}\), for
+\(t=\max(t_0, t_w),\dots,T\).</p>
+<p>If <code>forward</code> is <code>FALSE</code>, the last observation used for training
+will be \(y_{T-1}\).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="conformal.html">conformal</a></code> and the conformal methods
+<code><a href="scp.html">scp</a></code>, <code><a href="acp.html">acp</a></code>, <code><a href="pid.html">pid</a></code> and
+<code><a href="acmcp.html">acmcp</a></code>, which all take the result of <code>cvforecast()</code> as
+their input; <code><a href="update.cpforecast.html">update.cpforecast</a></code> to extend the results with
+new observations.</p></div>
     </div>
 
     <div class="section level2">
@@ -193,14 +213,13 @@ be \(y_{T-1}\).</p>
 <span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
-<span class="r-in"><span>                 forward <span class="op">=</span> <span class="cn">TRUE</span>, initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cross-validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      forward = TRUE, initial = 1, window = 50) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      window = 50) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 151 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -214,7 +233,7 @@ be \(y_{T-1}\).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      forward = TRUE, initial = 1, window = 50) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      window = 50) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  fit_times = 151 (the forward step included) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -230,12 +249,12 @@ be \(y_{T-1}\).</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example with exogenous predictors</span></span></span>
 <span class="r-in"><span><span class="va">far2_xreg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span>, <span class="va">xreg</span>, <span class="va">newxreg</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, xreg <span class="op">=</span> <span class="va">xreg</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, xreg <span class="op">=</span> <span class="va">xreg</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, level <span class="op">=</span> <span class="va">level</span>, xreg <span class="op">=</span> <span class="va">newxreg</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">fc_xreg</span> <span class="op">&lt;-</span> <span class="fu">cvforecast</span><span class="op">(</span><span class="va">series</span>, forecastfun <span class="op">=</span> <span class="va">far2_xreg</span>, h <span class="op">=</span> <span class="fl">3</span>, level <span class="op">=</span> <span class="fl">95</span>,</span></span>
-<span class="r-in"><span>                      forward <span class="op">=</span> <span class="cn">TRUE</span>, xreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">406</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">203</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                      initial <span class="op">=</span> <span class="fl">1</span>, window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                      xreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">406</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, nrow <span class="op">=</span> <span class="fl">203</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      window <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

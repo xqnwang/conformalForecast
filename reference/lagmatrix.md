@@ -14,7 +14,7 @@ lagmatrix(x, lag)
 
 - x:
 
-  A matrix or multivariate time series.
+  A matrix or a multivariate time series.
 
 - lag:
 
@@ -24,6 +24,12 @@ lagmatrix(x, lag)
 ## Value
 
 A matrix with the same class and size as `x`.
+
+## See also
+
+[`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md),
+which uses this function to align the forecasts and the forecast errors
+by horizon.
 
 ## Examples
 

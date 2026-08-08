@@ -50,11 +50,13 @@ An object of class `list` of length 8.
 
 - resid:
 
-  A numeric vector of residuals from either the validation or test data.
+  A numeric vector of residuals from either the validation or the test
+  data.
 
 - na.rm:
 
   If `TRUE`, remove missing values before calculating the measure.
+  Defaults to `TRUE`.
 
 - ...:
 
@@ -62,38 +64,49 @@ An object of class `list` of length 8.
 
 - actual:
 
-  A numeric vector of responses matching the forecasts (for percentage
-  measures).
+  A numeric vector of the realised values matching the forecasts.
+  Required by the percentage measures.
 
 - train:
 
-  A numeric vector of responses used to train the model (for scaled
-  measures).
+  A numeric vector of responses used to train the model. Required by the
+  scaled measures.
 
 - demean:
 
-  Should the response be demeaned (for MASE and RMSSE)?
+  Should the response be demeaned (for `MASE` and `RMSSE`)? Defaults to
+  `FALSE`.
 
 - period:
 
-  The seasonal period of the data.
+  The seasonal period of the data. Required by the scaled measures.
 
 - d:
 
-  Should the response model include a first difference?
+  Should the response model include a first difference? Defaults to
+  `period == 1`.
 
 - D:
 
-  Should the response model include a seasonal difference?
+  Should the response model include a seasonal difference? Defaults to
+  `period > 1`.
 
 ## Value
 
 For the individual functions (`ME`, `MAE`, `MSE`, `RMSE`, `MPE`, `MAPE`,
-`MASE`, `RMSSE`), returns a single numeric scalar giving the requested
-accuracy measure.
+`MASE`, `RMSSE`), a single numeric scalar giving the requested accuracy
+measure.
 
-For the exported object `point_measures`, returns a **named list of
-functions** that can be supplied to higher-level accuracy routines.
+For the exported object `point_measures`, a named list of functions that
+can be supplied to higher-level accuracy routines.
+
+## See also
+
+[`interval_measures`](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)
+for the interval counterparts, and
+[`accuracy.cvforecast`](https://xqnwang.github.io/conformalForecast/reference/accuracy.cvforecast.md),
+which applies these measures to a cross-validation or a conformal
+prediction object.
 
 ## Examples
 

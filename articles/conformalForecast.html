@@ -37,6 +37,12 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/conformalForecast.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/update.html">Updating conformal forecasts with new data</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -66,8 +72,21 @@
 
     
     
-<p>The <em>conformalForecast</em> package provides some commonly used
-conformal prediction methods for time series forecasting.</p>
+<p>The <em>conformalForecast</em> package implements conformal
+prediction methods for <strong>multistep-ahead</strong> time series
+forecasting. Given a point forecasting model and a validation set of
+past forecast errors, these methods construct prediction intervals that
+are distribution-free: they do not rely on an assumed error distribution
+(such as Gaussian errors), and instead calibrate directly from the
+empirical behaviour of past errors.</p>
+<p>The package provides four conformal methods: split conformal
+prediction (<code><a href="../reference/scp.html">scp()</a></code>), adaptive conformal prediction
+(<code><a href="../reference/acp.html">acp()</a></code>), conformal PID control (<code><a href="../reference/pid.html">pid()</a></code>) and
+autocorrelated multistep-ahead conformal prediction
+(<code><a href="../reference/acmcp.html">acmcp()</a></code>). A unified <code><a href="../reference/conformal.html">conformal()</a></code> function can
+call any of them by name. This vignette works through all four, starting
+from the simplest (SCP) and ending with AcMCP, the main contribution of
+the accompanying paper.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/xqnwang/conformalForecast" class="external-link">conformalForecast</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/" class="external-link">forecast</a></span><span class="op">)</span></span>
@@ -78,9 +97,12 @@ conformal prediction methods for time series forecasting.</p>
 <div class="section level2">
 <h2 id="data-simulation">Data simulation<a class="anchor" aria-label="anchor" href="#data-simulation"></a>
 </h2>
-<p>Suppose we are interested in forecasting a time series generated from
-an AR(2) model with <span class="math inline">\(\phi_1 = 0.8\)</span>,
-<span class="math inline">\(\phi_2=-0.5\)</span>, and <span class="math inline">\(\sigma^2 = 1\)</span>.</p>
+<p>Suppose we want to forecast a time series generated from an AR(2)
+model with <span class="math inline">\(\phi_1 = 0.8\)</span>, <span class="math inline">\(\phi_2 = -0.5\)</span>, and <span class="math inline">\(\sigma^2 = 1\)</span>.</p>
+<p>We simulate 1005 observations and hold the last five back: the first
+1000 are used throughout the vignette, and the remaining five are used
+later to demonstrate updating a fitted conformal object with newly
+arrived data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">series_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1005</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
@@ -96,12 +118,21 @@ an AR(2) model with <span class="math inline">\(\phi_1 = 0.8\)</span>,
 <div class="section level2">
 <h2 id="time-series-cross-validation">Time series cross-validation<a class="anchor" aria-label="anchor" href="#time-series-cross-validation"></a>
 </h2>
-<p>We first train a forecasting model AR(2) on a rolling forecast origin
-to generate forecasts and forecast errors on validation sets.</p>
-<p>Setting <code>forward = TRUE</code> includes an <span class="math inline">\(h\)</span>-step forecast from the final
-observation. The <code>window</code> argument controls the number of
-recent observations used at each forecast origin; setting it to
-<code>NULL</code> uses an expanding window.</p>
+<p>Before we can calibrate any conformal method, we need a record of
+past forecast errors to calibrate against. We obtain this with
+<code><a href="../reference/cvforecast.html">cvforecast()</a></code>, which repeatedly fits the AR(2) model on a
+rolling forecast origin and produces out-of-sample point forecasts and
+errors at every origin, for every forecast horizon up to
+<code>h</code>.</p>
+<p>Two arguments control how the origins are laid out.
+<code>forward = TRUE</code> appends an extra <span class="math inline">\(h\)</span>-step forecast made from the final
+observation, so that the object carries genuinely future forecasts as
+well as the validation history. <code>window</code> sets how many recent
+observations each refit sees: a number gives a fixed-length rolling
+estimation window, while <code>window = NULL</code> lets the estimation
+window expand over time. A non-<code>NULL</code> <code>level</code> is
+required, since the conformal methods calibrate against the nominal
+levels stored in the object.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">far2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">h</span>, <span class="va">level</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Arima.html" class="external-link">Arima</a></span><span class="op">(</span><span class="va">x</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast</a></span><span class="op">(</span>h <span class="op">=</span> <span class="va">h</span>, <span class="va">level</span><span class="op">)</span></span>
@@ -151,32 +182,128 @@ recent observations used at each forecast origin; setting it to
 <span><span class="co">#&gt; Median width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
 <span><span class="co">#&gt; 3.885016 4.919813 4.957593</span></span></code></pre></div>
+<p>The object <code>fc</code> stores point forecasts <code>MEAN</code>
+and forecast errors <code>ERROR</code> as multivariate time series, in
+which column <span class="math inline">\(h\)</span> holds the values for
+forecast horizon <span class="math inline">\(h\)</span>. In package
+notation, the error made forecasting <span class="math inline">\(y_{t+h}\)</span> from origin <span class="math inline">\(t\)</span> is <span class="math display">\[e_{t+h|t} = y_{t+h} - \hat{y}_{t+h|t}.\]</span>
+Every conformal method below calibrates against this <code>ERROR</code>
+matrix, one column (one horizon) at a time.</p>
 </div>
 <div class="section level2">
 <h2 id="conformal-prediction">Conformal prediction<a class="anchor" aria-label="anchor" href="#conformal-prediction"></a>
 </h2>
-<p>Based on the forecast errors on validation sets, we can apply various
-conformal prediction methods to construct prediction intervals.</p>
-<p>Each method can be called directly or through
-<code><a href="../reference/conformal.html">conformal()</a></code> by setting <code>method</code> to
-<code>"scp"</code>, <code>"acp"</code>, <code>"pid"</code>, or
-<code>"acmcp"</code>.</p>
-<p>For SCP, ACP, and PID, <code>ncal</code> sets the calibration or
-burn-in length. If <code>rolling = TRUE</code>, only the most recent
-<code>ncal</code> errors are used where applicable; otherwise, the
-window expands over time. Setting <code>symmetric = TRUE</code>
-calibrates absolute errors, while <code>symmetric = FALSE</code>
-calibrates the lower and upper tails separately. AcMCP only supports
-asymmetric errors.</p>
+<p>The four methods differ in how the quantile used to build the
+intervals is obtained, from a plain empirical quantile of past scores in
+SCP to an online recursion in the later methods. They are presented
+below in that order.</p>
+<div class="section level3">
+<h3 id="the-conformal-function">The <code>conformal()</code> function<a class="anchor" aria-label="anchor" href="#the-conformal-function"></a>
+</h3>
+<p>All four methods share the same calling convention: they accept a
+<code>cvforecast</code> object, or a previous conformal fit when
+updating, and return prediction intervals for one or more nominal
+levels. The <code><a href="../reference/conformal.html">conformal()</a></code> function provides a unified
+interface to these methods, which can be selected through its
+<code>method</code> argument:</p>
+<table class="table">
+<colgroup>
+<col width="9%">
+<col width="8%">
+<col width="81%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"><code>method =</code></th>
+<th align="left">function</th>
+<th align="left">core idea</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">“scp”</td>
+<td align="left"><code><a href="../reference/scp.html">scp()</a></code></td>
+<td align="left">Empirical quantile of past nonconformity scores, on an
+expanding or rolling calibration window</td>
+</tr>
+<tr class="even">
+<td align="left">“acp”</td>
+<td align="left"><code><a href="../reference/acp.html">acp()</a></code></td>
+<td align="left">Online update of the miscoverage target alpha in
+response to whether the last interval covered</td>
+</tr>
+<tr class="odd">
+<td align="left">“pid”</td>
+<td align="left"><code><a href="../reference/pid.html">pid()</a></code></td>
+<td align="left">P (quantile tracking) + I (bounded integral correction)
++ D (scorecasting) applied per horizon</td>
+</tr>
+<tr class="even">
+<td align="left">“acmcp”</td>
+<td align="left"><code><a href="../reference/acmcp.html">acmcp()</a></code></td>
+<td align="left">Same P+I+D structure as PID, but the scorecaster
+exploits correlation across horizons</td>
+</tr>
+</tbody>
+</table>
+<p><code>conformal(fc, method = "scp", ...)</code> is exactly equivalent
+to <code>scp(fc, ...)</code>: <code><a href="../reference/conformal.html">conformal()</a></code> forwards
+<code>object</code> and <code>...</code> to the chosen function and
+returns its result unchanged. The rest of this vignette calls
+<code><a href="../reference/scp.html">scp()</a></code>, <code><a href="../reference/acp.html">acp()</a></code>, <code><a href="../reference/pid.html">pid()</a></code> and
+<code><a href="../reference/acmcp.html">acmcp()</a></code> directly, to keep the method-specific arguments
+explicit.</p>
+<p>A few arguments recur across the methods and mean much the same thing
+everywhere. <code>ncal</code> is the length of the calibration history:
+for SCP and ACP it is the number of past scores the quantile is computed
+from, while for PID and AcMCP, which track the quantile recursively, it
+acts as a burn-in length before the recursion starts producing
+intervals. <code>rolling = TRUE</code> restricts that history to the
+most recent <code>ncal</code> errors wherever a window is used;
+<code>rolling = FALSE</code> (the default) lets it expand over time.
+<code>symmetric</code> chooses between calibrating absolute errors
+(<code>TRUE</code>) and calibrating the lower and upper tails separately
+(<code>FALSE</code>); AcMCP supports only the asymmetric case and
+therefore has no <code>symmetric</code> argument.</p>
+<p>Every method returns an object whose class vector is the method name
+followed by <code>cpforecast</code>, <code>cvforecast</code> and
+<code>forecast</code>, so <code>cpforecast</code> methods such as
+<code><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy()</a></code>, <code><a href="../reference/coverage.html">coverage()</a></code> and
+<code><a href="../reference/width.html">width()</a></code> apply to all four. Once you have one, you can
+extend it with newly observed data without recomputing the whole
+history, using <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>; see
+<code><a href="../articles/update.html">vignette("update", package = "conformalForecast")</a></code> for
+details.</p>
+</div>
 <div class="section level3">
 <h3 id="classical-split-conformal-prediction-scp">Classical split conformal prediction (SCP)<a class="anchor" aria-label="anchor" href="#classical-split-conformal-prediction-scp"></a>
 </h3>
-<p>Here, we perform a SCP method with equal weights in sample quantile
-estimation.</p>
+<p>SCP is the simplest of the four methods and a natural baseline. For
+each horizon <span class="math inline">\(h\)</span>, it forms a vector
+of nonconformity scores <span class="math inline">\(s_{t+h|t}\)</span>
+from past errors, and predicts an interval by adding and subtracting an
+empirical quantile of those scores from the point forecast.</p>
+<p>If <code>symmetric = TRUE</code>, the score is the absolute error,
+<span class="math inline">\(s_{t+h|t} = |e_{t+h|t}|\)</span>, and the
+<span class="math inline">\((1-\alpha)\)</span>-quantile <span class="math inline">\(\hat{q}_{t+h|t}\)</span> of the calibration scores
+gives a symmetric interval <span class="math display">\[\left[\hat{y}_{t+h|t} - \hat{q}_{t+h|t},\
+\hat{y}_{t+h|t} + \hat{q}_{t+h|t}\right].\]</span> If
+<code>symmetric = FALSE</code> (the default we use below), upper and
+lower bounds are calibrated separately from signed scores, <span class="math inline">\(s^u_{t+h|t} = e_{t+h|t}\)</span> and <span class="math inline">\(s^l_{t+h|t} = -e_{t+h|t}\)</span>, using the <span class="math inline">\((1-\alpha/2)\)</span>-quantiles <span class="math inline">\(\hat{q}^u_{t+h|t}\)</span> and <span class="math inline">\(\hat{q}^l_{t+h|t}\)</span> of the respective
+scores, giving <span class="math display">\[\left[\hat{y}_{t+h|t} -
+\hat{q}^l_{t+h|t},\ \hat{y}_{t+h|t} + \hat{q}^u_{t+h|t}\right].\]</span>
+Asymmetric scoring lets the interval be wider on one side than the
+other, which is useful whenever the error distribution itself is
+skewed.</p>
+<p>The calibration set the quantile is computed on can grow over time
+(<code>rolling = FALSE</code>): at time <span class="math inline">\(t\)</span> it is the expanding set <span class="math inline">\(s_{1+h|1}, \dots, s_{t|t-h}\)</span>, using every
+score observed so far. Or it can be a fixed-length trailing window
+(<code>rolling = TRUE</code>): a window of <code>ncal</code> most recent
+scores. A rolling window adapts faster to a changing error distribution
+but uses less data per quantile estimate; an expanding window is more
+stable but slower to react if the error distribution drifts. Below we
+use a rolling window of <code>ncal = 100</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc</span>, method <span class="op">=</span> <span class="st">"scp"</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                   rolling <span class="op">=</span> <span class="cn">TRUE</span>, weightfun <span class="op">=</span> <span class="cn">NULL</span>, kess <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                   quantiletype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">scpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>             weightfun <span class="op">=</span> <span class="cn">NULL</span>, kess <span class="op">=</span> <span class="cn">FALSE</span>, quantiletype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">scpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
@@ -194,9 +321,17 @@ estimation.</p>
 <span><span class="co">#&gt; Median width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
 <span><span class="co">#&gt; 4.054006 5.334842 5.326651</span></span></code></pre></div>
-<p>The <code><a href="../reference/scp.html">scp()</a></code> function allows us to include non-equal
-weights for sample quantile estimation by passing a weight calculation
-function to the <code>weightfun</code> argument.</p>
+<p><code><a href="../reference/scp.html">scp()</a></code> also allows non-equal weighting of the calibration
+scores via <code>weightfun</code>, a function that maps the number of
+scores in the calibration set to a vector of weights. This lets more
+recent scores count more toward the quantile than older ones, which is a
+middle ground between a rolling window (hard cutoff) and an expanding
+window (no decay). When weights are used, setting
+<code>kess = TRUE</code> computes the quantile using Kish’s effective
+sample size, <span class="math inline">\(n_{\mathrm{eff}} = (\sum w)^2 /
+\sum w^2\)</span>, rather than the raw number of scores, so the quantile
+estimate reflects how much <em>effective</em> information the weighted
+sample actually carries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">expweight</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fl">0.99</span><span class="op">^</span><span class="op">{</span><span class="va">n</span><span class="op">+</span><span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">}</span></span>
 <span><span class="va">scpfc_exp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -218,12 +353,40 @@ function to the <code>weightfun</code> argument.</p>
 <span><span class="co">#&gt; Median width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
 <span><span class="co">#&gt; 4.297306 5.455463 5.499007</span></span></code></pre></div>
+<p>SCP is the right choice when you want a simple, well-understood
+baseline and the error distribution within the calibration window is
+reasonably stable; it does not adapt online to feedback about whether
+recent intervals actually covered, which is exactly what the next two
+methods add.</p>
 </div>
 <div class="section level3">
 <h3 id="adaptive-conformal-prediction-acp">Adaptive conformal prediction (ACP)<a class="anchor" aria-label="anchor" href="#adaptive-conformal-prediction-acp"></a>
 </h3>
-<p>The ACP method updates <span class="math inline">\(\alpha\)</span>
-online to target the desired long-run empirical coverage.</p>
+<p>ACP (Gibbs and Candes 2021) keeps the SCP calibration mechanics but
+replaces the fixed miscoverage level <span class="math inline">\(\alpha\)</span> with one that adapts online, based
+on whether the previous interval covered the outcome or not: <span class="math display">\[\alpha_{t+h|t} := \alpha_{t+h-1|t-1} +
+\gamma\left(\alpha - \mathrm{err}_{t|t-h}\right),\]</span> computed
+separately for each horizon <span class="math inline">\(h\)</span>,
+where <span class="math inline">\(\mathrm{err}_{t|t-h} = 1\)</span> if
+the score <span class="math inline">\(s_{t|t-h}\)</span> exceeded the
+quantile <span class="math inline">\(q_{t|t-h}\)</span> used at that
+step (a miss), and <span class="math inline">\(0\)</span> otherwise (a
+hit). If misses have recently been more frequent than <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\alpha_{t+h|t}\)</span> is pushed down, which
+widens the next interval; if hits have been more frequent than intended,
+<span class="math inline">\(\alpha_{t+h|t}\)</span> is pushed up,
+narrowing the interval. The quantile itself, at each step, is still an
+empirical quantile of a calibration window of past scores (expanding or
+rolling, exactly as in SCP), but now computed at the <em>current</em>
+<span class="math inline">\(\alpha_{t+h|t}\)</span> rather than a fixed
+<span class="math inline">\(\alpha\)</span>.</p>
+<p>The step size <span class="math inline">\(\gamma &gt; 0\)</span>
+(argument <code>gamma</code>) controls how fast <span class="math inline">\(\alpha\)</span> reacts: larger values adapt more
+quickly to a change in the underlying error distribution but make the
+interval width more volatile; smaller values are steadier but slower to
+correct a persistent miscoverage. This adaptivity is what lets ACP
+maintain close-to-nominal long-run coverage under distribution shift,
+where an SCP quantile computed from a stale calibration window would
+not.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acp.html">acp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, gamma <span class="op">=</span> <span class="fl">0.005</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -247,9 +410,49 @@ online to target the desired long-run empirical coverage.</p>
 <div class="section level3">
 <h3 id="conformal-pid-control-pid">Conformal PID control (PID)<a class="anchor" aria-label="anchor" href="#conformal-pid-control-pid"></a>
 </h3>
-<p>The PID method combines three modules (quantile tracking, error
-integration, and scorecasting) to make an iteration to produce a
-sequence of quantile estimates used in the prediction sets.</p>
+<p>PID (Angelopoulos, Candes, and Tibshirani 2024) generalizes ACP by
+tracking the quantile <span class="math inline">\(q_{t+h|t}\)</span>
+itself (rather than <span class="math inline">\(\alpha\)</span>) through
+three additive components, evocative of a
+proportional-integral-derivative controller: <span class="math display">\[q_{t+h|t}=\underbrace{q_{t+h-1|t-1} +
+\eta\left(\mathrm{err}_{t|t-h}-\alpha\right)}_{\text{P}} +
+\underbrace{r_t\!\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\text{I}}
++ \underbrace{\hat{s}_{t+h|t}}_{\text{D}},\]</span> again computed
+separately for each horizon <span class="math inline">\(h\)</span>.</p>
+<ul>
+<li>The P term, quantile tracking, applies the same idea as ACP’s <span class="math inline">\(\alpha\)</span> update directly to the quantile:
+<span class="math inline">\(q_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h} -
+\alpha)\)</span>, with <span class="math inline">\(q_{1+h|1}\)</span>
+initialized to <span class="math inline">\(0\)</span>. The step size
+<span class="math inline">\(\eta\)</span> (argument <code>lr</code>) is
+scaled internally by the recent range of the errors, so it adapts to the
+level of forecast uncertainty rather than being a fixed number of score
+units.</li>
+<li>The I term, error integration, corrects a persistent bias in
+realized coverage, which the memoryless P term reacts to only slowly. It
+feeds the cumulative miscoverage <span class="math inline">\(\sum_{i=1}^t (\mathrm{err}_{i|i-h} -
+\alpha)\)</span> through a bounded, nonlinear saturation function <span class="math display">\[r_t(x) = K_{\mathrm{I}} \tan\!\left(\frac{x
+\log(t)}{t\, C_{\mathrm{sat}}}\right),\]</span> where <span class="math inline">\(\tan(x) = \mathrm{sign}(x)\cdot\infty\)</span>
+once <span class="math inline">\(x \notin [-\pi/2, \pi/2]\)</span>.
+<span class="math inline">\(C_{\mathrm{sat}}\)</span> and <span class="math inline">\(K_{\mathrm{I}}\)</span> are positive constants
+chosen heuristically: <span class="math inline">\(K_{\mathrm{I}}\)</span> (argument <code>KI</code>)
+puts the integrator on the same scale as the scores, and <span class="math inline">\(C_{\mathrm{sat}}\)</span> (argument
+<code>Csat</code>) is chosen so that, by a target time <code>Tg</code>,
+the method achieves at least <span class="math inline">\(1-\alpha-\delta\)</span> absolute coverage for a
+chosen tolerance <code>delta</code>. You can either supply
+<code>Csat</code> directly, as we do below, or leave it at its default
+of <code>NULL</code> and let it be derived from <code>Tg</code> and
+<code>delta</code>; in the latter case <code>Tg</code> must be greater
+than 1 and <code>delta</code> must lie in <span class="math inline">\((0, 1)\)</span>. Setting
+<code>integrate = FALSE</code> drops this term entirely.</li>
+<li>The D term, scorecasting, adds a forecast of the nonconformity score
+itself, <span class="math inline">\(\hat{s}_{t+h|t}\)</span>, produced
+by fitting a user-supplied <code>scorecastfun</code> to the scores
+observed so far. This anticipates predictable structure in the scores (a
+trend, a seasonal pattern) instead of only reacting to it after the
+fact. Set <code>scorecast = FALSE</code> to omit this term, or supply,
+e.g., a naive forecaster as below.</li>
+</ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># PID setup</span></span>
 <span><span class="va">Tg</span> <span class="op">&lt;-</span> <span class="fl">1000</span>; <span class="va">delta</span> <span class="op">&lt;-</span> <span class="fl">0.01</span></span>
@@ -303,28 +506,56 @@ sequence of quantile estimates used in the prediction sets.</p>
 <span><span class="co">#&gt; Median width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
 <span><span class="co">#&gt; 5.972480 7.664302 7.656036</span></span></code></pre></div>
+<p>PID is a good choice when you want both the persistent-bias
+correction that ACP lacks (via I) and the ability to plug in domain
+knowledge about the score dynamics (via D, through the scorecaster).
+Note, however, that the scorecaster here is trained separately at each
+horizon <span class="math inline">\(h\)</span>, using only that
+horizon’s own score history. It does not use the fact that, at a given
+origin, the scores at horizons <span class="math inline">\(1, \dots,
+h-1\)</span> are already known and correlated with the score at horizon
+<span class="math inline">\(h\)</span>. That is the gap AcMCP
+closes.</p>
 </div>
 <div class="section level3">
 <h3 id="autocorrelated-multistep-ahead-conformal-prediction-acmcp">Autocorrelated multistep-ahead conformal prediction (AcMCP)<a class="anchor" aria-label="anchor" href="#autocorrelated-multistep-ahead-conformal-prediction-acmcp"></a>
 </h3>
-<p>Similar to the PID method, the AcMCP method also integrates three
-modules (P, I, and D) to form the final iteration. However, instead of
-performing conformal prediction for each individual forecast horizon
-<span class="math inline">\(h\)</span> separately, AcMCP employs a
-combination of an MA(<span class="math inline">\(h-1\)</span>) model and
-a linear regression model of <span class="math inline">\(e_{t+h|t}\)</span> on <span class="math inline">\(e_{t+h-1|t},\dots,e_{t+1|t}\)</span> as the
-scorecaster. This allows the AcMCP method to capture the relationship
-between the <span class="math inline">\(h\)</span>-step ahead forecast
-error and past errors.</p>
-<p>The MA scorecaster uses CSS-ML estimation by default, matching the
-reference implementation. For longer forecast horizons,
-<code>ma_method = "CSS"</code> may be faster, although it can produce
-different estimates. Scorecasts are constructed recursively, so the
-first scorecast for horizon <span class="math inline">\(h\)</span>
-becomes available at cross-validation error index <span class="math inline">\(n_{\mathrm{cal}} + h(h-1)/2\)</span>.</p>
+<p>AcMCP (Wang and Hyndman 2024) keeps PID’s P+I+D structure, and
+supports only asymmetric (signed-error) scores, but replaces the
+scorecaster in the D term. Instead of forecasting <span class="math inline">\(e_{t+h|t}\)</span> from its own history in
+isolation, the scorecaster combines two models that use the
+<em>other</em> horizons’ errors from the same origin <span class="math inline">\(t\)</span>: an <span class="math inline">\(\mathrm{MA}(h-1)\)</span> model fitted to the
+horizon-<span class="math inline">\(h\)</span> error series, and a
+linear regression of <span class="math inline">\(e_{t+h|t}\)</span> on
+<span class="math inline">\(e_{t+h-1|t}, \dots, e_{t+1|t}\)</span>, the
+shorter-horizon errors already observed at the same forecast origin. The
+two models’ forecasts are averaged to give <span class="math inline">\(\hat{s}_{t+h|t}\)</span>. (At <span class="math inline">\(h=1\)</span>, where there is no shorter-horizon
+error to regress on, the scorecaster falls back to a simple mean
+forecast.)</p>
+<p>This exploits the correlation between horizons. Optimal <span class="math inline">\(h\)</span>-step-ahead forecast errors are serially
+correlated up to lag <span class="math inline">\(h-1\)</span> under
+general nonstationary autoregressive data-generating processes, so the
+errors observed at horizons <span class="math inline">\(1\)</span>
+through <span class="math inline">\(h-1\)</span> at time <span class="math inline">\(t\)</span> carry information about the error still
+to come at horizon <span class="math inline">\(h\)</span>. AcMCP’s
+regression term captures exactly that. In principle this yields narrower
+intervals than PID for the same long-run marginal coverage, because it
+uses information PID leaves unused. As with every method here, the
+guarantee being targeted is asymptotic marginal coverage. Realized
+coverage will fluctuate around the nominal level in any finite
+validation set, more so at longer horizons.</p>
+<p>Two practical points follow from the way this scorecaster is built.
+The MA component is fitted by CSS-ML estimation by default, matching the
+reference implementation; <code>ma_method = "CSS"</code> is available
+and is faster at longer forecast horizons, at the cost of somewhat
+different estimates. And because the regression at horizon <span class="math inline">\(h\)</span> consumes the scorecasts made at
+horizons <span class="math inline">\(1, \dots, h-1\)</span>, the
+scorecasts are constructed recursively: the first scorecast for horizon
+<span class="math inline">\(h\)</span> only becomes available at
+cross-validation error index <span class="math inline">\(n_{\mathrm{cal}} + h(h-1)/2\)</span>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/acmcp.html">acmcp</a></span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, integrate <span class="op">=</span> <span class="cn">TRUE</span>, scorecast <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>             lr <span class="op">=</span> <span class="va">lr</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
+<span>                 lr <span class="op">=</span> <span class="va">lr</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span>, Csat <span class="op">=</span> <span class="va">Csat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">acmcpfc_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">acmcpfc</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
@@ -348,9 +579,10 @@ becomes available at cross-validation error index <span class="math inline">\(n_
 <h2 id="updating-with-new-observations">Updating with new observations<a class="anchor" aria-label="anchor" href="#updating-with-new-observations"></a>
 </h2>
 <p>When new observations become available, <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> extends
-the cross-validation forecasts and conformal intervals without
-recomputing the existing results. It also reuses the conformal settings
-stored in the fitted object.</p>
+the cross-validation forecasts and the conformal intervals without
+recomputing the results that are already there. It replays the conformal
+settings stored in the fitted object, so the extension is made under
+exactly the same configuration as the original fit.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scpfc_updated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scpfc</span>, new_data <span class="op">=</span> <span class="va">new_data</span>, forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scpfc_updated</span><span class="op">$</span><span class="va">x</span><span class="op">)</span></span>
@@ -361,6 +593,10 @@ stored in the fitted object.</p>
 <span><span class="co">#&gt; End = 1008 </span></span>
 <span><span class="co">#&gt; Frequency = 1 </span></span>
 <span><span class="co">#&gt; [1]  0.279596189  0.457719582 -0.001123158</span></span></code></pre></div>
+<p>This is only a first look;
+<code><a href="../articles/update.html">vignette("update", package = "conformalForecast")</a></code> covers
+updating in full, including which methods can resume from stored state
+and what has to match for them to do so.</p>
 </div>
 <div class="section level2">
 <h2 id="forecasting-with-external-regressors">Forecasting with external regressors<a class="anchor" aria-label="anchor" href="#forecasting-with-external-regressors"></a>
@@ -402,6 +638,9 @@ simulated series and reserves the next five for updating.</p>
 <span>  ncal <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  rolling <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>This chunk also shows the unified interface in use:
+<code>conformal(fc_xreg, method = "scp", ...)</code> does exactly what a
+direct call to <code><a href="../reference/scp.html">scp()</a></code> would do.</p>
 <p>With <code>forward = TRUE</code>, the stored <code>xreg</code>
 already contains the original <span class="math inline">\(h\)</span>
 future rows. Therefore, <code>new_xreg</code> supplies the rows
@@ -425,8 +664,8 @@ observation and the same columns as the stored <code>xreg</code>.</p>
 <div class="section level2">
 <h2 id="coverage-and-width-of-prediction-intervals">Coverage and width of prediction intervals<a class="anchor" aria-label="anchor" href="#coverage-and-width-of-prediction-intervals"></a>
 </h2>
-<p>Taking the AcMCP result as an example, we now show the average
-coverage on validation sets.</p>
+<p>Taking the AcMCP result as an example, we now look at the rolling
+average coverage on the validation set.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc_cov</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -441,8 +680,8 @@ coverage on validation sets.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean coverage for AcMCP"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/covplot-1.png" class="r-plt" alt="" width="672"></p>
-<p>We can also show the rolling average interval width on validation
-sets.</p>
+<p>We can similarly look at the rolling average interval width on the
+validation set.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">acmcpfc_wid</span><span class="op">$</span><span class="va">rollmean</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -456,11 +695,12 @@ sets.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean width for AcMCP"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/widplot-1.png" class="r-plt" alt="" width="672"></p>
-<p>We can also combine all the results and show them in one single plot.
-Here, WCP denotes weighted SCP with exponential weights, and PI denotes
-conformal PID without the scorecasting component. The comparison is
-based on a single simulated series and is intended only to illustrate
-the output; it should not be used to rank the methods.</p>
+<p>Finally, we combine the results from all the methods considered above
+into a single comparison: the underlying AR(2) model’s own intervals
+(<code>AR</code>), SCP with equal weights (<code>SCP</code>), SCP with
+exponential weights (<code>WCP</code>), ACP, PID without a scorecaster
+(<code>PI</code>), PID with a naive scorecaster (<code>PID</code>), and
+AcMCP.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fc"</span>, <span class="st">"scpfc"</span>, <span class="st">"scpfc_exp"</span>, <span class="st">"acpfc"</span>, <span class="st">"pidfc_nsf"</span>, <span class="st">"pidfc"</span>, <span class="st">"acmcpfc"</span><span class="op">)</span></span>
 <span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AR"</span>, <span class="st">"SCP"</span>, <span class="st">"WCP"</span>, <span class="st">"ACP"</span>, <span class="st">"PI"</span>, <span class="st">"PID"</span>, <span class="st">"AcMCP"</span><span class="op">)</span></span>
@@ -567,6 +807,18 @@ the output; it should not be used to rank the methods.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Rolling mean width"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="conformalForecast_files/figure-html/bind-wid-1.png" class="r-plt" alt="" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024).
+“Conformal PID control for time series prediction”. <em>Advances in
+Neural Information Processing Systems</em>, 36, 23047–23074.</p>
+<p>Gibbs, I., and Candes, E. (2021). “Adaptive conformal inference under
+distribution shift”. <em>Advances in Neural Information Processing
+Systems</em>, 34, 1660–1672.</p>
+<p>Wang, X., and Hyndman, R. J. (2024). “Online conformal inference for
+multi-step time series forecasting”. arXiv:2410.13115. <a href="https://doi.org/10.48550/arXiv.2410.13115" class="external-link uri">https://doi.org/10.48550/arXiv.2410.13115</a></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -32,36 +32,39 @@ cvforecast(
   the forecast horizon and an argument `level` for the confidence level
   for prediction intervals. If exogenous predictors are used, then it
   must also have `xreg` and `newxreg` arguments corresponding to the
-  training and test periods, respectively.
+  training and the test periods, respectively.
 
 - h:
 
-  Forecast horizon.
+  Forecast horizon. Defaults to `1`.
 
 - level:
 
-  Confidence level for prediction intervals.
+  Confidence level for prediction intervals, as a numeric vector of
+  percentages. It must not be `NULL`, since the conformal methods need
+  at least one interval to start from. Defaults to `c(80, 95)`.
 
 - forward:
 
   If `TRUE`, the final forecast origin for forecasting is \\y_T\\.
-  Otherwise, the final forecast origin is \\y\_{T-1}\\.
+  Otherwise, the final forecast origin is \\y\_{T-1}\\. Defaults to
+  `TRUE`.
 
 - xreg:
 
   Exogenous predictor variables passed to `forecastfun` if required. It
   should be of the same size as `y`+`forward`\*`h`, otherwise, `NA`
-  padding or subsetting will be applied.
+  padding or subsetting will be applied. Defaults to `NULL`.
 
 - initial:
 
   Initial period of the time series where no cross-validation
-  forecasting is performed.
+  forecasting is performed. Defaults to `1`.
 
 - window:
 
-  Length of the rolling window. If `NULL`, a rolling window will not be
-  used.
+  Length of the rolling window. Defaults to `NULL`, in which case a
+  rolling window will not be used.
 
 - ...:
 
@@ -127,7 +130,8 @@ A list of class `c("cvforecast", "forecast")` with components:
 
 If `forward` is `TRUE`, the components `mean`, `lower`, `upper`, and
 `model` will also be returned, showing the information about the final
-fitted model and forecasts using all available observations, see e.g.
+fitted model and the forecasts using all available observations, see
+e.g.
 [`forecast.ets`](https://pkg.robjhyndman.com/forecast/reference/forecast.ets.html)
 for more details.
 
@@ -147,6 +151,19 @@ to the subset time series \\y\_{t-t_w+1},\dots,y\_{t}\\, for
 If `forward` is `FALSE`, the last observation used for training will be
 \\y\_{T-1}\\.
 
+## See also
+
+[`conformal`](https://xqnwang.github.io/conformalForecast/reference/conformal.md)
+and the conformal methods
+[`scp`](https://xqnwang.github.io/conformalForecast/reference/scp.md),
+[`acp`](https://xqnwang.github.io/conformalForecast/reference/acp.md),
+[`pid`](https://xqnwang.github.io/conformalForecast/reference/pid.md)
+and
+[`acmcp`](https://xqnwang.github.io/conformalForecast/reference/acmcp.md),
+which all take the result of `cvforecast()` as their input;
+[`update.cpforecast`](https://xqnwang.github.io/conformalForecast/reference/update.cpforecast.md)
+to extend the results with new observations.
+
 ## Examples
 
 ``` r
@@ -160,14 +177,13 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 print(fc)
 #> Cross-validation
 #> 
 #> Call:
 #>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  
-#>      forward = TRUE, initial = 1, window = 50) 
+#>      window = 50) 
 #> 
 #>  fit_times = 151 (the forward step included) 
 #> 
@@ -181,7 +197,7 @@ summary(fc)
 #> 
 #> Call:
 #>  cvforecast(y = series, forecastfun = far2, h = 3, level = 95,  
-#>      forward = TRUE, initial = 1, window = 50) 
+#>      window = 50) 
 #> 
 #>  fit_times = 151 (the forward step included) 
 #> 
@@ -197,10 +213,10 @@ summary(fc)
 
 # Example with exogenous predictors
 far2_xreg <- function(x, h, level, xreg, newxreg) {
-  Arima(x, order=c(2, 0, 0), xreg = xreg) |>
+  Arima(x, order = c(2, 0, 0), xreg = xreg) |>
     forecast(h = h, level = level, xreg = newxreg)
 }
 fc_xreg <- cvforecast(series, forecastfun = far2_xreg, h = 3, level = 95,
-                      forward = TRUE, xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
-                      initial = 1, window = 50)
+                      xreg = matrix(rnorm(406), ncol = 2, nrow = 203),
+                      window = 50)
 ```

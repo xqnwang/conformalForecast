@@ -1,9 +1,9 @@
 # Calculate interval forecast width
 
-Calculate the mean width of prediction intervals on the validation set.
-If `window` is not `NULL`, a matrix of the rolling means of interval
-width is also returned. If `includemedian` is `TRUE`, the information of
-the median interval width will be returned.
+Calculate the mean width of the prediction intervals on the validation
+set. If `window` is not `NULL`, a matrix of the rolling means of the
+interval width is also returned. If `includemedian` is `TRUE`, the
+information of the median interval width will be returned.
 
 ## Usage
 
@@ -26,25 +26,30 @@ width(
 
 - ...:
 
-  Time-series matrices `LOWER` and `UPPER` if `object` is missing.
+  Time-series matrices `LOWER` and `UPPER` if `object` is missing. They
+  may also be lists keyed by confidence level.
 
 - level:
 
-  Target confidence level for prediction intervals.
+  Target confidence level for the prediction intervals. Only one level
+  can be specified. Defaults to `95`.
 
 - includemedian:
 
-  If `TRUE`, the median interval width will also be returned.
+  If `TRUE`, the median interval width will also be returned. Defaults
+  to `FALSE`.
 
 - window:
 
-  If not `NULL`, the rolling mean (and rolling median if applicable)
-  matrix for interval width will also be returned.
+  If not `NULL`, the rolling mean (and the rolling median if applicable)
+  matrix for the interval width will also be returned. Defaults to
+  `NULL`.
 
 - na.rm:
 
   A logical indicating whether `NA` values should be stripped before the
-  rolling mean and rolling median computation proceeds.
+  rolling mean and rolling median computation proceeds. Defaults to
+  `FALSE`.
 
 ## Value
 
@@ -63,8 +68,8 @@ A list of class `"width"` with the following components:
 
 - rollmean:
 
-  If `window` is not NULL, a matrix of the rolling means of interval
-  width will be returned.
+  If `window` is not `NULL`, a matrix of the rolling means of the
+  interval width will be returned.
 
 - median:
 
@@ -72,8 +77,17 @@ A list of class `"width"` with the following components:
 
 - rollmedian:
 
-  If `window` is not NULL, a matrix of the rolling medians of interval
-  width will be returned.
+  If `window` is not `NULL`, a matrix of the rolling medians of the
+  interval width will be returned.
+
+## See also
+
+[`cvforecast`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
+and the conformal methods, which produce `object`.
+
+Other evaluation functions:
+[`accuracy.cvforecast()`](https://xqnwang.github.io/conformalForecast/reference/accuracy.cvforecast.md),
+[`coverage()`](https://xqnwang.github.io/conformalForecast/reference/coverage.md)
 
 ## Examples
 
@@ -88,8 +102,7 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Mean and rolling mean width for interval forecasts on validation set
 wid_fc <- width(fc, level = 95, window = 50)

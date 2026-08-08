@@ -23,6 +23,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/conformalForecast.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/update.html">Updating conformal forecasts with new data</a></li>
+  </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -46,6 +50,7 @@
 <code>forecast</code> moved from <code>Imports</code> to <code>Depends</code>, so it is attached together with <code>conformalForecast</code>.</li>
 <li>
 <code><a href="../reference/acmcp.html">acmcp()</a></code> now accepts <code>ma_method = "CSS"</code> for faster MA scorecaster fitting at longer forecast horizons, while retaining <code>"CSS-ML"</code> as the default, and reports successful scorecasts in <code>scorecast_times</code>.</li>
+<li>New unit-test suite covering all four conformal methods, <code><a href="../reference/cvforecast.html">cvforecast()</a></code>, <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, and the evaluation functions.</li>
 </ul><div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
@@ -73,6 +78,9 @@
 <ul><li>The pkgdown site renders mathematics again (<code>math-rendering: mathjax</code>).</li>
 <li>Corrected the documented return classes, the <code>Winkler</code> measure name, the <code><a href="../reference/lagmatrix.html">lagmatrix()</a></code> error message, and several typos.</li>
 <li>Expanded the vignette with the <code><a href="../reference/conformal.html">conformal()</a></code> interface, incremental updates, external regressors, clearer method descriptions, and updated ggplot2 calls.</li>
+<li>New <code><a href="../articles/update.html">vignette("update")</a></code>, on extending a fitted conformal pipeline with newly arrived observations instead of refitting it from scratch.</li>
+<li>The introductory vignette now documents <code><a href="../reference/conformal.html">conformal()</a></code>, and describes each method, its key formula and its tuning arguments in more detail.</li>
+<li>The pkgdown site indexes both vignettes under “Articles”.</li>
 <li>Help examples now cover raw inputs to <code><a href="../reference/coverage.html">coverage()</a></code> and <code><a href="../reference/width.html">width()</a></code> and <code>cpforecast</code> accuracy, and use fixed random seeds for reproducibility.</li>
 </ul></div>
 </div>

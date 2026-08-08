@@ -1,9 +1,9 @@
 # Accuracy measures for a cross-validation model and a conformal prediction model
 
-Return range of summary measures of the out-of-sample forecast accuracy.
-If `x` is given, the function also measures test set forecast accuracy.
-If `x` is not given, the function only produces accuracy measures on
-validation set.
+Return a range of summary measures of the out-of-sample forecast
+accuracy. If `x` is given, the function also measures the test set
+forecast accuracy. If `x` is not given, the function only produces
+accuracy measures on the validation set.
 
 ## Usage
 
@@ -31,16 +31,18 @@ accuracy(object, ...)
 
 - x:
 
-  An optional numerical vector containing actual values of the same
+  An optional numerical vector containing the actual values of the same
   length as `mean` in `object`.
 
 - CV:
 
   If `TRUE`, the cross-validation forecast accuracy will be returned.
+  Defaults to `TRUE`.
 
 - period:
 
-  The seasonal period of the data.
+  The seasonal period of the data. Defaults to `NULL`, in which case it
+  is taken from the frequency of the series.
 
 - measures:
 
@@ -48,11 +50,12 @@ accuracy(object, ...)
   [point_measures](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
   or
   [interval_measures](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)).
+  Defaults to `interval_measures`.
 
 - byhorizon:
 
   If `TRUE`, accuracy measures will be calculated for each individual
-  forecast horizon `h` separately.
+  forecast horizon `h` separately. Defaults to `FALSE`.
 
 - ...:
 
@@ -88,8 +91,14 @@ The measures calculated are:
 
 ## See also
 
-[`point_measures`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md),
+[`point_measures`](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
+and
 [`interval_measures`](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)
+for the measures that can be supplied through `measures`.
+
+Other evaluation functions:
+[`coverage()`](https://xqnwang.github.io/conformalForecast/reference/coverage.md),
+[`width()`](https://xqnwang.github.io/conformalForecast/reference/width.md)
 
 ## Examples
 
@@ -104,8 +113,7 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Out-of-sample forecast accuracy on validation set
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
@@ -124,8 +132,7 @@ accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 #> CV h=3   6.245013 6.565268
 
 # Accuracy of conformal prediction intervals
-scpfc <- conformal(fc, method = "scp", symmetric = FALSE,
-                   ncal = 50, rolling = TRUE)
+scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 accuracy(scpfc, measures = interval_measures, level = 95,
          byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
