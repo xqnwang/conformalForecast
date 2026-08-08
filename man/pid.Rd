@@ -188,7 +188,7 @@ pidfc <- pid(fc, ncal = 50, rolling = TRUE, scorecastfun = naivefun,
 
 }
 \references{
-Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024). "Conformal PID
+Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2023). "Conformal PID
 control for time series prediction", \emph{Advances in Neural Information
 Processing Systems}, \bold{36}, 23047--23074.
 }

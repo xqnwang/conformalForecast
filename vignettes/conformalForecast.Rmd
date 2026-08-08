@@ -162,7 +162,7 @@ acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
 
 ### Conformal PID control (PID)
 
-PID (Angelopoulos, Candes, and Tibshirani 2024) generalizes ACP by tracking the quantile $q_{t+h|t}$ itself (rather than $\alpha$) through three additive components, evocative of a proportional-integral-derivative controller:
+PID (Angelopoulos, Candes, and Tibshirani 2023) generalizes ACP by tracking the quantile $q_{t+h|t}$ itself (rather than $\alpha$) through three additive components, evocative of a proportional-integral-derivative controller:
 $$q_{t+h|t}=\underbrace{q_{t+h-1|t-1} + \eta\left(\mathrm{err}_{t|t-h}-\alpha\right)}_{\text{P}} + \underbrace{r_t\!\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\text{I}} + \underbrace{\hat{s}_{t+h|t}}_{\text{D}},$$
 again computed separately for each horizon $h$.
 
@@ -413,7 +413,7 @@ wid |>
 
 ## References
 
-Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024). "Conformal PID control for time series prediction". *Advances in Neural Information Processing Systems*, 36, 23047–23074.
+Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2023). "Conformal PID control for time series prediction". *Advances in Neural Information Processing Systems*, 36, 23047–23074.
 
 Gibbs, I., and Candes, E. (2021). "Adaptive conformal inference under distribution shift". *Advances in Neural Information Processing Systems*, 34, 1660–1672.
 
