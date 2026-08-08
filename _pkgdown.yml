@@ -3,3 +3,10 @@ template:
   bootstrap: 5
   math-rendering: mathjax
 
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - conformalForecast
+  - update
+

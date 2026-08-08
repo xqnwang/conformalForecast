@@ -1,18 +1,24 @@
 #' Conformal prediction
 #'
-#' This function allows you to specify the method used to perform conformal prediction.
+#' This function allows you to specify the method used to perform conformal
+#' prediction.
 #'
-#' @param object An object of class \code{"cvforecast"}. It must have an argument
-#' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors on validation set.
-#' See the results of a call to \code{\link{cvforecast}}.
-#' @param method A character string specifying the conformal method to be applied.
-#' Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
-#' \code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).
-#' @param ... Additional arguments to be passed to the selected conformal method.
+#' @inheritParams scp
+#' @param method A character string specifying the conformal method to be
+#'   applied. Possible options include \code{"scp"} (\link{scp}), \code{"acp"}
+#'   (\link{acp}), \code{"pid"} (\link{pid}), and \code{"acmcp"}
+#'   (\link{acmcp}). Defaults to \code{"scp"}.
+#' @param ... Additional arguments to be passed to the selected conformal
+#'   method.
 #'
 #' @return An object whose class depends on the method invoked.
-#' @seealso \code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}}, and \code{\link{acmcp}}
+#'
+#' @family conformal prediction methods
+#'
+#' @seealso \code{\link{cvforecast}} to produce \code{object}, and
+#'   \code{\link{update.cpforecast}} to extend the results with new
+#'   observations.
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
@@ -24,15 +30,14 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # Classical conformal prediction with equal weights
-#' scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 50, rolling = TRUE)
+#' scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 #' summary(scpfc)
 #'
 #' # ACP with asymmetric nonconformity scores and rolling calibration sets
-#' acpfc <- conformal(fc, method = "acp", symmetric = FALSE, gamma = 0.005,
+#' acpfc <- conformal(fc, method = "acp", gamma = 0.005,
 #'                    ncal = 50, rolling = TRUE)
 #' summary(acpfc)
 #'
@@ -43,16 +48,22 @@ conformal <- function(object, ...) {
 
 #' @rdname conformal
 #' @export
-conformal.cvforecast <- function(object, method = c("scp", "acp", "pid", "acmcp"), ...) {
+conformal.cvforecast <- function(
+  object,
+  method = c("scp", "acp", "pid", "acmcp"),
+  ...
+) {
   # Match the method argument
   method <- match.arg(method)
 
   # Call the respective function based on the method
-  result <- switch(method,
-                   scp = scp(object, ...),
-                   acp = acp(object, ...),
-                   pid = pid(object, ...),
-                   acmcp = acmcp(object, ...))
+  result <- switch(
+    method,
+    scp = scp(object, ...),
+    acp = acp(object, ...),
+    pid = pid(object, ...),
+    acmcp = acmcp(object, ...)
+  )
 
   # Return the result of the chosen method
   return(result)

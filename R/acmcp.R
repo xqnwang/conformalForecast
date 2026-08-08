@@ -1,93 +1,86 @@
 #' Autocorrelated multistep-ahead conformal prediction method
 #'
-#' Compute prediction intervals and other information by applying the Autocorrelated
-#' Multistep-ahead Conformal Prediction (AcMCP) method. The method can only
-#' deal with asymmetric nonconformity scores, i.e., forecast errors.
+#' Compute prediction intervals and other information by applying the
+#' Autocorrelated Multistep-ahead Conformal Prediction (AcMCP) method. The
+#' method can only deal with asymmetric nonconformity scores, i.e., forecast
+#' errors.
 #'
-#' Similar to the PID method, the AcMCP method also integrates three modules (P, I, and D) to
-#' form the final iteration. However, instead of performing conformal prediction
-#' for each individual forecast horizon \code{h} separately, AcMCP employs a combination
-#' of an MA\eqn{(h-1)} model and a linear regression model of \eqn{e_{t+h|t}} on
-#' \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the AcMCP method
-#' to capture the relationship between the \eqn{h}-step ahead forecast error and
-#' past errors.
+#' Similar to the PID method, the AcMCP method also integrates three modules
+#' (P, I, and D) to form the final iteration. However, instead of performing
+#' conformal prediction for each individual forecast horizon \code{h}
+#' separately, AcMCP employs a combination of an MA\eqn{(h-1)} model and a
+#' linear regression model of \eqn{e_{t+h|t}} on
+#' \eqn{e_{t+h-1|t},\dots,e_{t+1|t}} as the scorecaster. This allows the AcMCP
+#' method to capture the relationship between the \eqn{h}-step-ahead forecast
+#' error and the past errors.
+#'
 #' Scorecasts are constructed recursively, so longer forecast horizons require
 #' more history before all scorecaster inputs are available. For horizon
 #' \eqn{h}, the first scorecast can be computed at cross-validation error index
-#' \code{ncal} + \eqn{h(h-1)/2}. The number of successful scorecasts is reported
-#' in \code{scorecast_times}.
+#' \code{ncal} + \eqn{h(h-1)/2}. The number of successful scorecasts is
+#' reported in \code{scorecast_times}.
 #'
-#' @param object An object of class \code{"cvforecast"}. It must have an argument
-#' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors on validation set.
-#' See the results of a call to \code{\link{cvforecast}}.
-#' @param alpha A numeric vector of significance levels to achieve a desired
-#' coverage level \eqn{1-\alpha}.
-#' @param ncal Length of the burn-in period for training the scorecaster.
-#' If \code{rolling = TRUE}, it is also used as the length of the trailing windows
-#' for learning rate calculation and the windows for the calibration set.
-#' If \code{rolling = FALSE}, it is used as the initial period of calibration sets
-#' and trailing windows for learning rate calculation.
-#' @param rolling If \code{TRUE}, a rolling window strategy will be adopted to
-#' form the trailing window for learning rate calculation and the calibration set
-#' for scorecaster if applicable. Otherwise, expanding window strategy will be used.
-#' @param integrate If \code{TRUE}, error integration will be included in the
-#' update process.
-#' @param scorecast If \code{TRUE}, scorecasting will be included in the update
-#' process.
-#' @param lr A positive initial learning rate used for quantile tracking.
-#' @param Tg The time that is set to achieve the target absolute coverage
-#' guarantee before this. It must be greater than 1 when \code{Csat} is not
-#' supplied. Defaults to the number of cross-validation periods in \code{object}.
-#' @param delta A number in \eqn{(0, 1)}. The target absolute coverage guarantee
-#' is set to \eqn{1-\alpha-\delta}.
-#' @param Csat A positive constant ensuring that by time \code{Tg}, an absolute
-#' guarantee is of at least \eqn{1-\alpha-\delta} coverage. Derived from \code{Tg}
-#' and \code{delta} when not supplied.
-#' @param KI A non-negative constant to place the integrator on the same scale as
-#' the scores. Defaults to the largest absolute forecast error in \code{object}.
-#' @param update If \code{TRUE}, \code{object} already holds the results of a
-#' previous call and only the newly added time steps are computed; the
-#' prediction intervals produced earlier are carried over unchanged. Set by
-#' \code{\link{update.cpforecast}} and not normally set by hand.
+#' @inheritParams pid
+#' @param scorecast If \code{TRUE}, scorecasting will be included in the
+#'   update process. Defaults to \code{TRUE}.
 #' @param ma_method Estimation method for the MA\eqn{(h-1)} scorecaster.
-#' \code{"CSS-ML"} uses conditional sum of squares for starting values followed
-#' by maximum likelihood. \code{"CSS"} uses conditional sum of squares only and
-#' may be faster, especially for longer forecast horizons, but can produce
-#' different estimates.
+#'   \code{"CSS-ML"} uses conditional sum of squares for starting values
+#'   followed by maximum likelihood. \code{"CSS"} uses conditional sum of
+#'   squares only and may be faster, especially for longer forecast horizons,
+#'   but can produce different estimates. Defaults to \code{"CSS-ML"}.
 #' @param ... Not used.
 #'
-#' @return A list of class \code{c("acmcp", "cpforecast", "cvforecast", "forecast")}
-#' with the following components:
-#' \item{x}{The original time series.}
-#' \item{series}{The name of the series \code{x}.}
-#' \item{xreg}{Exogenous predictor variables used, if applicable.}
-#' \item{method}{A character string "acmcp".}
-#' \item{cp_times}{An integer vector giving the number of conformal predictions
-#' performed in cross-validation for each forecast horizon.}
-#' \item{scorecast_times}{An integer vector giving the number of successful
-#' scorecasts for each forecast horizon. Returned when \code{scorecast = TRUE}.}
-#' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
-#' holds the point forecasts for forecast horizon \eqn{h}. The time index
-#' corresponds to the period for which the forecast is produced.}
-#' \item{ERROR}{Forecast errors given by
-#' \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
-#' \item{LOWER}{A list containing lower bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{UPPER}{A list containing upper bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{level}{The confidence values associated with the prediction intervals.}
-#' \item{call}{The matched call.}
-#' \item{model}{A list containing information about the conformal prediction model.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean},
-#' \code{lower}, and \code{upper} will also be returned, showing the information
-#' about the test set forecasts generated using all available observations.
+#' @return A list of class
+#'   \code{c("acmcp", "cpforecast", "cvforecast", "forecast")} with the
+#'   following components:
+#'   \item{x}{The original time series.}
+#'   \item{series}{The name of the series \code{x}.}
+#'   \item{xreg}{Exogenous predictor variables used, if applicable.}
+#'   \item{method}{A character string "acmcp".}
+#'   \item{cp_times}{An integer vector giving the number of conformal
+#'     predictions performed in cross-validation for each forecast horizon.}
+#'   \item{scorecast_times}{An integer vector giving the number of successful
+#'     scorecasts for each forecast horizon. Returned when
+#'     \code{scorecast = TRUE}.}
+#'   \item{MEAN}{Point forecasts as a multivariate time series, where the
+#'     \eqn{h}th column holds the point forecasts for forecast horizon
+#'     \eqn{h}. The time index corresponds to the period for which the
+#'     forecast is produced.}
+#'   \item{ERROR}{Forecast errors given by
+#'     \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
+#'   \item{LOWER}{A list containing lower bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{UPPER}{A list containing upper bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{level}{The confidence values associated with the prediction
+#'     intervals.}
+#'   \item{call}{The matched call.}
+#'   \item{model}{A list containing information about the conformal prediction
+#'     model: the resolved arguments in \code{model$args}, the call and the
+#'     arguments of the underlying cross-validation in
+#'     \code{model$cvforecast}, the learning rates actually used in
+#'     \code{model$lr_update}, and the recursion state needed to extend the
+#'     results in \code{model$state} and \code{model$t_last}. The integrator
+#'     and scorecaster series are returned in \code{model$integrator} and
+#'     \code{model$scorecaster} when \code{integrate} and \code{scorecast} are
+#'     \code{TRUE}; each holds a \code{lower} and an \code{upper} element.}
+#'   If \code{mean} is included in the \code{object}, the components
+#'   \code{mean}, \code{lower}, and \code{upper} will also be returned, showing
+#'   the information about the test set forecasts generated using all
+#'   available observations.
 #'
-#' @references Wang, X., and Hyndman, R. J. (2024). "Online conformal inference
-#' for multi-step time series forecasting", arXiv preprint arXiv:2410.13115.
-#' @seealso \code{\link{pid}}
+#' @family conformal prediction methods
+#'
+#' @seealso \code{\link{cvforecast}} to produce \code{object}, and
+#'   \code{\link{update.cpforecast}} to extend the results with new
+#'   observations.
+#'
+#' @references
+#' Wang, X., and Hyndman, R. J. (2024). "Online conformal inference for
+#'   multi-step time series forecasting", arXiv preprint arXiv:2410.13115.
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
@@ -99,19 +92,15 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # AcMCP setup
 #' Tg <- 200; delta <- 0.01
 #' Csat <- 2 / pi * (ceiling(log(Tg) * delta) - 1 / log(Tg))
 #' KI <- 2
-#' lr <- 0.1
 #'
 #' # AcMCP with integrator and scorecaster
-#' acmcpfc <- acmcp(fc, ncal = 50, rolling = TRUE,
-#'              integrate = TRUE, scorecast = TRUE,
-#'              lr = lr, Tg = Tg, KI = KI, Csat = Csat)
+#' acmcpfc <- acmcp(fc, ncal = 50, rolling = TRUE, KI = KI, Csat = Csat)
 #' print(acmcpfc)
 #' summary(acmcpfc)
 #' acmcpfc$scorecast_times
@@ -385,46 +374,55 @@ acmcp <- function(
       if (do_scorecast) {
         score <- NA_real_
         if (h == 1) {
-          score <- try(suppressWarnings(
-            as.numeric(forecast::meanf(errors_subset, h = h)$mean)
-          ), silent = TRUE)
+          score <- try(
+            suppressWarnings(
+              as.numeric(forecast::meanf(errors_subset, h = h)$mean)
+            ),
+            silent = TRUE
+          )
         } else {
           score_inputs <- sapply(seq_len(h - 1L), function(j) {
             scorecaster_upper[t - h + 1L + j, j]
           })
           if (all(is.finite(score_inputs))) {
-            score <- try(suppressWarnings({
-              model_MA <- forecast::Arima(
-                errors_subset,
-                order = c(0, 0, h - 1),
-                method = ma_method
-              ) |>
-                forecast::forecast(h = h)
-              model_LR <- lm(
-                as.formula(paste0("V", h, " ~ .")),
-                data = setNames(
-                  as.data.frame(sapply(seq_len(h), function(j) {
-                    subset(
-                      errors[, j],
-                      start = ifelse(!rolling, j, t - ncal + 1L - h + j),
-                      end = t - h + j
-                    )
-                  })),
-                  paste0("V", seq_len(h))
-                )
-              ) |>
-                forecast::forecast(
-                  newdata = setNames(
-                    data.frame(matrix(score_inputs, nrow = 1L)),
-                    paste0("V", seq_len(h - 1L))
+            score <- try(
+              suppressWarnings({
+                model_MA <- forecast::Arima(
+                  errors_subset,
+                  order = c(0, 0, h - 1),
+                  method = ma_method
+                ) |>
+                  forecast::forecast(h = h)
+                model_LR <- lm(
+                  as.formula(paste0("V", h, " ~ .")),
+                  data = setNames(
+                    as.data.frame(sapply(seq_len(h), function(j) {
+                      subset(
+                        errors[, j],
+                        start = ifelse(!rolling, j, t - ncal + 1L - h + j),
+                        end = t - h + j
+                      )
+                    })),
+                    paste0("V", seq_len(h))
                   )
-                )
-              (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean)) / 2
-            }), silent = TRUE)
+                ) |>
+                  forecast::forecast(
+                    newdata = setNames(
+                      data.frame(matrix(score_inputs, nrow = 1L)),
+                      paste0("V", seq_len(h - 1L))
+                    )
+                  )
+                (as.numeric(model_MA$mean[h]) + as.numeric(model_LR$mean)) / 2
+              }),
+              silent = TRUE
+            )
           }
         }
-        if (!inherits(score, "try-error") &&
-            length(score) == 1L && is.finite(score)) {
+        if (
+          !inherits(score, "try-error") &&
+            length(score) == 1L &&
+            is.finite(score)
+        ) {
           scorecaster_lower[t + h, h] <- -score
           scorecaster_upper[t + h, h] <- score
         }

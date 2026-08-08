@@ -10,22 +10,26 @@ conformal(object, ...)
 \method{conformal}{cvforecast}(object, method = c("scp", "acp", "pid", "acmcp"), ...)
 }
 \arguments{
-\item{object}{An object of class \code{"cvforecast"}. It must have an argument
-\code{x} for original univariate time series, an argument \code{MEAN} for
-point forecasts and \code{ERROR} for forecast errors on validation set.
-See the results of a call to \code{\link{cvforecast}}.}
+\item{object}{An object of class \code{"cvforecast"}. It must have an
+argument \code{x} for the original univariate time series, an argument
+\code{MEAN} for the point forecasts and \code{ERROR} for the forecast
+errors on the validation set. See the results of a call to
+\code{\link{cvforecast}}.}
 
-\item{...}{Additional arguments to be passed to the selected conformal method.}
+\item{...}{Additional arguments to be passed to the selected conformal
+method.}
 
-\item{method}{A character string specifying the conformal method to be applied.
-Possible options include \code{"scp"} (\link{scp}), \code{"acp"}(\link{acp}),
-\code{"pid"}(\link{pid}), and \code{"acmcp"}(\link{acmcp}).}
+\item{method}{A character string specifying the conformal method to be
+applied. Possible options include \code{"scp"} (\link{scp}), \code{"acp"}
+(\link{acp}), \code{"pid"} (\link{pid}), and \code{"acmcp"}
+(\link{acmcp}). Defaults to \code{"scp"}.}
 }
 \value{
 An object whose class depends on the method invoked.
 }
 \description{
-This function allows you to specify the method used to perform conformal prediction.
+This function allows you to specify the method used to perform conformal
+prediction.
 }
 \examples{
 # Simulate time series from an AR(2) model
@@ -38,19 +42,27 @@ far2 <- function(x, h, level) {
   Arima(x, order = c(2, 0, 0)) |>
     forecast(h = h, level)
 }
-fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-                 forward = TRUE, initial = 1, window = 50)
+fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Classical conformal prediction with equal weights
-scpfc <- conformal(fc, method = "scp", symmetric = FALSE, ncal = 50, rolling = TRUE)
+scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 summary(scpfc)
 
 # ACP with asymmetric nonconformity scores and rolling calibration sets
-acpfc <- conformal(fc, method = "acp", symmetric = FALSE, gamma = 0.005,
+acpfc <- conformal(fc, method = "acp", gamma = 0.005,
                    ncal = 50, rolling = TRUE)
 summary(acpfc)
 
 }
 \seealso{
-\code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}}, and \code{\link{acmcp}}
+\code{\link{cvforecast}} to produce \code{object}, and
+\code{\link{update.cpforecast}} to extend the results with new
+observations.
+
+Other conformal prediction methods: 
+\code{\link{acmcp}()},
+\code{\link{acp}()},
+\code{\link{pid}()},
+\code{\link{scp}()}
 }
+\concept{conformal prediction methods}

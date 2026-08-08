@@ -7,17 +7,19 @@
 lagmatrix(x, lag)
 }
 \arguments{
-\item{x}{A matrix or multivariate time series.}
+\item{x}{A matrix or a multivariate time series.}
 
 \item{lag}{A vector of finite integer lags (positive values) or leads
-(negative values) with a length equal to the number of columns of \code{x}.}
+(negative values) with a length equal to the number of columns of
+\code{x}.}
 }
 \value{
 A matrix with the same class and size as \code{x}.
 }
 \description{
-Find a shifted version of a matrix, adjusting the time base backward (lagged)
-or forward (leading) by a specified number of observations for each column.
+Find a shifted version of a matrix, adjusting the time base backward
+(lagged) or forward (leading) by a specified number of observations for
+each column.
 }
 \examples{
 set.seed(1)
@@ -29,4 +31,8 @@ lagmatrix(x, c(0, 1, 2, 3))
 # Create leads of a matrix
 lagmatrix(x, c(0, -1, -2, -3))
 
+}
+\seealso{
+\code{\link{cvforecast}}, which uses this function to align the
+forecasts and the forecast errors by horizon.
 }

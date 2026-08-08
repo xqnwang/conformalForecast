@@ -90,22 +90,34 @@ RMSSE <- function(
 #'
 #' Accuracy measures for point forecast residuals.
 #'
-#' @param resid A numeric vector of residuals from either the validation or test data.
-#' @param actual A numeric vector of responses matching the forecasts (for percentage measures).
-#' @param train A numeric vector of responses used to train the model (for scaled measures).
-#' @param period The seasonal period of the data.
-#' @param d Should the response model include a first difference?
-#' @param D Should the response model include a seasonal difference?
-#' @param demean Should the response be demeaned (for MASE and RMSSE)?
-#' @param na.rm If `TRUE`, remove missing values before calculating the measure.
+#' @param resid A numeric vector of residuals from either the validation or
+#'   the test data.
+#' @param actual A numeric vector of the realised values matching the
+#'   forecasts. Required by the percentage measures.
+#' @param train A numeric vector of responses used to train the model.
+#'   Required by the scaled measures.
+#' @param period The seasonal period of the data. Required by the scaled
+#'   measures.
+#' @param d Should the response model include a first difference? Defaults to
+#'   \code{period == 1}.
+#' @param D Should the response model include a seasonal difference? Defaults
+#'   to \code{period > 1}.
+#' @param demean Should the response be demeaned (for \code{MASE} and
+#'   \code{RMSSE})? Defaults to \code{FALSE}.
+#' @param na.rm If \code{TRUE}, remove missing values before calculating the
+#'   measure. Defaults to \code{TRUE}.
 #' @param ... Additional arguments for each measure.
 #'
-#' @return
-#' For the individual functions (`ME`, `MAE`, `MSE`, `RMSE`, `MPE`, `MAPE`, `MASE`, `RMSSE`),
-#' returns a single numeric scalar giving the requested accuracy measure.
+#' @return For the individual functions (\code{ME}, \code{MAE}, \code{MSE},
+#'   \code{RMSE}, \code{MPE}, \code{MAPE}, \code{MASE}, \code{RMSSE}), a
+#'   single numeric scalar giving the requested accuracy measure.
 #'
-#' For the exported object `point_measures`, returns a **named list of functions**
-#' that can be supplied to higher-level accuracy routines.
+#'   For the exported object \code{point_measures}, a named list of functions
+#'   that can be supplied to higher-level accuracy routines.
+#'
+#' @seealso \code{\link{interval_measures}} for the interval counterparts, and
+#'   \code{\link{accuracy.cvforecast}}, which applies these measures to a
+#'   cross-validation or a conformal prediction object.
 #'
 #' @examples
 #' # Toy residuals and data
@@ -200,23 +212,33 @@ winkler_score <- function(lower, upper, actual, level = 95, na.rm = TRUE, ...) {
 #'
 #' Accuracy measures for interval forecasts.
 #'
-#' @param lower A numeric vector of lower bounds of interval forecasts.
-#' @param upper A numeric vector of upper bounds of interval forecasts.
+#' @param lower A numeric vector of lower bounds of the interval forecasts.
+#' @param upper A numeric vector of upper bounds of the interval forecasts.
 #' @param actual A numeric vector of realised values.
-#' @param train A numeric vector of responses used to train the model (for scaled scores).
+#' @param train A numeric vector of responses used to train the model.
+#'   Required by the scaled scores.
 #' @param level The nominal level of the forecast interval (e.g., 95 or 0.95).
-#' @param period The seasonal period of the data.
-#' @param d Should the response model include a first difference?
-#' @param D Should the response model include a seasonal difference?
-#' @param na.rm If `TRUE`, remove missing values before calculating the measure.
+#'   Defaults to \code{95}.
+#' @param period The seasonal period of the data. Required by the scaled
+#'   scores.
+#' @param d Should the response model include a first difference? Defaults to
+#'   \code{period == 1}.
+#' @param D Should the response model include a seasonal difference? Defaults
+#'   to \code{period > 1}.
+#' @param na.rm If \code{TRUE}, remove missing values before calculating the
+#'   measure. Defaults to \code{TRUE}.
 #' @param ... Additional arguments for each measure.
 #'
-#' @return
-#' For `winkler_score` and `MSIS`, returns a single numeric scalar giving
-#' the average interval score (Winkler or mean scaled interval score).
+#' @return For \code{winkler_score} and \code{MSIS}, a single numeric scalar
+#'   giving the average interval score (Winkler or mean scaled interval
+#'   score).
 #'
-#' For the exported object `interval_measures`, returns a **named list of functions**
-#' that can be supplied to higher-level accuracy routines.
+#'   For the exported object \code{interval_measures}, a named list of
+#'   functions that can be supplied to higher-level accuracy routines.
+#'
+#' @seealso \code{\link{point_measures}} for the point counterparts, and
+#'   \code{\link{accuracy.cvforecast}}, which applies these measures to a
+#'   cross-validation or a conformal prediction object.
 #'
 #' @examples
 #' set.seed(1)
@@ -236,12 +258,13 @@ winkler_score <- function(lower, upper, actual, level = 95, na.rm = TRUE, ...) {
 interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 
 
-#' Accuracy measures for a cross-validation model and a conformal prediction model
+#' Accuracy measures for a cross-validation model and a conformal prediction
+#' model
 #'
-#' Return range of summary measures of the out-of-sample forecast accuracy.
-#' If \code{x} is given, the function also measures test set forecast accuracy.
-#' If \code{x} is not given, the function only produces accuracy measures on
-#' validation set.
+#' Return a range of summary measures of the out-of-sample forecast accuracy.
+#' If \code{x} is given, the function also measures the test set forecast
+#' accuracy. If \code{x} is not given, the function only produces accuracy
+#' measures on the validation set.
 #'
 #' The measures calculated are:
 #' \itemize{
@@ -257,20 +280,28 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #'   \item MSIS: Mean Scaled Interval Score
 #' }
 #'
-#' @param object An object of class \code{"cvforecast"} or \code{"cpforecast"}.
-#' @param x An optional numerical vector containing actual values of the same
-#' length as \code{mean} in \code{object}.
-#' @param CV If \code{TRUE}, the cross-validation forecast accuracy will be returned.
-#' @param period The seasonal period of the data.
+#' @inheritParams coverage
+#' @param x An optional numerical vector containing the actual values of the
+#'   same length as \code{mean} in \code{object}.
+#' @param CV If \code{TRUE}, the cross-validation forecast accuracy will be
+#'   returned. Defaults to \code{TRUE}.
+#' @param period The seasonal period of the data. Defaults to \code{NULL}, in
+#'   which case it is taken from the frequency of the series.
 #' @param measures A list of accuracy measure functions to compute (such as
-#' \link{point_measures} or \link{interval_measures}).
-#' @param byhorizon If \code{TRUE}, accuracy measures will be calculated for each
-#' individual forecast horizon \code{h} separately.
+#'   \link{point_measures} or \link{interval_measures}). Defaults to
+#'   \code{interval_measures}.
+#' @param byhorizon If \code{TRUE}, accuracy measures will be calculated for
+#'   each individual forecast horizon \code{h} separately. Defaults to
+#'   \code{FALSE}.
 #' @param ... Additional arguments depending on the specific measure.
 #'
 #' @return A matrix giving mean out-of-sample forecast accuracy measures.
 #'
-#' @seealso \code{\link{point_measures}}, \code{\link{interval_measures}}
+#' @family evaluation functions
+#'
+#' @seealso \code{\link{point_measures}} and \code{\link{interval_measures}}
+#'   for the measures that can be supplied through \code{measures}.
+#'
 #' @examples
 #' # Simulate time series from an AR(2) model
 #' library(forecast)
@@ -282,16 +313,14 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # Out-of-sample forecast accuracy on validation set
 #' accuracy(fc, measures = point_measures, byhorizon = TRUE)
 #' accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 #'
 #' # Accuracy of conformal prediction intervals
-#' scpfc <- conformal(fc, method = "scp", symmetric = FALSE,
-#'                    ncal = 50, rolling = TRUE)
+#' scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 #' accuracy(scpfc, measures = interval_measures, level = 95,
 #'          byhorizon = TRUE)
 #'

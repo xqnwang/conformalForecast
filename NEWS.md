@@ -8,6 +8,8 @@
 * `acmcp()` now accepts `ma_method = "CSS"` for faster MA scorecaster fitting at
   longer forecast horizons, while retaining `"CSS-ML"` as the default, and
   reports successful scorecasts in `scorecast_times`.
+* New unit-test suite covering all four conformal methods, `cvforecast()`, 
+  `update()`, and the evaluation functions.
 
 ## Bug fixes
 
@@ -37,6 +39,11 @@
   `lagmatrix()` error message, and several typos.
 * Expanded the vignette with the `conformal()` interface, incremental updates,
   external regressors, clearer method descriptions, and updated ggplot2 calls.
+* New `vignette("update")`, on extending a fitted conformal pipeline with newly
+  arrived observations instead of refitting it from scratch.
+* The introductory vignette now documents `conformal()`, and describes each
+  method, its key formula and its tuning arguments in more detail.
+* The pkgdown site indexes both vignettes under "Articles".
 * Help examples now cover raw inputs to `coverage()` and `width()` and
   `cpforecast` accuracy, and use fixed random seeds for reproducibility.
 

@@ -53,29 +53,38 @@ RMSSE(
 point_measures
 }
 \arguments{
-\item{resid}{A numeric vector of residuals from either the validation or test data.}
+\item{resid}{A numeric vector of residuals from either the validation or
+the test data.}
 
-\item{na.rm}{If \code{TRUE}, remove missing values before calculating the measure.}
+\item{na.rm}{If \code{TRUE}, remove missing values before calculating the
+measure. Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments for each measure.}
 
-\item{actual}{A numeric vector of responses matching the forecasts (for percentage measures).}
+\item{actual}{A numeric vector of the realised values matching the
+forecasts. Required by the percentage measures.}
 
-\item{train}{A numeric vector of responses used to train the model (for scaled measures).}
+\item{train}{A numeric vector of responses used to train the model.
+Required by the scaled measures.}
 
-\item{demean}{Should the response be demeaned (for MASE and RMSSE)?}
+\item{demean}{Should the response be demeaned (for \code{MASE} and
+\code{RMSSE})? Defaults to \code{FALSE}.}
 
-\item{period}{The seasonal period of the data.}
+\item{period}{The seasonal period of the data. Required by the scaled
+measures.}
 
-\item{d}{Should the response model include a first difference?}
+\item{d}{Should the response model include a first difference? Defaults to
+\code{period == 1}.}
 
-\item{D}{Should the response model include a seasonal difference?}
+\item{D}{Should the response model include a seasonal difference? Defaults
+to \code{period > 1}.}
 }
 \value{
-For the individual functions (\code{ME}, \code{MAE}, \code{MSE}, \code{RMSE}, \code{MPE}, \code{MAPE}, \code{MASE}, \code{RMSSE}),
-returns a single numeric scalar giving the requested accuracy measure.
+For the individual functions (\code{ME}, \code{MAE}, \code{MSE},
+\code{RMSE}, \code{MPE}, \code{MAPE}, \code{MASE}, \code{RMSSE}), a
+single numeric scalar giving the requested accuracy measure.
 
-For the exported object \code{point_measures}, returns a \strong{named list of functions}
+For the exported object \code{point_measures}, a named list of functions
 that can be supplied to higher-level accuracy routines.
 }
 \description{
@@ -102,5 +111,10 @@ MAPE(resid, actual = y_test)
 MASE(resid, train = y_train, period = 1)
 RMSSE(resid, train = y_train, period = 1)
 
+}
+\seealso{
+\code{\link{interval_measures}} for the interval counterparts, and
+\code{\link{accuracy.cvforecast}}, which applies these measures to a
+cross-validation or a conformal prediction object.
 }
 \keyword{datasets}

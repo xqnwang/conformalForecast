@@ -1,88 +1,109 @@
 #' Classical split conformal prediction method
 #'
-#' Compute prediction intervals and other information by
-#' applying the classical split conformal prediction (SCP) method.
+#' Compute prediction intervals and other information by applying the classical
+#' split conformal prediction (SCP) method.
 #'
-#' Consider a vector \eqn{s_{t+h|t}} that contains the nonconformity scores for the
-#' \eqn{h}-step-ahead forecasts.
+#' Consider a vector \eqn{s_{t+h|t}} that contains the nonconformity scores for
+#' the \eqn{h}-step-ahead forecasts.
 #'
-#' If \code{symmetric} is \code{TRUE}, \eqn{s_{t+h|t}=|e_{t+h|t}|}.
-#' When \code{rolling} is \code{FALSE}, the \eqn{(1-\alpha)}-quantile
-#' \eqn{\hat{q}_{t+h|t}} are computed successively on expanding calibration sets
-#' \eqn{s_{1+h|1},\dots,s_{t|t-h}}, for \eqn{t=\mathrm{ncal}+h,\dots,T}. Then the
-#' prediction intervals will be
-#' \eqn{[\hat{y}_{t+h|t}-\hat{q}_{t+h|t}, \hat{y}_{t+h|t}+\hat{q}_{t+h|t}]}.
-#' When \code{rolling} is \code{TRUE}, the calibration sets will be of same length
-#' \code{ncal}.
-#'
-#' If \code{symmetric} is \code{FALSE}, \eqn{s_{t+h|t}^{u}=e_{t+h|t}} for upper
-#' interval bounds and \eqn{s_{t+h|t}^{l} = -e_{t+h|t}} for lower bounds.
-#' Instead of computing \eqn{(1-\alpha)}-quantile, \eqn{(1-\alpha/2)}-quantiles for lower
-#' bound (\eqn{\hat{q}_{t+h|t}^{l}}) and upper bound (\eqn{\hat{q}_{t+h|t}^{u}})
-#' are calculated based on their nonconformity scores, respectively.
+#' If \code{symmetric} is \code{TRUE}, \eqn{s_{t+h|t}=|e_{t+h|t}|}. When
+#' \code{rolling} is \code{FALSE}, the \eqn{(1-\alpha)}-quantiles
+#' \eqn{\hat{q}_{t+h|t}} are computed successively on expanding calibration
+#' sets \eqn{s_{1+h|1},\dots,s_{t|t-h}}, for \eqn{t=\mathrm{ncal}+h,\dots,T}.
 #' Then the prediction intervals will be
+#' \eqn{[\hat{y}_{t+h|t}-\hat{q}_{t+h|t}, \hat{y}_{t+h|t}+\hat{q}_{t+h|t}]}.
+#' When \code{rolling} is \code{TRUE}, the calibration sets will be of the same
+#' length \code{ncal}.
+#'
+#' If \code{symmetric} is \code{FALSE}, \eqn{s_{t+h|t}^{u}=e_{t+h|t}} for the
+#' upper interval bounds and \eqn{s_{t+h|t}^{l} = -e_{t+h|t}} for the lower
+#' bounds. Instead of computing the \eqn{(1-\alpha)}-quantile, the
+#' \eqn{(1-\alpha/2)}-quantiles for the lower bound \eqn{\hat{q}_{t+h|t}^{l}}
+#' and the upper bound \eqn{\hat{q}_{t+h|t}^{u}} are calculated based on their
+#' nonconformity scores, respectively. Then the prediction intervals will be
 #' \eqn{[\hat{y}_{t+h|t}-\hat{q}_{t+h|t}^{l}, \hat{y}_{t+h|t}+\hat{q}_{t+h|t}^{u}]}.
 #'
-#' @param object An object of class \code{"cvforecast"}. It must have an argument
-#' \code{x} for original univariate time series, an argument \code{MEAN} for
-#' point forecasts and \code{ERROR} for forecast errors on validation set.
-#' See the results of a call to \code{\link{cvforecast}}.
+#' @param object An object of class \code{"cvforecast"}. It must have an
+#'   argument \code{x} for the original univariate time series, an argument
+#'   \code{MEAN} for the point forecasts and \code{ERROR} for the forecast
+#'   errors on the validation set. See the results of a call to
+#'   \code{\link{cvforecast}}.
 #' @param alpha A numeric vector of significance levels to achieve a desired
-#' coverage level \eqn{1-\alpha}.
-#' @param symmetric If \code{TRUE}, symmetric nonconformity scores (i.e. \eqn{|e_{t+h|t}|})
-#' are used. If \code{FALSE}, asymmetric nonconformity scores (i.e. \eqn{e_{t+h|t}})
-#' are used, and then upper bounds and lower bounds are produced separately.
-#' @param ncal Length of the calibration set. If \code{rolling = FALSE}, it denotes
-#' the initial period of calibration sets. Otherwise, it indicates
-#' the period of every rolling calibration set.
+#'   coverage level \eqn{1-\alpha}. Defaults to
+#'   \code{1 - 0.01 * object$level}, the levels used in \code{object}.
+#' @param symmetric If \code{TRUE}, symmetric nonconformity scores
+#'   (i.e. \eqn{|e_{t+h|t}|}) are used. If \code{FALSE}, asymmetric
+#'   nonconformity scores (i.e. \eqn{e_{t+h|t}}) are used, and then upper
+#'   bounds and lower bounds are produced separately. Defaults to
+#'   \code{FALSE}.
+#' @param ncal Length of the calibration set. If \code{rolling = FALSE}, it
+#'   denotes the initial period of the calibration sets. Otherwise, it
+#'   indicates the period of every rolling calibration set. Defaults to
+#'   \code{10}.
 #' @param rolling If \code{TRUE}, a rolling window strategy will be adopted to
-#' form the calibration set. Otherwise, expanding window strategy will be used.
+#'   form the calibration set. Otherwise, an expanding window strategy will be
+#'   used. Defaults to \code{FALSE}.
 #' @param quantiletype An integer between 1 and 9 determining the type of
-#' quantile estimator to be used. Types 1 to 3 are for discontinuous quantiles,
-#' types 4 to 9 are for continuous quantiles. See the
-#' \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
-#' @param weightfun Function to return a vector of weights used for sample quantile
-#' computation. Its first argument must be an integer indicating the number of
-#' observations for which weights are generated. If \code{NULL}, equal weights
-#' will be used for sample quantile computation. Currently, only non-data-dependent
-#' weights are supported.
-#' @param kess If \code{TRUE}, Kish's effective sample size is used for sample
-#' quantile computation.
+#'   quantile estimator to be used. Types 1 to 3 are for discontinuous
+#'   quantiles, types 4 to 9 are for continuous quantiles. See the
+#'   \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
+#'   Defaults to \code{1}.
+#' @param weightfun Function to return a vector of weights used for the sample
+#'   quantile computation. Its first argument must be an integer indicating
+#'   the number of observations for which weights are generated. Defaults to
+#'   \code{NULL}, in which case equal weights are used. Currently, only
+#'   non-data-dependent weights are supported.
+#' @param kess If \code{TRUE}, Kish's effective sample size is used for the
+#'   sample quantile computation. Defaults to \code{FALSE}.
 #' @param update If \code{TRUE}, \code{object} already holds the results of a
-#' previous call and only the newly added time steps are computed; the
-#' prediction intervals produced earlier are carried over unchanged. Set by
-#' \code{\link{update.cpforecast}} and not normally set by hand.
-#' @param na.rm If \code{TRUE}, corresponding entries in sample values and weights
-#' are removed if either is \code{NA} when calculating sample quantile.
+#'   previous call and only the newly added time steps are computed; the
+#'   prediction intervals produced earlier are carried over unchanged. Set by
+#'   \code{\link{update.cpforecast}} and not normally set by hand. Defaults to
+#'   \code{FALSE}.
+#' @param na.rm If \code{TRUE}, corresponding entries in the sample values and
+#'   weights are removed if either is \code{NA} when calculating the sample
+#'   quantile. Defaults to \code{TRUE}.
 #' @param ... Other arguments are passed to \code{weightfun}.
 #'
-#' @return A list of class \code{c("scp", "cpforecast", "cvforecast", "forecast")}
-#' with the following components:
-#' \item{x}{The original time series.}
-#' \item{series}{The name of the series \code{x}.}
-#' \item{xreg}{Exogenous predictor variables used, if applicable.}
-#' \item{method}{A character string "scp".}
-#' \item{cp_times}{An integer vector giving the number of conformal predictions
-#' performed in cross-validation for each forecast horizon.}
-#' \item{MEAN}{Point forecasts as a multivariate time series, where the \eqn{h}th column
-#' holds the point forecasts for forecast horizon \eqn{h}. The time index
-#' corresponds to the period for which the forecast is produced.}
-#' \item{ERROR}{Forecast errors given by
-#' \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
-#' \item{LOWER}{A list containing lower bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{UPPER}{A list containing upper bounds for prediction intervals for
-#' each \code{level}. Each element within the list will be a multivariate time
-#' series with the same dimensional characteristics as \code{MEAN}.}
-#' \item{level}{The confidence values associated with the prediction intervals.}
-#' \item{call}{The matched call.}
-#' \item{model}{A list containing detailed information about the `cvforecast` and `conformal` models.}
-#' If \code{mean} is included in the \code{object}, the components \code{mean},
-#' \code{lower}, and \code{upper} will also be returned, showing the information
-#' about the test set forecasts generated using all available observations.
+#' @return A list of class
+#'   \code{c("scp", "cpforecast", "cvforecast", "forecast")} with the
+#'   following components:
+#'   \item{x}{The original time series.}
+#'   \item{series}{The name of the series \code{x}.}
+#'   \item{xreg}{Exogenous predictor variables used, if applicable.}
+#'   \item{method}{A character string "scp".}
+#'   \item{cp_times}{An integer vector giving the number of conformal
+#'     predictions performed in cross-validation for each forecast horizon.}
+#'   \item{MEAN}{Point forecasts as a multivariate time series, where the
+#'     \eqn{h}th column holds the point forecasts for forecast horizon
+#'     \eqn{h}. The time index corresponds to the period for which the
+#'     forecast is produced.}
+#'   \item{ERROR}{Forecast errors given by
+#'     \eqn{e_{t+h|t} = y_{t+h}-\hat{y}_{t+h|t}}{e[t+h] = y[t+h]-f[t+h]}.}
+#'   \item{LOWER}{A list containing lower bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{UPPER}{A list containing upper bounds for prediction intervals for
+#'     each \code{level}. Each element within the list will be a multivariate
+#'     time series with the same dimensional characteristics as \code{MEAN}.}
+#'   \item{level}{The confidence values associated with the prediction
+#'     intervals.}
+#'   \item{call}{The matched call.}
+#'   \item{model}{A list containing information about the conformal prediction
+#'     model: the resolved arguments in \code{model$args}, and the call and
+#'     the arguments of the underlying cross-validation in
+#'     \code{model$cvforecast}.}
+#'   If \code{mean} is included in the \code{object}, the components
+#'   \code{mean}, \code{lower}, and \code{upper} will also be returned, showing
+#'   the information about the test set forecasts generated using all
+#'   available observations.
 #'
-#' @seealso \code{\link[ggdist]{weighted_quantile}}
+#' @family conformal prediction methods
+#'
+#' @seealso \code{\link{cvforecast}} to produce \code{object},
+#'   \code{\link{update.cpforecast}} to extend the results with new
+#'   observations, and \code{\link[ggdist]{weighted_quantile}} for the
+#'   weighted quantile estimator used here.
 #'
 #' @examples
 #' # Simulate time series from an AR(2) model
@@ -95,11 +116,10 @@
 #'   Arima(x, order = c(2, 0, 0)) |>
 #'     forecast(h = h, level)
 #' }
-#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95,
-#'                  forward = TRUE, initial = 1, window = 50)
+#' fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 #'
 #' # Classical conformal prediction with equal weights
-#' scpfc <- scp(fc, symmetric = FALSE, ncal = 50, rolling = TRUE)
+#' scpfc <- scp(fc, ncal = 50, rolling = TRUE)
 #' print(scpfc)
 #' summary(scpfc)
 #'
@@ -107,7 +127,7 @@
 #' expweight <- function(n) {
 #'   0.99^{n+1-(1:n)}
 #' }
-#' scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 50, rolling = TRUE,
+#' scpfc_exp <- scp(fc, ncal = 50, rolling = TRUE,
 #'                  weightfun = expweight, kess = TRUE)
 #'
 #' @importFrom ggdist weighted_quantile
