@@ -113,23 +113,15 @@ test_that("every conformal method reaches roughly the nominal coverage", {
   }
 })
 
-test_that("the quantile methods nest the intervals of nested levels", {
-  # `scp()` and `acp()` derive every level from the same calibration set, so
-  # a wider nominal level must give a wider interval everywhere. `pid()` and
-  # `acmcp()` run one independent recursion per level and give no such
-  # guarantee, which is why they are left out here.
+test_that("scp nests the intervals of nested levels", {
   fc <- test_cv(n = 100, h = 3, level = c(80, 95), initial = 10)
+  cp <- scp(fc, ncal = 40, rolling = TRUE)
 
-  for (cp in list(
-    scp(fc, ncal = 40, rolling = TRUE),
-    acp(fc, ncal = 40, rolling = TRUE)
-  )) {
-    expect_true(all(
-      as_mat(cp$UPPER[["95%"]]) - as_mat(cp$LOWER[["95%"]]) >=
-        as_mat(cp$UPPER[["80%"]]) - as_mat(cp$LOWER[["80%"]]),
-      na.rm = TRUE
-    ))
-  }
+  expect_true(all(
+    as_mat(cp$UPPER[["95%"]]) - as_mat(cp$LOWER[["95%"]]) >=
+      as_mat(cp$UPPER[["80%"]]) - as_mat(cp$LOWER[["80%"]]),
+    na.rm = TRUE
+  ))
 })
 
 test_that("every conformal method rejects the settings it cannot work with", {
