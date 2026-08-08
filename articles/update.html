@@ -166,7 +166,8 @@ lets the loops below treat them uniformly.</p>
 <span><span class="va">cps_list</span><span class="op">[[</span><span class="st">"pid"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc0</span>, method <span class="op">=</span> <span class="st">"pid"</span>, ncal <span class="op">=</span> <span class="va">ncal</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                               scorecastfun <span class="op">=</span> <span class="va">naivefun</span>, Tg <span class="op">=</span> <span class="va">Tg</span>, KI <span class="op">=</span> <span class="va">KI</span><span class="op">)</span></span>
 <span><span class="va">cps_list</span><span class="op">[[</span><span class="st">"acmcp"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conformal.html">conformal</a></span><span class="op">(</span><span class="va">fc0</span>, method <span class="op">=</span> <span class="st">"acmcp"</span>, ncal <span class="op">=</span> <span class="va">ncal</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                                 KI <span class="op">=</span> <span class="va">KI</span>, Tg <span class="op">=</span> <span class="va">Tg</span><span class="op">)</span></span></code></pre></div>
+<span>                                 KI <span class="op">=</span> <span class="va">KI</span>, Tg <span class="op">=</span> <span class="va">Tg</span><span class="op">)</span></span>
+<span><span class="va">scp_initial</span> <span class="op">&lt;-</span> <span class="va">cps_list</span><span class="op">$</span><span class="va">scp</span></span></code></pre></div>
 <p>Each element of <code>cps_list</code> holds the state of one pipeline
 after the initial 200 observations. Nothing here is update-specific:
 <code>conformal(fc0, method = "scp", ...)</code> is the same call as
@@ -194,11 +195,11 @@ is given and replays the settings recorded in it.</p>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">timings_update</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           scp   acp   pid acmcp</span></span>
-<span><span class="co">#&gt; batch 1 0.135 0.140 0.209 0.451</span></span>
-<span><span class="co">#&gt; batch 2 0.138 0.140 0.209 0.475</span></span>
-<span><span class="co">#&gt; batch 3 0.134 0.137 0.206 0.449</span></span>
-<span><span class="co">#&gt; batch 4 0.137 0.141 0.210 0.570</span></span>
-<span><span class="co">#&gt; batch 5 0.141 0.142 0.215 0.454</span></span></code></pre></div>
+<span><span class="co">#&gt; batch 1 0.146 0.143 0.230 0.476</span></span>
+<span><span class="co">#&gt; batch 2 0.139 0.145 0.221 0.486</span></span>
+<span><span class="co">#&gt; batch 3 0.140 0.143 0.212 0.464</span></span>
+<span><span class="co">#&gt; batch 4 0.142 0.143 0.215 0.593</span></span>
+<span><span class="co">#&gt; batch 5 0.145 0.148 0.218 0.466</span></span></code></pre></div>
 <p>That is the whole streaming loop: five calls to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>
 per method, each doing only the work required by the 20 new observations
 in that batch.</p>
@@ -244,11 +245,11 @@ this approach.</p>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">timings_full</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         cvforecast   scp   acp   pid acmcp</span></span>
-<span><span class="co">#&gt; batch 1      0.935 0.168 0.183 0.677 2.344</span></span>
-<span><span class="co">#&gt; batch 2      1.035 0.197 0.215 0.787 2.709</span></span>
-<span><span class="co">#&gt; batch 3      1.145 0.223 0.239 0.885 3.201</span></span>
-<span><span class="co">#&gt; batch 4      1.238 0.247 0.267 0.989 3.418</span></span>
-<span><span class="co">#&gt; batch 5      1.358 0.273 0.298 1.085 3.863</span></span></code></pre></div>
+<span><span class="co">#&gt; batch 1      0.967 0.179 0.190 0.702 2.432</span></span>
+<span><span class="co">#&gt; batch 2      1.082 0.229 0.224 0.823 3.018</span></span>
+<span><span class="co">#&gt; batch 3      1.255 0.235 0.250 0.923 3.530</span></span>
+<span><span class="co">#&gt; batch 4      1.370 0.259 0.276 1.037 3.792</span></span>
+<span><span class="co">#&gt; batch 5      1.495 0.286 0.310 1.143 4.318</span></span></code></pre></div>
 <p>The cost of the <code><a href="../reference/cvforecast.html">cvforecast()</a></code> step grows with every
 batch. At <code>batch = 5</code> it fits the AR(2) model at essentially
 every rolling origin of a 300-point series, most of which were already
@@ -269,11 +270,14 @@ fit the model at the newly added origins.</p>
 methods in the package. <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> reads the settings
 recorded when the object was built, and reports an error if they are not
 available rather than falling back on defaults.</p>
-<p>Calibration settings should be left as they are. Passing different
-values of <code>ncal</code>, <code>lr</code>, <code>KI</code> or any
-other calibration argument at update time causes the intervals to be
-recomputed from the beginning rather than continued, so the call then
-costs as much as a fresh fit.</p>
+<p><code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> preserves the calibration settings stored in
+the fitted object. Arguments supplied through <code>...</code> are
+forwarded to <code>forecastfun</code>; they do not override the
+conformal configuration. Consequently, calibration parameters such as
+<code>ncal</code>, <code>lr</code> and <code>KI</code> should not be
+supplied to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>. A different calibration specification
+requires refitting the conformal method with the desired parameter
+values.</p>
 </div>
 <div class="section level2">
 <h2 id="exogenous-regressors">Exogenous regressors<a class="anchor" aria-label="anchor" href="#exogenous-regressors"></a>
@@ -299,10 +303,11 @@ observations.</p>
 <span><span class="va">cp_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc_x</span>, ncal <span class="op">=</span> <span class="fl">20</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><code>cp_x$xreg</code> has 62 rows: the 60 historical values, plus
 the 2 future values needed for the last <code>h = 2</code> forecast.
-Updating with 5 new observations therefore requires 5 new rows of
-history together with enough further values to cover the new forecast
-horizon, which here is again 5 rows, since the horizon does not
-change.</p>
+When 5 observations are appended, these 2 stored future values become
+the regressors for the first 2 new observations. Therefore,
+<code>new_xreg</code> supplies exactly 5 subsequent rows: the first 3
+complete the regressor history for the new observations, and the final 2
+preserve the future <code>h = 2</code> forecast horizon.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/arima.sim.html" class="external-link">arima.sim</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>ar <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">xreg_full</span><span class="op">[</span><span class="op">(</span><span class="va">n_x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n_x</span> <span class="op">+</span> <span class="fl">5</span><span class="op">)</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">new_xreg</span> <span class="op">&lt;-</span> <span class="va">xreg_full</span><span class="op">[</span><span class="op">(</span><span class="va">n_x</span> <span class="op">+</span> <span class="fl">3</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="va">n_x</span> <span class="op">+</span> <span class="fl">7</span><span class="op">)</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
@@ -320,19 +325,19 @@ the new data have been appended, <code><a href="https://rdrr.io/r/stats/update.h
 at the new final origin, so that these components describe a forecast
 made from all the data now available.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cps_list</span><span class="op">$</span><span class="va">scp</span><span class="op">$</span><span class="va">mean</span></span>
+<code class="sourceCode R"><span><span class="va">scp_initial</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="co">#&gt; Time Series:</span></span>
-<span><span class="co">#&gt; Start = 301 </span></span>
-<span><span class="co">#&gt; End = 303 </span></span>
+<span><span class="co">#&gt; Start = 201 </span></span>
+<span><span class="co">#&gt; End = 203 </span></span>
 <span><span class="co">#&gt; Frequency = 1 </span></span>
-<span><span class="co">#&gt; [1]  0.1592721 -0.6984566 -0.6471300</span></span>
-<span><span class="va">scp_upd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">cps_list</span><span class="op">$</span><span class="va">scp</span>, new_data <span class="op">=</span> <span class="va">batches</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.1155681 0.4993606 0.1030395</span></span>
+<span><span class="va">scp_upd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">scp_initial</span>, new_data <span class="op">=</span> <span class="va">batches</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, forecastfun <span class="op">=</span> <span class="va">far2</span><span class="op">)</span></span>
 <span><span class="va">scp_upd</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="co">#&gt; Time Series:</span></span>
-<span><span class="co">#&gt; Start = 321 </span></span>
-<span><span class="co">#&gt; End = 323 </span></span>
+<span><span class="co">#&gt; Start = 221 </span></span>
+<span><span class="co">#&gt; End = 223 </span></span>
 <span><span class="co">#&gt; Frequency = 1 </span></span>
-<span><span class="co">#&gt; [1] 0.2677864 0.1034313 0.1395630</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.4228521 0.3087081 0.3112907</span></span></code></pre></div>
 <p>The forecast origin moves from the end of the initial 200
 observations to the end of the 220 now available, as it would after a
 fresh <code><a href="../reference/cvforecast.html">cvforecast()</a></code> call on the extended series.</p>

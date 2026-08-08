@@ -222,7 +222,7 @@ for each individual forecast horizon `h`, respectively, where
 
 ## References
 
-Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024). "Conformal
+Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2023). "Conformal
 PID control for time series prediction", *Advances in Neural Information
 Processing Systems*, **36**, 23047–23074.
 

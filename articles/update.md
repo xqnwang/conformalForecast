@@ -115,6 +115,7 @@ cps_list[["pid"]] <- conformal(fc0, method = "pid", ncal = ncal, rolling = TRUE,
                                scorecastfun = naivefun, Tg = Tg, KI = KI)
 cps_list[["acmcp"]] <- conformal(fc0, method = "acmcp", ncal = ncal, rolling = TRUE, 
                                  KI = KI, Tg = Tg)
+scp_initial <- cps_list$scp
 ```
 
 Each element of `cps_list` holds the state of one pipeline after the
@@ -146,11 +147,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_update, 3)
 #>           scp   acp   pid acmcp
-#> batch 1 0.135 0.140 0.209 0.451
-#> batch 2 0.138 0.140 0.209 0.475
-#> batch 3 0.134 0.137 0.206 0.449
-#> batch 4 0.137 0.141 0.210 0.570
-#> batch 5 0.141 0.142 0.215 0.454
+#> batch 1 0.146 0.143 0.230 0.476
+#> batch 2 0.139 0.145 0.221 0.486
+#> batch 3 0.140 0.143 0.212 0.464
+#> batch 4 0.142 0.143 0.215 0.593
+#> batch 5 0.145 0.148 0.218 0.466
 ```
 
 That is the whole streaming loop: five calls to
@@ -200,11 +201,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_full, 3)
 #>         cvforecast   scp   acp   pid acmcp
-#> batch 1      0.935 0.168 0.183 0.677 2.344
-#> batch 2      1.035 0.197 0.215 0.787 2.709
-#> batch 3      1.145 0.223 0.239 0.885 3.201
-#> batch 4      1.238 0.247 0.267 0.989 3.418
-#> batch 5      1.358 0.273 0.298 1.085 3.863
+#> batch 1      0.967 0.179 0.190 0.702 2.432
+#> batch 2      1.082 0.229 0.224 0.823 3.018
+#> batch 3      1.255 0.235 0.250 0.923 3.530
+#> batch 4      1.370 0.259 0.276 1.037 3.792
+#> batch 5      1.495 0.286 0.310 1.143 4.318
 ```
 
 The cost of the
@@ -232,10 +233,14 @@ in the package. [`update()`](https://rdrr.io/r/stats/update.html) reads
 the settings recorded when the object was built, and reports an error if
 they are not available rather than falling back on defaults.
 
-Calibration settings should be left as they are. Passing different
-values of `ncal`, `lr`, `KI` or any other calibration argument at update
-time causes the intervals to be recomputed from the beginning rather
-than continued, so the call then costs as much as a fresh fit.
+[`update()`](https://rdrr.io/r/stats/update.html) preserves the
+calibration settings stored in the fitted object. Arguments supplied
+through `...` are forwarded to `forecastfun`; they do not override the
+conformal configuration. Consequently, calibration parameters such as
+`ncal`, `lr` and `KI` should not be supplied to
+[`update()`](https://rdrr.io/r/stats/update.html). A different
+calibration specification requires refitting the conformal method with
+the desired parameter values.
 
 ## Exogenous regressors
 
@@ -264,10 +269,12 @@ cp_x <- scp(fc_x, ncal = 20, rolling = TRUE)
 ```
 
 `cp_x$xreg` has 62 rows: the 60 historical values, plus the 2 future
-values needed for the last `h = 2` forecast. Updating with 5 new
-observations therefore requires 5 new rows of history together with
-enough further values to cover the new forecast horizon, which here is
-again 5 rows, since the horizon does not change.
+values needed for the last `h = 2` forecast. When 5 observations are
+appended, these 2 stored future values become the regressors for the
+first 2 new observations. Therefore, `new_xreg` supplies exactly 5
+subsequent rows: the first 3 complete the regressor history for the new
+observations, and the final 2 preserve the future `h = 2` forecast
+horizon.
 
 ``` r
 
@@ -290,19 +297,19 @@ forecast made from all the data now available.
 
 ``` r
 
-cps_list$scp$mean
+scp_initial$mean
 #> Time Series:
-#> Start = 301 
-#> End = 303 
+#> Start = 201 
+#> End = 203 
 #> Frequency = 1 
-#> [1]  0.1592721 -0.6984566 -0.6471300
-scp_upd <- update(cps_list$scp, new_data = batches[[1]], forecastfun = far2)
+#> [1] 1.1155681 0.4993606 0.1030395
+scp_upd <- update(scp_initial, new_data = batches[[1]], forecastfun = far2)
 scp_upd$mean
 #> Time Series:
-#> Start = 321 
-#> End = 323 
+#> Start = 221 
+#> End = 223 
 #> Frequency = 1 
-#> [1] 0.2677864 0.1034313 0.1395630
+#> [1] 0.4228521 0.3087081 0.3112907
 ```
 
 The forecast origin moves from the end of the initial 200 observations

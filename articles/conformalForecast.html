@@ -208,12 +208,12 @@ interface to these methods, which can be selected through its
 <code>method</code> argument:</p>
 <table class="table">
 <colgroup>
-<col width="9%">
+<col width="7%">
 <col width="8%">
-<col width="81%">
+<col width="83%">
 </colgroup>
 <thead><tr class="header">
-<th align="left"><code>method =</code></th>
+<th align="left"><code>method</code></th>
 <th align="left">function</th>
 <th align="left">core idea</th>
 </tr></thead>
@@ -233,8 +233,8 @@ response to whether the last interval covered</td>
 <tr class="odd">
 <td align="left">“pid”</td>
 <td align="left"><code><a href="../reference/pid.html">pid()</a></code></td>
-<td align="left">P (quantile tracking) + I (bounded integral correction)
-+ D (scorecasting) applied per horizon</td>
+<td align="left">P (quantile tracking) + I (error integration) + D
+(scorecasting) applied per horizon</td>
 </tr>
 <tr class="even">
 <td align="left">“acmcp”</td>
@@ -356,29 +356,32 @@ sample actually carries.</p>
 <p>SCP is the right choice when you want a simple, well-understood
 baseline and the error distribution within the calibration window is
 reasonably stable; it does not adapt online to feedback about whether
-recent intervals actually covered, which is exactly what the next two
+recent intervals actually covered, which is exactly what the later
 methods add.</p>
 </div>
 <div class="section level3">
 <h3 id="adaptive-conformal-prediction-acp">Adaptive conformal prediction (ACP)<a class="anchor" aria-label="anchor" href="#adaptive-conformal-prediction-acp"></a>
 </h3>
 <p>ACP (Gibbs and Candes 2021) keeps the SCP calibration mechanics but
-replaces the fixed miscoverage level <span class="math inline">\(\alpha\)</span> with one that adapts online, based
-on whether the previous interval covered the outcome or not: <span class="math display">\[\alpha_{t+h|t} := \alpha_{t+h-1|t-1} +
-\gamma\left(\alpha - \mathrm{err}_{t|t-h}\right),\]</span> computed
-separately for each horizon <span class="math inline">\(h\)</span>,
-where <span class="math inline">\(\mathrm{err}_{t|t-h} = 1\)</span> if
-the score <span class="math inline">\(s_{t|t-h}\)</span> exceeded the
-quantile <span class="math inline">\(q_{t|t-h}\)</span> used at that
-step (a miss), and <span class="math inline">\(0\)</span> otherwise (a
-hit). If misses have recently been more frequent than <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\alpha_{t+h|t}\)</span> is pushed down, which
-widens the next interval; if hits have been more frequent than intended,
-<span class="math inline">\(\alpha_{t+h|t}\)</span> is pushed up,
-narrowing the interval. The quantile itself, at each step, is still an
-empirical quantile of a calibration window of past scores (expanding or
-rolling, exactly as in SCP), but now computed at the <em>current</em>
-<span class="math inline">\(\alpha_{t+h|t}\)</span> rather than a fixed
-<span class="math inline">\(\alpha\)</span>.</p>
+replaces the fixed miscoverage level <span class="math inline">\(\alpha\)</span> with one that adapts online. For
+symmetric intervals, a single level is updated according to <span class="math display">\[\alpha_{t+h|t} := \alpha_{t+h-1|t-1} +
+\gamma\left(\alpha - \mathrm{err}_{t|t-h}\right),\]</span> where <span class="math inline">\(\mathrm{err}_{t|t-h} = 1\)</span> indicates a miss
+and <span class="math inline">\(0\)</span> a hit. For asymmetric
+intervals, as used below, the lower and upper tails are updated
+separately: <span class="math display">\[\begin{aligned}
+\alpha^l_{t+h|t} &amp;:= \alpha^l_{t+h-1|t-1} + \gamma\left(\alpha/2 -
+\mathrm{err}^l_{t|t-h}\right),\\
+\alpha^u_{t+h|t} &amp;:= \alpha^u_{t+h-1|t-1} + \gamma\left(\alpha/2 -
+\mathrm{err}^u_{t|t-h}\right),
+\end{aligned}\]</span> where <span class="math inline">\(\mathrm{err}^l\)</span> and <span class="math inline">\(\mathrm{err}^u\)</span> indicate misses below and
+above the interval, respectively. The symmetric level is initialized at
+<span class="math inline">\(\alpha\)</span>, while both tail-specific
+levels are initialized at <span class="math inline">\(\alpha/2\)</span>.
+Each recursion is computed separately for every horizon <span class="math inline">\(h\)</span>. A miss pushes the corresponding level
+down and widens that side of the next interval, while a hit pushes it
+up. At each step, the quantile is still computed from an expanding or
+rolling calibration window, as in SCP, but uses the current adaptive
+level.</p>
 <p>The step size <span class="math inline">\(\gamma &gt; 0\)</span>
 (argument <code>gamma</code>) controls how fast <span class="math inline">\(\alpha\)</span> reacts: larger values adapt more
 quickly to a change in the underlying error distribution but make the
@@ -410,31 +413,37 @@ not.</p>
 <div class="section level3">
 <h3 id="conformal-pid-control-pid">Conformal PID control (PID)<a class="anchor" aria-label="anchor" href="#conformal-pid-control-pid"></a>
 </h3>
-<p>PID (Angelopoulos, Candes, and Tibshirani 2024) generalizes ACP by
+<p>PID (Angelopoulos, Candes, and Tibshirani 2023) generalizes ACP by
 tracking the quantile <span class="math inline">\(q_{t+h|t}\)</span>
 itself (rather than <span class="math inline">\(\alpha\)</span>) through
 three additive components, evocative of a
-proportional-integral-derivative controller: <span class="math display">\[q_{t+h|t}=\underbrace{q_{t+h-1|t-1} +
+proportional-integral-derivative controller. For symmetric intervals,
+the recursion is <span class="math display">\[q_{t+h|t}=\underbrace{q_{t+h-1|t-1} +
 \eta\left(\mathrm{err}_{t|t-h}-\alpha\right)}_{\text{P}} +
 \underbrace{r_t\!\left(\sum_{i=1}^t\left(\mathrm{err}_{i|i-h}-\alpha\right)\right)}_{\text{I}}
-+ \underbrace{\hat{s}_{t+h|t}}_{\text{D}},\]</span> again computed
-separately for each horizon <span class="math inline">\(h\)</span>.</p>
++ \underbrace{\hat{s}_{t+h|t}}_{\text{D}},\]</span> computed separately
+for each horizon <span class="math inline">\(h\)</span>. For asymmetric
+intervals, as used in both examples below, the lower and upper quantiles
+follow separate recursions. For <span class="math inline">\(b \in
+\{l,u\}\)</span>, <span class="math display">\[q^b_{t+h|t}=q^b_{t+h-1|t-1} +
+\eta\left(\mathrm{err}^b_{t|t-h}-\alpha/2\right) +
+r_t\!\left(\sum_{i=1}^t\left(\mathrm{err}^b_{i|i-h}-\alpha/2\right)\right)
++ \hat{s}^b_{t+h|t}.\]</span></p>
 <ul>
-<li>The P term, quantile tracking, applies the same idea as ACP’s <span class="math inline">\(\alpha\)</span> update directly to the quantile:
-<span class="math inline">\(q_{t+h-1|t-1} + \eta(\mathrm{err}_{t|t-h} -
-\alpha)\)</span>, with <span class="math inline">\(q_{1+h|1}\)</span>
-initialized to <span class="math inline">\(0\)</span>. The step size
-<span class="math inline">\(\eta\)</span> (argument <code>lr</code>) is
-scaled internally by the recent range of the errors, so it adapts to the
-level of forecast uncertainty rather than being a fixed number of score
-units.</li>
+<li>The P term, quantile tracking, applies the same idea as ACP’s <span class="math inline">\(\alpha\)</span> update directly to the quantile,
+with each quantile initialized at <span class="math inline">\(0\)</span>. Its target is <span class="math inline">\(\alpha\)</span> for symmetric intervals and <span class="math inline">\(\alpha/2\)</span> for each tail of an asymmetric
+interval. The step size <span class="math inline">\(\eta\)</span>
+(argument <code>lr</code>) is scaled internally by the recent range of
+the errors, so it adapts to the level of forecast uncertainty rather
+than being a fixed number of score units.</li>
 <li>The I term, error integration, corrects a persistent bias in
 realized coverage, which the memoryless P term reacts to only slowly. It
-feeds the cumulative miscoverage <span class="math inline">\(\sum_{i=1}^t (\mathrm{err}_{i|i-h} -
-\alpha)\)</span> through a bounded, nonlinear saturation function <span class="math display">\[r_t(x) = K_{\mathrm{I}} \tan\!\left(\frac{x
-\log(t)}{t\, C_{\mathrm{sat}}}\right),\]</span> where <span class="math inline">\(\tan(x) = \mathrm{sign}(x)\cdot\infty\)</span>
-once <span class="math inline">\(x \notin [-\pi/2, \pi/2]\)</span>.
-<span class="math inline">\(C_{\mathrm{sat}}\)</span> and <span class="math inline">\(K_{\mathrm{I}}\)</span> are positive constants
+feeds the corresponding cumulative miscoverage through a nonlinear
+saturation function <span class="math display">\[r_t(x) = K_{\mathrm{I}}
+\tan\!\left(\frac{x \log(t)}{t\, C_{\mathrm{sat}}}\right),\]</span>
+where <span class="math inline">\(\tan(x) =
+\mathrm{sign}(x)\cdot\infty\)</span> once <span class="math inline">\(x
+\notin [-\pi/2, \pi/2]\)</span>. <span class="math inline">\(C_{\mathrm{sat}}\)</span> and <span class="math inline">\(K_{\mathrm{I}}\)</span> are positive constants
 chosen heuristically: <span class="math inline">\(K_{\mathrm{I}}\)</span> (argument <code>KI</code>)
 puts the integrator on the same scale as the scores, and <span class="math inline">\(C_{\mathrm{sat}}\)</span> (argument
 <code>Csat</code>) is chosen so that, by a target time <code>Tg</code>,
@@ -508,39 +517,31 @@ e.g., a naive forecaster as below.</li>
 <span><span class="co">#&gt; 5.972480 7.664302 7.656036</span></span></code></pre></div>
 <p>PID is a good choice when you want both the persistent-bias
 correction that ACP lacks (via I) and the ability to plug in domain
-knowledge about the score dynamics (via D, through the scorecaster).
-Note, however, that the scorecaster here is trained separately at each
-horizon <span class="math inline">\(h\)</span>, using only that
-horizon’s own score history. It does not use the fact that, at a given
-origin, the scores at horizons <span class="math inline">\(1, \dots,
-h-1\)</span> are already known and correlated with the score at horizon
-<span class="math inline">\(h\)</span>. That is the gap AcMCP
-closes.</p>
+knowledge about the score dynamics (via D, through the scorecaster). Its
+scorecaster is trained separately at each horizon <span class="math inline">\(h\)</span>, using only that horizon’s own score
+history, and therefore does not model dependence across horizons. AcMCP
+closes this gap without using future realized errors.</p>
 </div>
 <div class="section level3">
 <h3 id="autocorrelated-multistep-ahead-conformal-prediction-acmcp">Autocorrelated multistep-ahead conformal prediction (AcMCP)<a class="anchor" aria-label="anchor" href="#autocorrelated-multistep-ahead-conformal-prediction-acmcp"></a>
 </h3>
 <p>AcMCP (Wang and Hyndman 2024) keeps PID’s P+I+D structure, and
 supports only asymmetric (signed-error) scores, but replaces the
-scorecaster in the D term. Instead of forecasting <span class="math inline">\(e_{t+h|t}\)</span> from its own history in
-isolation, the scorecaster combines two models that use the
-<em>other</em> horizons’ errors from the same origin <span class="math inline">\(t\)</span>: an <span class="math inline">\(\mathrm{MA}(h-1)\)</span> model fitted to the
-horizon-<span class="math inline">\(h\)</span> error series, and a
-linear regression of <span class="math inline">\(e_{t+h|t}\)</span> on
-<span class="math inline">\(e_{t+h-1|t}, \dots, e_{t+1|t}\)</span>, the
-shorter-horizon errors already observed at the same forecast origin. The
-two models’ forecasts are averaged to give <span class="math inline">\(\hat{s}_{t+h|t}\)</span>. (At <span class="math inline">\(h=1\)</span>, where there is no shorter-horizon
-error to regress on, the scorecaster falls back to a simple mean
-forecast.)</p>
+scorecaster in the D term. The scorecaster averages two forecasts: an
+<span class="math inline">\(\mathrm{MA}(h-1)\)</span> model fitted to
+the historical horizon-<span class="math inline">\(h\)</span> errors,
+and a linear regression of historical horizon-<span class="math inline">\(h\)</span> errors on shorter-horizon errors
+aligned by forecast origin. At prediction origin <span class="math inline">\(t\)</span>, the errors <span class="math inline">\(e_{t+1|t}, \dots, e_{t+h-1|t}\)</span> are not yet
+observed, so the regression uses their recursively generated scorecasts
+instead. At <span class="math inline">\(h=1\)</span>, where there is no
+shorter-horizon input, the scorecaster falls back to a simple mean
+forecast.</p>
 <p>This exploits the correlation between horizons. Optimal <span class="math inline">\(h\)</span>-step-ahead forecast errors are serially
 correlated up to lag <span class="math inline">\(h-1\)</span> under
-general nonstationary autoregressive data-generating processes, so the
-errors observed at horizons <span class="math inline">\(1\)</span>
-through <span class="math inline">\(h-1\)</span> at time <span class="math inline">\(t\)</span> carry information about the error still
-to come at horizon <span class="math inline">\(h\)</span>. AcMCP’s
-regression term captures exactly that. In principle this yields narrower
-intervals than PID for the same long-run marginal coverage, because it
-uses information PID leaves unused. As with every method here, the
+general nonstationary autoregressive data-generating processes. AcMCP
+estimates this dependence from historical errors available by the
+prediction origin and recursively constructs the shorter-horizon inputs
+needed to scorecast horizon <span class="math inline">\(h\)</span>. The
 guarantee being targeted is asymptotic marginal coverage. Realized
 coverage will fluctuate around the nominal level in any finite
 validation set, more so at longer horizons.</p>
@@ -697,10 +698,13 @@ validation set.</p>
 <p><img src="conformalForecast_files/figure-html/widplot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Finally, we combine the results from all the methods considered above
 into a single comparison: the underlying AR(2) model’s own intervals
-(<code>AR</code>), SCP with equal weights (<code>SCP</code>), SCP with
-exponential weights (<code>WCP</code>), ACP, PID without a scorecaster
-(<code>PI</code>), PID with a naive scorecaster (<code>PID</code>), and
-AcMCP.</p>
+(<code>AR</code>), SCP with equal weights (<code>SCP</code>), weighted
+conformal prediction with exponential weights (<code>WCP</code>), ACP,
+proportional-integral control without scorecasting (<code>PI</code>),
+PID with a naive scorecaster (<code>PID</code>), and AcMCP.</p>
+<p>The comparison is based on a single simulated series and is intended
+only to illustrate the output; it should not be used to rank the
+methods.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fc"</span>, <span class="st">"scpfc"</span>, <span class="st">"scpfc_exp"</span>, <span class="st">"acpfc"</span>, <span class="st">"pidfc_nsf"</span>, <span class="st">"pidfc"</span>, <span class="st">"acmcpfc"</span><span class="op">)</span></span>
 <span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AR"</span>, <span class="st">"SCP"</span>, <span class="st">"WCP"</span>, <span class="st">"ACP"</span>, <span class="st">"PI"</span>, <span class="st">"PID"</span>, <span class="st">"AcMCP"</span><span class="op">)</span></span>
@@ -811,7 +815,7 @@ AcMCP.</p>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2024).
+<p>Angelopoulos, A., Candes, E., and Tibshirani, R. J. (2023).
 “Conformal PID control for time series prediction”. <em>Advances in
 Neural Information Processing Systems</em>, 36, 23047–23074.</p>
 <p>Gibbs, I., and Candes, E. (2021). “Adaptive conformal inference under
