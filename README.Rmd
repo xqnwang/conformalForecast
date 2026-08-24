@@ -2,8 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -13,7 +11,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# conformalForecast
+# conformalForecast <img src="man/figures/logo.svg" alt="logo" align="right" width="150" style="border: none; float: right;"/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/xqnwang/conformalForecast/actions/workflows/R-CMD-check.yaml)
