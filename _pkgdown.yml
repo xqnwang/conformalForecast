@@ -10,3 +10,40 @@ articles:
   - conformalForecast
   - update
 
+
+reference:
+- title: Forecasting workflow
+  desc: >
+    Generate multistep-ahead forecasts by time series cross-validation,
+    conformalize them, and update the result as new observations arrive.
+  contents:
+  - cvforecast
+  - conformal
+  - update.cpforecast
+
+- title: Conformal prediction methods
+  desc: >
+    The calibration algorithms dispatched by `conformal()`.
+  contents:
+  - scp
+  - acp
+  - pid
+  - acmcp
+
+- title: Forecast evaluation
+  desc: >
+    Assess point and interval forecast performance.
+  contents:
+  - accuracy.cvforecast
+  - coverage
+  - width
+  - point_measures
+  - interval_measures
+
+- title: Utilities
+  contents:
+  - lagmatrix
+
+- title: Package overview
+  contents:
+  - conformalForecast-package
