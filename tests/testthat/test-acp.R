@@ -23,6 +23,23 @@ test_that("acp() adapts, and gamma controls how much", {
   expect_gt(fast_range, slow_range)
 })
 
+test_that("acp() retains the infinite lower-tail calibration score", {
+  fc <- test_cv(n = 100, h = 1, initial = 10)
+  cp <- acp(fc, ncal = 40, rolling = TRUE)
+  first <- which(!is.na(cp$LOWER[["95%"]][, 1]))[1]
+  calibration_errors <- fc$ERROR[(first - 40):(first - 1), 1]
+  expected <- ggdist::weighted_quantile(
+    c(-calibration_errors, Inf),
+    probs = 0.975,
+    type = 1
+  )
+
+  expect_equal(
+    unname(cp$MEAN[first, 1] - cp$LOWER[["95%"]][first, 1]),
+    unname(expected)
+  )
+})
+
 test_that("acp() stores the alpha updating path", {
   # Unlike pid() and acmcp(), which carry a compact `state`/`t_last` warm
   # start, acp() records the whole alpha_t path and update() replays it.

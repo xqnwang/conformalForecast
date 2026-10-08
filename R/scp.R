@@ -259,7 +259,7 @@ scp <- function(
         )
       } else {
         q_lo <- ggdist::weighted_quantile(
-          x = -c(errors_subset, Inf),
+          x = c(-errors_subset, Inf),
           probs = 1 - alpha / 2,
           weights = weight_subset,
           n = kess,

@@ -14,6 +14,23 @@ test_that("scp() replaces the intervals it was given", {
   )))
 })
 
+test_that("scp() retains the infinite lower-tail calibration score", {
+  fc <- test_cv(n = 100, h = 1, initial = 10)
+  cp <- scp(fc, ncal = 40, rolling = TRUE)
+  first <- which(!is.na(cp$LOWER[["95%"]][, 1]))[1]
+  calibration_errors <- fc$ERROR[(first - 40):(first - 1), 1]
+  expected <- ggdist::weighted_quantile(
+    c(-calibration_errors, Inf),
+    probs = 0.975,
+    type = 1
+  )
+
+  expect_equal(
+    unname(cp$MEAN[first, 1] - cp$LOWER[["95%"]][first, 1]),
+    unname(expected)
+  )
+})
+
 test_that("scp() distinguishes rolling from expanding calibration sets", {
   fc <- test_cv(n = 100, h = 3, initial = 10)
 

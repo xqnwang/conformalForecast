@@ -265,7 +265,7 @@ acp <- function(
 
         # Compute sample quantiles
         q_lo_h[t + h, ] <- ggdist::weighted_quantile(
-          x = -c(errors_subset, Inf),
+          x = c(-errors_subset, Inf),
           probs = 1 - alphat_lower_h[t + h, ],
           type = quantiletype,
           na.rm = na.rm,
