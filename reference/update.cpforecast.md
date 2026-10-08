@@ -90,10 +90,10 @@ print(scpfc_update)
 #>  cp_times (the forward step included): 104 (h=1), 103 (h=2), 102 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast      Lo 95    Hi 95
-#> 204      1.3171165 -0.3335623 3.753786
-#> 205     -0.1244955 -2.2766551 3.079426
-#> 206     -0.5533392 -2.7220088 2.644333
+#>     Point Forecast     Lo 95    Hi 95
+#> 204      1.3171165 -1.016113 3.753786
+#> 205     -0.1244955 -2.810763 3.079426
+#> 206     -0.5533392 -3.074082 2.644333
 summary(scpfc_update)
 #> SCP 
 #> 
@@ -105,12 +105,12 @@ summary(scpfc_update)
 #>  cp_times (the forward step included): 104 (h=1), 103 (h=2), 102 (h=3)
 #> 
 #> Forecasts of the forward step:
-#>     Point Forecast      Lo 95    Hi 95
-#> 204      1.3171165 -0.3335623 3.753786
-#> 205     -0.1244955 -2.2766551 3.079426
-#> 206     -0.5533392 -2.7220088 2.644333
+#>     Point Forecast     Lo 95    Hi 95
+#> 204      1.3171165 -1.016113 3.753786
+#> 205     -0.1244955 -2.810763 3.079426
+#> 206     -0.5533392 -3.074082 2.644333
 #> 
 #> Cross-validation error measures:
 #>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.037 0.957 1.448 1.072 -3.518 265.271 1.002  0.89      6.104   6.536
+#> CV 0.037 0.957 1.448 1.072 -3.518 265.271 1.002  0.89      6.326   6.757
 ```

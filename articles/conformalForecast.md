@@ -238,20 +238,20 @@ scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 (scpfc_score <- accuracy(scpfc, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.003118 4.830704
-#> CV h=2   6.527138 6.302017
-#> CV h=3   6.635156 6.403022
+#> CV h=1   5.020987 4.847092
+#> CV h=2   6.445482 6.222655
+#> CV h=3   6.570437 6.338417
 (scpfc_cov <- coverage(scpfc, window = 100, level = 95))
 #>       h=1       h=2       h=3 
-#> 0.9500000 0.9473684 0.9396985
+#> 0.9575000 0.9611529 0.9484925
 (scpfc_wid <- width(scpfc, window = 100, level = 95, includemedian = TRUE))
 #> Mean width:
 #>      h=1      h=2      h=3 
-#> 4.114655 5.368746 5.403647 
+#> 4.281447 5.568356 5.603784 
 #> 
 #> Median width:
 #>      h=1      h=2      h=3 
-#> 4.054006 5.334842 5.326651
+#> 4.154276 5.619012 5.404932
 ```
 
 [`scp()`](https://xqnwang.github.io/conformalForecast/reference/scp.md)
@@ -274,20 +274,20 @@ scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 
 (scpfc_exp_score <- accuracy(scpfc_exp, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.108981 4.930413
-#> CV h=2   6.563368 6.336281
-#> CV h=3   6.615147 6.381920
+#> CV h=1   5.195064 5.013180
+#> CV h=2   6.660090 6.428747
+#> CV h=3   6.723121 6.487340
 (scpfc_exp_cov <- coverage(scpfc_exp, window = 100, level = 95))
 #>       h=1       h=2       h=3 
-#> 0.9550000 0.9548872 0.9484925
+#> 0.9687500 0.9699248 0.9660804
 (scpfc_exp_wid <- width(scpfc_exp, window = 100, level = 95, includemedian = TRUE))
 #> Mean width:
 #>      h=1      h=2      h=3 
-#> 4.322785 5.567499 5.585576 
+#> 4.692348 5.982281 6.018163 
 #> 
 #> Median width:
 #>      h=1      h=2      h=3 
-#> 4.297306 5.455463 5.499007
+#> 4.807502 5.752871 5.819602
 ```
 
 SCP is the right choice when you want a simple, well-understood baseline
@@ -331,20 +331,20 @@ acpfc <- acp(fc, symmetric = FALSE, gamma = 0.005, ncal = 100, rolling = TRUE)
 
 (acpfc_score <- accuracy(acpfc, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.036517 4.863717
-#> CV h=2   6.644759 6.416735
-#> CV h=3   6.785646 6.551065
+#> CV h=1   5.127966 4.951833
+#> CV h=2   6.607002 6.379480
+#> CV h=3        Inf      Inf
 (acpfc_cov <- coverage(acpfc, window = 100, level = 95))
 #>       h=1       h=2       h=3 
-#> 0.9487500 0.9498747 0.9497487
+#> 0.9512500 0.9523810 0.9522613
 (acpfc_wid <- width(acpfc, window = 100, level = 95, includemedian = TRUE))
 #> Mean width:
 #>      h=1      h=2      h=3 
-#> 4.119178 5.420955 5.635120 
+#> 4.225143 5.448446      Inf 
 #> 
 #> Median width:
 #>      h=1      h=2      h=3 
-#> 4.034989 5.426268 5.499007
+#> 4.089708 5.433334 5.499007
 ```
 
 ### Conformal PID control (PID)
@@ -732,29 +732,29 @@ cov_mean <- do.call(bind_rows, cov_mean) |>
   arrange(horizon, method)
 print(cov_mean, n = nrow(cov_mean))
 #> # A tibble: 21 × 6
-#>    horizon method covmean winkler  msis   covdiff
-#>    <chr>   <fct>    <dbl>   <dbl> <dbl>     <dbl>
-#>  1 h=1     AR       0.954    4.78  4.66  0.00444 
-#>  2 h=1     SCP      0.95     5.00  4.83  0       
-#>  3 h=1     WCP      0.955    5.11  4.93  0.00500 
-#>  4 h=1     ACP      0.949    5.04  4.86 -0.00125 
-#>  5 h=1     PI       0.944    5.12  4.95 -0.00625 
-#>  6 h=1     PID      0.939    7.13  6.89 -0.0112  
-#>  7 h=1     AcMCP    0.944    5.16  4.98 -0.00625 
-#>  8 h=2     AR       0.942    6.25  6.09 -0.00784 
-#>  9 h=2     SCP      0.947    6.53  6.30 -0.00263 
-#> 10 h=2     WCP      0.955    6.56  6.34  0.00489 
-#> 11 h=2     ACP      0.950    6.64  6.42 -0.000125
-#> 12 h=2     PI       0.946    6.76  6.53 -0.00388 
-#> 13 h=2     PID      0.941    9.34  9.03 -0.00890 
-#> 14 h=2     AcMCP    0.947    6.66  6.44 -0.00263 
-#> 15 h=3     AR       0.935    6.27  6.11 -0.0146  
-#> 16 h=3     SCP      0.940    6.64  6.40 -0.0103  
-#> 17 h=3     WCP      0.948    6.62  6.38 -0.00151 
-#> 18 h=3     ACP      0.950    6.79  6.55 -0.000251
-#> 19 h=3     PI       0.945    6.96  6.72 -0.00528 
-#> 20 h=3     PID      0.941   10.0   9.71 -0.00905 
-#> 21 h=3     AcMCP    0.945    6.90  6.66 -0.00528
+#>    horizon method covmean winkler   msis  covdiff
+#>    <chr>   <fct>    <dbl>   <dbl>  <dbl>    <dbl>
+#>  1 h=1     AR       0.954    4.78   4.66  0.00444
+#>  2 h=1     SCP      0.958    5.02   4.85  0.00750
+#>  3 h=1     WCP      0.969    5.20   5.01  0.0188 
+#>  4 h=1     ACP      0.951    5.13   4.95  0.00125
+#>  5 h=1     PI       0.944    5.12   4.95 -0.00625
+#>  6 h=1     PID      0.939    7.13   6.89 -0.0112 
+#>  7 h=1     AcMCP    0.944    5.16   4.98 -0.00625
+#>  8 h=2     AR       0.942    6.25   6.09 -0.00784
+#>  9 h=2     SCP      0.961    6.45   6.22  0.0112 
+#> 10 h=2     WCP      0.970    6.66   6.43  0.0199 
+#> 11 h=2     ACP      0.952    6.61   6.38  0.00238
+#> 12 h=2     PI       0.946    6.76   6.53 -0.00388
+#> 13 h=2     PID      0.941    9.34   9.03 -0.00890
+#> 14 h=2     AcMCP    0.947    6.66   6.44 -0.00263
+#> 15 h=3     AR       0.935    6.27   6.11 -0.0146 
+#> 16 h=3     SCP      0.948    6.57   6.34 -0.00151
+#> 17 h=3     WCP      0.966    6.72   6.49  0.0161 
+#> 18 h=3     ACP      0.952  Inf    Inf     0.00226
+#> 19 h=3     PI       0.945    6.96   6.72 -0.00528
+#> 20 h=3     PID      0.941   10.0    9.71 -0.00905
+#> 21 h=3     AcMCP    0.945    6.90   6.66 -0.00528
 ```
 
 ``` r

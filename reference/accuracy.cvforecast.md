@@ -136,9 +136,9 @@ scpfc <- conformal(fc, method = "scp", ncal = 50, rolling = TRUE)
 accuracy(scpfc, measures = interval_measures, level = 95,
          byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.394495 5.789155
-#> CV h=2   6.629521 7.129421
-#> CV h=3   6.502841 6.963483
+#> CV h=1   5.618527 6.015506
+#> CV h=2   6.941124 7.442657
+#> CV h=3   6.582634 7.038759
 
 # Out-of-sample forecast accuracy on test set
 accuracy(fc, x = c(1, 0.5, 0), measures = interval_measures,

@@ -226,9 +226,9 @@ print(scpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.6271538 -1.023525 3.234253
-#> 202      0.8607034 -1.291456 4.064625
-#> 203      0.4935805 -1.675089 3.691253
+#> 201      0.6271538 -1.706076 3.234253
+#> 202      0.8607034 -1.825564 4.064625
+#> 203      0.4935805 -2.027163 3.691253
 summary(scpfc)
 #> SCP 
 #> 
@@ -239,13 +239,13 @@ summary(scpfc)
 #> 
 #> Forecasts of the forward step:
 #>     Point Forecast     Lo 95    Hi 95
-#> 201      0.6271538 -1.023525 3.234253
-#> 202      0.8607034 -1.291456 4.064625
-#> 203      0.4935805 -1.675089 3.691253
+#> 201      0.6271538 -1.706076 3.234253
+#> 202      0.8607034 -1.825564 4.064625
+#> 203      0.4935805 -2.027163 3.691253
 #> 
 #> Cross-validation error measures:
 #>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.123   6.568
+#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.335    6.78
 
 # Classical conformal prediction with exponential weights
 expweight <- function(n) {
