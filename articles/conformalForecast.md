@@ -259,10 +259,13 @@ also allows non-equal weighting of the calibration scores via
 `weightfun`, a function that maps the number of scores in the
 calibration set to a vector of weights. This lets more recent scores
 count more toward the quantile than older ones, which is a middle ground
-between a rolling window (hard cutoff) and an expanding window (no
-decay). When weights are used, setting `kess = TRUE` computes the
-quantile using Kish’s effective sample size, \\n\_{\mathrm{eff}} = (\sum
-w)^2 / \sum w^2\\, rather than the raw number of scores, so the quantile
+between a rolling window (hard cutoff) and an expanding window (more
+stable but slower to adapt). The default `quantiletype = 1` retains the
+order-statistic estimator used by standard conformal calibration. When
+weights are used with a continuous quantile estimator
+(`quantiletype = 4:9`), setting `kess = TRUE` computes the quantile
+using Kish’s effective sample size, \\n\_{\mathrm{eff}} = (\sum w)^2 /
+\sum w^2\\, rather than the raw number of scores, so the quantile
 estimate reflects how much *effective* information the weighted sample
 actually carries.
 
@@ -270,24 +273,24 @@ actually carries.
 
 expweight <- function(n) 0.99^{n+1-(1:n)}
 scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
-                 weightfun = expweight, kess = FALSE, quantiletype = 1)
+                 weightfun = expweight, kess = TRUE, quantiletype = 7)
 
 (scpfc_exp_score <- accuracy(scpfc_exp, byhorizon = TRUE))
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.195064 5.013180
-#> CV h=2   6.660090 6.428747
-#> CV h=3   6.723121 6.487340
+#> CV h=1   5.077359 4.901238
+#> CV h=2   6.508062 6.283169
+#> CV h=3   6.605940 6.373053
 (scpfc_exp_cov <- coverage(scpfc_exp, window = 100, level = 95))
 #>       h=1       h=2       h=3 
-#> 0.9687500 0.9699248 0.9660804
+#> 0.9637500 0.9661654 0.9610553
 (scpfc_exp_wid <- width(scpfc_exp, window = 100, level = 95, includemedian = TRUE))
 #> Mean width:
 #>      h=1      h=2      h=3 
-#> 4.692348 5.982281 6.018163 
+#> 4.451511 5.730601 5.755210 
 #> 
 #> Median width:
 #>      h=1      h=2      h=3 
-#> 4.807502 5.752871 5.819602
+#> 4.514476 5.670930 5.634672
 ```
 
 SCP is the right choice when you want a simple, well-understood baseline
@@ -736,21 +739,21 @@ print(cov_mean, n = nrow(cov_mean))
 #>    <chr>   <fct>    <dbl>   <dbl>  <dbl>    <dbl>
 #>  1 h=1     AR       0.954    4.78   4.66  0.00444
 #>  2 h=1     SCP      0.958    5.02   4.85  0.00750
-#>  3 h=1     WCP      0.969    5.20   5.01  0.0188 
+#>  3 h=1     WCP      0.964    5.08   4.90  0.0138 
 #>  4 h=1     ACP      0.951    5.13   4.95  0.00125
 #>  5 h=1     PI       0.944    5.12   4.95 -0.00625
 #>  6 h=1     PID      0.939    7.13   6.89 -0.0112 
 #>  7 h=1     AcMCP    0.944    5.16   4.98 -0.00625
 #>  8 h=2     AR       0.942    6.25   6.09 -0.00784
 #>  9 h=2     SCP      0.961    6.45   6.22  0.0112 
-#> 10 h=2     WCP      0.970    6.66   6.43  0.0199 
+#> 10 h=2     WCP      0.966    6.51   6.28  0.0162 
 #> 11 h=2     ACP      0.952    6.61   6.38  0.00238
 #> 12 h=2     PI       0.946    6.76   6.53 -0.00388
 #> 13 h=2     PID      0.941    9.34   9.03 -0.00890
 #> 14 h=2     AcMCP    0.947    6.66   6.44 -0.00263
 #> 15 h=3     AR       0.935    6.27   6.11 -0.0146 
 #> 16 h=3     SCP      0.948    6.57   6.34 -0.00151
-#> 17 h=3     WCP      0.966    6.72   6.49  0.0161 
+#> 17 h=3     WCP      0.961    6.61   6.37  0.0111 
 #> 18 h=3     ACP      0.952  Inf    Inf     0.00226
 #> 19 h=3     PI       0.945    6.96   6.72 -0.00528
 #> 20 h=3     PID      0.941   10.0    9.71 -0.00905

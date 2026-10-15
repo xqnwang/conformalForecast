@@ -62,7 +62,8 @@ scp(
   to be used. Types 1 to 3 are for discontinuous quantiles, types 4 to 9
   are for continuous quantiles. See the
   [`weighted_quantile`](https://mjskay.github.io/ggdist/reference/weighted_quantile.html)
-  function in the ggdist package. Defaults to `1`.
+  function in the ggdist package. Defaults to `1`, the order-statistic
+  estimator used by standard conformal calibration.
 
 - weightfun:
 
@@ -75,7 +76,9 @@ scp(
 - kess:
 
   If `TRUE`, Kish's effective sample size is used for the sample
-  quantile computation. Defaults to `FALSE`.
+  quantile computation. This adjustment is only supported for the
+  continuous quantile estimators, `quantiletype = 4:9`. Defaults to
+  `FALSE`.
 
 - update:
 
@@ -252,5 +255,5 @@ expweight <- function(n) {
   0.99^{n+1-(1:n)}
 }
 scpfc_exp <- scp(fc, ncal = 50, rolling = TRUE,
-                 weightfun = expweight, kess = TRUE)
+                 weightfun = expweight, kess = TRUE, quantiletype = 7)
 ```

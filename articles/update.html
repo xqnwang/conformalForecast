@@ -199,11 +199,11 @@ is given and replays the settings recorded in it.</p>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">timings_update</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           scp   acp   pid acmcp</span></span>
-<span><span class="co">#&gt; batch 1 0.119 0.123 0.189 0.409</span></span>
-<span><span class="co">#&gt; batch 2 0.118 0.123 0.191 0.416</span></span>
-<span><span class="co">#&gt; batch 3 0.118 0.121 0.189 0.406</span></span>
-<span><span class="co">#&gt; batch 4 0.120 0.122 0.191 0.557</span></span>
-<span><span class="co">#&gt; batch 5 0.122 0.124 0.191 0.408</span></span></code></pre></div>
+<span><span class="co">#&gt; batch 1 0.137 0.141 0.209 0.451</span></span>
+<span><span class="co">#&gt; batch 2 0.136 0.140 0.209 0.464</span></span>
+<span><span class="co">#&gt; batch 3 0.136 0.139 0.206 0.447</span></span>
+<span><span class="co">#&gt; batch 4 0.137 0.140 0.208 0.566</span></span>
+<span><span class="co">#&gt; batch 5 0.140 0.142 0.210 0.454</span></span></code></pre></div>
 <p>That is the whole streaming loop: five calls to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>
 per method, each doing only the work required by the 20 new observations
 in that batch.</p>
@@ -249,11 +249,11 @@ this approach.</p>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">timings_full</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         cvforecast   scp   acp   pid acmcp</span></span>
-<span><span class="co">#&gt; batch 1      0.835 0.129 0.143 0.635 2.100</span></span>
-<span><span class="co">#&gt; batch 2      0.931 0.149 0.166 0.723 2.428</span></span>
-<span><span class="co">#&gt; batch 3      1.017 0.170 0.185 0.809 2.877</span></span>
-<span><span class="co">#&gt; batch 4      1.106 0.188 0.205 0.905 3.046</span></span>
-<span><span class="co">#&gt; batch 5      1.210 0.214 0.232 1.000 3.506</span></span></code></pre></div>
+<span><span class="co">#&gt; batch 1      0.928 0.170 0.187 0.685 2.345</span></span>
+<span><span class="co">#&gt; batch 2      1.044 0.202 0.217 0.787 2.725</span></span>
+<span><span class="co">#&gt; batch 3      1.147 0.227 0.244 0.882 3.164</span></span>
+<span><span class="co">#&gt; batch 4      1.243 0.251 0.269 0.985 3.409</span></span>
+<span><span class="co">#&gt; batch 5      1.355 0.283 0.302 1.100 3.862</span></span></code></pre></div>
 <p>The cost of the <code><a href="../reference/cvforecast.html">cvforecast()</a></code> step grows with every
 batch. At <code>batch = 5</code> it fits the AR(2) model at essentially
 every rolling origin of a 300-point series, most of which were already

@@ -111,7 +111,8 @@ used. Defaults to <code>FALSE</code>.</p></dd>
 quantile estimator to be used. Types 1 to 3 are for discontinuous
 quantiles, types 4 to 9 are for continuous quantiles. See the
 <code><a href="https://mjskay.github.io/ggdist/reference/weighted_quantile.html" class="external-link">weighted_quantile</a></code> function in the ggdist package.
-Defaults to <code>1</code>.</p></dd>
+Defaults to <code>1</code>, the order-statistic estimator used by standard
+conformal calibration.</p></dd>
 
 
 <dt id="arg-weightfun">weightfun<a class="anchor" aria-label="anchor" href="#arg-weightfun"></a></dt>
@@ -124,7 +125,9 @@ non-data-dependent weights are supported.</p></dd>
 
 <dt id="arg-kess">kess<a class="anchor" aria-label="anchor" href="#arg-kess"></a></dt>
 <dd><p>If <code>TRUE</code>, Kish's effective sample size is used for the
-sample quantile computation. Defaults to <code>FALSE</code>.</p></dd>
+sample quantile computation. This adjustment is only supported for the
+continuous quantile estimators, <code>quantiletype = 4:9</code>. Defaults to
+<code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-update">update<a class="anchor" aria-label="anchor" href="#arg-update"></a></dt>
@@ -289,7 +292,7 @@ weighted quantile estimator used here.</p>
 <span class="r-in"><span>  <span class="fl">0.99</span><span class="op">^</span><span class="op">{</span><span class="va">n</span><span class="op">+</span><span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="va">scpfc_exp</span> <span class="op">&lt;-</span> <span class="fu">scp</span><span class="op">(</span><span class="va">fc</span>, ncal <span class="op">=</span> <span class="fl">50</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>                 weightfun <span class="op">=</span> <span class="va">expweight</span>, kess <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 weightfun <span class="op">=</span> <span class="va">expweight</span>, kess <span class="op">=</span> <span class="cn">TRUE</span>, quantiletype <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

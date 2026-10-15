@@ -330,7 +330,10 @@ scores via <code>weightfun</code>, a function that maps the number of
 scores in the calibration set to a vector of weights. This lets more
 recent scores count more toward the quantile than older ones, which is a
 middle ground between a rolling window (hard cutoff) and an expanding
-window (no decay). When weights are used, setting
+window (more stable but slower to adapt). The default
+<code>quantiletype = 1</code> retains the order-statistic estimator used
+by standard conformal calibration. When weights are used with a
+continuous quantile estimator (<code>quantiletype = 4:9</code>), setting
 <code>kess = TRUE</code> computes the quantile using Kish’s effective
 sample size, <span class="math inline">\(n_{\mathrm{eff}} = (\sum w)^2 /
 \sum w^2\)</span>, rather than the raw number of scores, so the quantile
@@ -339,24 +342,24 @@ sample actually carries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">expweight</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="fl">0.99</span><span class="op">^</span><span class="op">{</span><span class="va">n</span><span class="op">+</span><span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">}</span></span>
 <span><span class="va">scpfc_exp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scp.html">scp</a></span><span class="op">(</span><span class="va">fc</span>, symmetric <span class="op">=</span> <span class="cn">FALSE</span>, ncal <span class="op">=</span> <span class="fl">100</span>, rolling <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                 weightfun <span class="op">=</span> <span class="va">expweight</span>, kess <span class="op">=</span> <span class="cn">FALSE</span>, quantiletype <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                 weightfun <span class="op">=</span> <span class="va">expweight</span>, kess <span class="op">=</span> <span class="cn">TRUE</span>, quantiletype <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">scpfc_exp_score</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/accuracy.html" class="external-link">accuracy</a></span><span class="op">(</span><span class="va">scpfc_exp</span>, byhorizon <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        Winkler_95  MSIS_95</span></span>
-<span><span class="co">#&gt; CV h=1   5.195064 5.013180</span></span>
-<span><span class="co">#&gt; CV h=2   6.660090 6.428747</span></span>
-<span><span class="co">#&gt; CV h=3   6.723121 6.487340</span></span>
+<span><span class="co">#&gt; CV h=1   5.077359 4.901238</span></span>
+<span><span class="co">#&gt; CV h=2   6.508062 6.283169</span></span>
+<span><span class="co">#&gt; CV h=3   6.605940 6.373053</span></span>
 <span><span class="op">(</span><span class="va">scpfc_exp_cov</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coverage.html">coverage</a></span><span class="op">(</span><span class="va">scpfc_exp</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       h=1       h=2       h=3 </span></span>
-<span><span class="co">#&gt; 0.9687500 0.9699248 0.9660804</span></span>
+<span><span class="co">#&gt; 0.9637500 0.9661654 0.9610553</span></span>
 <span><span class="op">(</span><span class="va">scpfc_exp_wid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/width.html">width</a></span><span class="op">(</span><span class="va">scpfc_exp</span>, window <span class="op">=</span> <span class="fl">100</span>, level <span class="op">=</span> <span class="fl">95</span>, includemedian <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Mean width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
-<span><span class="co">#&gt; 4.692348 5.982281 6.018163 </span></span>
+<span><span class="co">#&gt; 4.451511 5.730601 5.755210 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Median width:</span></span>
 <span><span class="co">#&gt;      h=1      h=2      h=3 </span></span>
-<span><span class="co">#&gt; 4.807502 5.752871 5.819602</span></span></code></pre></div>
+<span><span class="co">#&gt; 4.514476 5.670930 5.634672</span></span></code></pre></div>
 <p>SCP is the right choice when you want a simple, well-understood
 baseline and the error distribution within the calibration window is
 reasonably stable; it does not adapt online to feedback about whether
@@ -771,21 +774,21 @@ methods.</p>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> h=1     AR       0.954    4.78   4.66  0.004<span style="text-decoration: underline;">44</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> h=1     SCP      0.958    5.02   4.85  0.007<span style="text-decoration: underline;">50</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> h=1     WCP      0.969    5.20   5.01  0.018<span style="text-decoration: underline;">8</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> h=1     WCP      0.964    5.08   4.90  0.013<span style="text-decoration: underline;">8</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> h=1     ACP      0.951    5.13   4.95  0.001<span style="text-decoration: underline;">25</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> h=1     PI       0.944    5.12   4.95 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> h=1     PID      0.939    7.13   6.89 -<span style="color: #BB0000;">0.011</span><span style="color: #BB0000; text-decoration: underline;">2</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> h=1     AcMCP    0.944    5.16   4.98 -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">25</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> h=2     AR       0.942    6.25   6.09 -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">84</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> h=2     SCP      0.961    6.45   6.22  0.011<span style="text-decoration: underline;">2</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> h=2     WCP      0.970    6.66   6.43  0.019<span style="text-decoration: underline;">9</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> h=2     WCP      0.966    6.51   6.28  0.016<span style="text-decoration: underline;">2</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> h=2     ACP      0.952    6.61   6.38  0.002<span style="text-decoration: underline;">38</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> h=2     PI       0.946    6.76   6.53 -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">88</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> h=2     PID      0.941    9.34   9.03 -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">90</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> h=2     AcMCP    0.947    6.66   6.44 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">63</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> h=3     AR       0.935    6.27   6.11 -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> h=3     SCP      0.948    6.57   6.34 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">51</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> h=3     WCP      0.966    6.72   6.49  0.016<span style="text-decoration: underline;">1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> h=3     WCP      0.961    6.61   6.37  0.011<span style="text-decoration: underline;">1</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> h=3     ACP      0.952  <span style="color: #BB0000;">Inf</span>    <span style="color: #BB0000;">Inf</span>     0.002<span style="text-decoration: underline;">26</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> h=3     PI       0.945    6.96   6.72 -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">28</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> h=3     PID      0.941   10.0    9.71 -<span style="color: #BB0000;">0.009</span><span style="color: #BB0000; text-decoration: underline;">05</span></span></span>
