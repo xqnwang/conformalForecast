@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">conformalForecast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="conformalforecast-development-version">conformalForecast (development version)<a class="anchor" aria-label="anchor" href="#conformalforecast-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="conformalforecast-020">conformalForecast 0.2.0<a class="anchor" aria-label="anchor" href="#conformalforecast-020"></a></h2>
 <ul><li>Settings previously stored as <code>model$alpha</code>, <code>model$symmetric</code>, <code>model$integrate</code>, <code>model$scorecast</code>, <code>model$lr</code>, <code>model$Csat</code> and <code>model$KI</code> are now collected in <code>model$args</code>.</li>
 <li>
 <code>forecast</code> moved from <code>Imports</code> to <code>Depends</code>, so it is attached together with <code>conformalForecast</code>.</li>
@@ -51,8 +51,11 @@
 <code><a href="../reference/acmcp.html">acmcp()</a></code> now accepts <code>ma_method = "CSS"</code> for faster MA scorecaster fitting at longer forecast horizons, while retaining <code>"CSS-ML"</code> as the default, and reports successful scorecasts in <code>scorecast_times</code>.</li>
 <li>New unit-test suite covering all four conformal methods, <code><a href="../reference/cvforecast.html">cvforecast()</a></code>, <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, and the evaluation functions.</li>
 </ul><div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
+<h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
+<ul><li>Corrected lower-tail calibration scores in <code><a href="../reference/scp.html">scp()</a></code> and <code><a href="../reference/acp.html">acp()</a></code>, ensuring that the infinite finite-sample correction is retained with the correct sign.</li>
+<li>
+<code>kess = TRUE</code> now requires a continuous quantile estimator (<code>quantiletype = 4:9</code>); an informative error is returned for discontinuous quantile estimators.</li>
+<li>
 <code><a href="../reference/acmcp.html">acmcp()</a></code> no longer fits MA models before its recursive scorecaster inputs are available.</li>
 <li>
 <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> now works on <code><a href="../reference/pid.html">pid()</a></code>, <code><a href="../reference/acmcp.html">acmcp()</a></code> and <code>acp(symmetric = TRUE)</code> objects, and resumes from the last computed step instead of recomputing the whole history.</li>
@@ -73,7 +76,7 @@
 <li>Clearer error from <code><a href="../reference/scp.html">scp()</a></code> and <code><a href="../reference/acp.html">acp()</a></code> when <code>ncal</code> is too large.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<h3 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h3>
 <ul><li>The pkgdown site renders mathematics again (<code>math-rendering: mathjax</code>).</li>
 <li>Corrected the documented return classes, the <code>Winkler</code> measure name, the <code><a href="../reference/lagmatrix.html">lagmatrix()</a></code> error message, and several typos.</li>
 <li>Expanded the vignette with the <code><a href="../reference/conformal.html">conformal()</a></code> interface, incremental updates, external regressors, clearer method descriptions, and updated ggplot2 calls.</li>
