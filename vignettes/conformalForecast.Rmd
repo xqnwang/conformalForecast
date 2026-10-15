@@ -130,12 +130,12 @@ scpfc <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
 (scpfc_wid <- width(scpfc, window = 100, level = 95, includemedian = TRUE))
 ```
 
-`scp()` also allows non-equal weighting of the calibration scores via `weightfun`, a function that maps the number of scores in the calibration set to a vector of weights. This lets more recent scores count more toward the quantile than older ones, which is a middle ground between a rolling window (hard cutoff) and an expanding window (no decay). When weights are used, setting `kess = TRUE` computes the quantile using Kish's effective sample size, $n_{\mathrm{eff}} = (\sum w)^2 / \sum w^2$, rather than the raw number of scores, so the quantile estimate reflects how much *effective* information the weighted sample actually carries.
+`scp()` also allows non-equal weighting of the calibration scores via `weightfun`, a function that maps the number of scores in the calibration set to a vector of weights. This lets more recent scores count more toward the quantile than older ones, which is a middle ground between a rolling window (hard cutoff) and an expanding window (more stable but slower to adapt). The default `quantiletype = 1` retains the order-statistic estimator used by standard conformal calibration. When weights are used with a continuous quantile estimator (`quantiletype = 4:9`), setting `kess = TRUE` computes the quantile using Kish's effective sample size, $n_{\mathrm{eff}} = (\sum w)^2 / \sum w^2$, rather than the raw number of scores, so the quantile estimate reflects how much *effective* information the weighted sample actually carries.
 
 ```{r scp-exp}
 expweight <- function(n) 0.99^{n+1-(1:n)}
 scpfc_exp <- scp(fc, symmetric = FALSE, ncal = 100, rolling = TRUE,
-                 weightfun = expweight, kess = FALSE, quantiletype = 1)
+                 weightfun = expweight, kess = TRUE, quantiletype = 7)
 
 (scpfc_exp_score <- accuracy(scpfc_exp, byhorizon = TRUE))
 (scpfc_exp_cov <- coverage(scpfc_exp, window = 100, level = 95))

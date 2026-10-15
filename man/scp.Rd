@@ -48,7 +48,8 @@ used. Defaults to \code{FALSE}.}
 quantile estimator to be used. Types 1 to 3 are for discontinuous
 quantiles, types 4 to 9 are for continuous quantiles. See the
 \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
-Defaults to \code{1}.}
+Defaults to \code{1}, the order-statistic estimator used by standard
+conformal calibration.}
 
 \item{weightfun}{Function to return a vector of weights used for the sample
 quantile computation. Its first argument must be an integer indicating
@@ -57,7 +58,9 @@ the number of observations for which weights are generated. Defaults to
 non-data-dependent weights are supported.}
 
 \item{kess}{If \code{TRUE}, Kish's effective sample size is used for the
-sample quantile computation. Defaults to \code{FALSE}.}
+sample quantile computation. This adjustment is only supported for the
+continuous quantile estimators, \code{quantiletype = 4:9}. Defaults to
+\code{FALSE}.}
 
 \item{update}{If \code{TRUE}, \code{object} already holds the results of a
 previous call and only the newly added time steps are computed; the
@@ -153,7 +156,7 @@ expweight <- function(n) {
   0.99^{n+1-(1:n)}
 }
 scpfc_exp <- scp(fc, ncal = 50, rolling = TRUE,
-                 weightfun = expweight, kess = TRUE)
+                 weightfun = expweight, kess = TRUE, quantiletype = 7)
 
 }
 \seealso{

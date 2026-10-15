@@ -60,9 +60,19 @@ test_that("scp() treats constant weights as no weights", {
   )
 })
 
+test_that("scp() requires a continuous quantile estimator with kess", {
+  fc <- test_cv(n = 60, h = 1, initial = 10)
+
+  for (quantiletype in 1:3) {
+    expect_error(
+      scp(fc, ncal = 20, quantiletype = quantiletype, kess = TRUE),
+      "requires a continuous quantile estimator"
+    )
+  }
+})
+
 test_that("scp() reacts to a weight function and to Kish's sample size", {
-  # `kess` rescales the sample size, which only moves an interpolating
-  # estimator: quantile types 1 to 3 are step functions and do not react.
+  # `kess` is defined for continuous estimators, so use type 7 here.
   fc <- test_cv(n = 120, h = 3, level = 80, initial = 10)
   decay <- function(n) 0.999^(n:1)
 

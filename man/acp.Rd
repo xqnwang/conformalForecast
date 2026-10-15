@@ -50,7 +50,8 @@ used. Defaults to \code{FALSE}.}
 quantile estimator to be used. Types 1 to 3 are for discontinuous
 quantiles, types 4 to 9 are for continuous quantiles. See the
 \code{\link[ggdist]{weighted_quantile}} function in the ggdist package.
-Defaults to \code{1}.}
+Defaults to \code{1}, the order-statistic estimator used by standard
+conformal calibration.}
 
 \item{update}{If \code{TRUE}, \code{object} already holds the results of a
 previous call and only the newly added time steps are computed; the
