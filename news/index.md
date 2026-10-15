@@ -2,6 +2,8 @@
 
 ## conformalForecast 0.2.0
 
+CRAN release: 2026-10-15
+
 - Settings previously stored as `model$alpha`, `model$symmetric`,
   `model$integrate`, `model$scorecast`, `model$lr`, `model$Csat` and
   `model$KI` are now collected in `model$args`.

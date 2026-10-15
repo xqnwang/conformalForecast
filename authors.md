@@ -13,7 +13,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/xqnwang/conformalForecast/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/xqnwang/conformalForecast/blob/v0.2.0/DESCRIPTION)
 
 Wang X, Hyndman R, Girolimetto D (2026). *conformalForecast: Conformal
 Prediction Methods for Multistep-Ahead Time Series Forecasting*. R

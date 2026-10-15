@@ -147,11 +147,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_update, 3)
 #>           scp   acp   pid acmcp
-#> batch 1 0.102 0.106 0.155 0.342
-#> batch 2 0.105 0.105 0.165 0.352
-#> batch 3 0.102 0.102 0.154 0.336
-#> batch 4 0.104 0.106 0.153 0.482
-#> batch 5 0.109 0.109 0.158 0.347
+#> batch 1 0.143 0.145 0.217 0.470
+#> batch 2 0.142 0.145 0.217 0.480
+#> batch 3 0.140 0.142 0.214 0.460
+#> batch 4 0.142 0.144 0.215 0.587
+#> batch 5 0.145 0.151 0.218 0.474
 ```
 
 That is the whole streaming loop: five calls to
@@ -201,11 +201,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_full, 3)
 #>         cvforecast   scp   acp   pid acmcp
-#> batch 1      0.707 0.116 0.131 0.480 1.835
-#> batch 2      0.800 0.136 0.147 0.555 2.059
-#> batch 3      0.868 0.153 0.167 0.625 2.603
-#> batch 4      0.947 0.170 0.182 0.701 2.592
-#> batch 5      1.027 0.193 0.205 0.763 3.115
+#> batch 1      0.967 0.176 0.193 0.717 2.413
+#> batch 2      1.074 0.203 0.218 0.800 2.785
+#> batch 3      1.173 0.231 0.249 0.899 3.256
+#> batch 4      1.282 0.259 0.290 1.016 3.549
+#> batch 5      1.413 0.289 0.306 1.111 3.976
 ```
 
 The cost of the
