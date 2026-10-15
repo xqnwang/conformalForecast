@@ -1,4 +1,4 @@
-# conformalForecast (development version)
+# conformalForecast 0.2.0
 
 * Settings previously stored as `model$alpha`, `model$symmetric`,
   `model$integrate`, `model$scorecast`, `model$lr`, `model$Csat` and `model$KI`
@@ -13,6 +13,12 @@
 
 ## Bug fixes
 
+* Corrected lower-tail calibration scores in `scp()` and `acp()`, ensuring
+  that the infinite finite-sample correction is retained with the correct
+  sign.
+* `kess = TRUE` now requires a continuous quantile estimator
+  (`quantiletype = 4:9`); an informative error is returned for discontinuous
+  quantile estimators.
 * `acmcp()` no longer fits MA models before its recursive scorecaster inputs are
   available.
 * `update()` now works on `pid()`, `acmcp()` and `acp(symmetric = TRUE)`
