@@ -158,9 +158,11 @@ The cost of the `cvforecast()` step grows with every batch. At `batch = 5` it fi
 
 ## What `update()` expects
 
-Three points are worth keeping in mind when calling `update()`.
+Keep the following points in mind when calling `update()`.
 
 `forecastfun` has to be supplied again at every call. It is not stored on the object, and it should be the same function used to build the original `cvforecast()` object, since it is used to fit the model at the newly added origins.
+
+`update()` also preserves the original base forecast `level`, including `NULL`. For a point-only base model, supply `alpha` explicitly when first calibrating the object; subsequent updates retain that calibration level.
 
 The object being updated has to come from one of the conformal methods in the package. `update()` reads the settings recorded when the object was built, and reports an error if they are not available rather than falling back on defaults.
 
@@ -197,7 +199,7 @@ cp_x_upd <- update(cp_x, new_data = new_y, forecastfun = lm_fun, new_xreg = new_
 
 ## The `forward` forecast
 
-When the original `cvforecast()` object was built with `forward = TRUE`, which is the default, it carries `mean`, `lower` and `upper` components holding the out-of-sample forecast from the most recent origin. After the new data have been appended, `update()` refits the model at the new final origin, so that these components describe a forecast made from all the data now available.
+When the conformal fit was built with `forward = TRUE`, which is the default, it carries `mean`, `lower` and `upper` components holding the out-of-sample forecast from the most recent origin. After the new data have been appended, `update()` refits the model at the new final origin, so that these components describe a forecast made from all the data now available.
 
 ```{r forward-refresh}
 scp_initial$mean

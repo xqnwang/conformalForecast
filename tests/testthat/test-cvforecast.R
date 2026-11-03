@@ -84,10 +84,6 @@ test_that("cvforecast() demands a usable confidence level", {
   y <- test_series(40)
 
   expect_error(
-    cvforecast(y, forecastfun = naive_fun, h = 2, level = NULL, initial = 10),
-    "must not be NULL"
-  )
-  expect_error(
     cvforecast(y, forecastfun = naive_fun, h = 2, level = 150, initial = 10),
     "out of range"
   )
@@ -250,4 +246,82 @@ test_that("cvforecast() carries exogenous predictors through", {
   expect_gt(length(observed), 0)
   expect_equal(observed, round(observed))
   expect_true(all(observed > 0))
+})
+
+test_that("point-only CV preserves forecasts, errors and time alignment", {
+  for (forward in c(TRUE, FALSE)) {
+    for (h in c(1, 3)) {
+      y <- test_series(80, frequency = 12)
+      point <- cvforecast(y, point_fun, h = h, level = NULL,
+                          window = 20, forward = forward)
+      base <- cvforecast(y, naive_fun, h = h, level = 90,
+                         window = 20, forward = forward)
+      expect_equal(point$MEAN, base$MEAN)
+      expect_equal(point$ERROR, base$ERROR)
+      expect_aligned_errors(point)
+      expect_contains(names(point), "level")
+      expect_null(point$level)
+      expect_null(point$args$level)
+      expect_length(point$LOWER, 0)
+      expect_length(point$UPPER, 0)
+      expect_null(point$lower)
+      expect_null(point$upper)
+      if (forward) {
+        expect_equal(point$mean, base$mean)
+        expect_output(print(point), "Forecasts of the forward step")
+      }
+      expect_output(print(summary(point)), "Cross-validation error measures")
+      expect_equal(
+        accuracy(point, measures = point_measures, byhorizon = TRUE),
+        accuracy(base, measures = point_measures, byhorizon = TRUE)
+      )
+      expect_error(accuracy(point), "intervals are unavailable")
+      if (forward) {
+        expect_equal(
+          accuracy(point, x = rep(12, h), measures = point_measures),
+          accuracy(base, x = rep(12, h), measures = point_measures)
+        )
+      }
+    }
+  }
+})
+
+test_that("point-only CV passes regressors through and omits unused bounds", {
+  f <- function(x, h, level, xreg, newxreg) {
+    stopifnot(is.null(level), length(x) == NROW(xreg))
+    list(mean = rep(as.numeric(tail(x, 1)), h) + as.numeric(newxreg))
+  }
+  y <- test_series(60)
+  for (forward in c(TRUE, FALSE)) {
+    xreg <- matrix(seq_len(60 + 3 - !forward), ncol = 1)
+    point <- cvforecast(y, f, h = 3, level = NULL, xreg = xreg,
+                        window = 20, forward = forward)
+    base <- cvforecast(y, xreg_fun, h = 3, level = 90, xreg = xreg,
+                       window = 20, forward = forward)
+    expect_equal(point$MEAN, base$MEAN)
+    expect_equal(point$ERROR, base$ERROR)
+    expect_aligned_errors(point)
+  }
+  # A base function can ignore level and return default intervals; NULL
+  # still means that none of those intervals are exposed by cvforecast().
+  ignores_level <- function(x, h, level) naive_fun(x, h, level = 90)
+  point <- cvforecast(y, ignores_level, h = 3, level = NULL, initial = 10)
+  expect_length(point$LOWER, 0)
+  expect_null(point$lower)
+  expect_null(point$upper)
+  expect_output(print(point), "Cross-validation")
+})
+
+test_that("missing base intervals and invalid levels have actionable errors", {
+  f <- function(x, h, level) list(mean = rep(tail(x, 1), h))
+  expect_error(
+    cvforecast(test_series(40), f, level = 90, initial = 10),
+    "use `level = NULL`"
+  )
+  for (level in list(numeric(0), NA_real_, Inf, "90")) {
+    expect_error(
+      cvforecast(test_series(40), f, level = level, initial = 10),
+      "non-empty finite numeric vector"
+    )
+  }
 })

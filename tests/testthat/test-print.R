@@ -74,3 +74,14 @@ test_that("printing never fails on any supported combination", {
     expect_output(print(summary(cp)))
   }
 })
+
+test_that("point-only forecasts support plotting and reject interval evaluation", {
+  skip_if_not_installed("ggplot2")
+  fc <- cvforecast(test_series(80, frequency = 12), point_fun,
+                   h = 3, level = NULL, window = 20)
+  expect_no_error(ggplot2::ggplot_build(ggplot2::autoplot(fc)))
+  cp <- scp(fc, alpha = 0.1, ncal = 20)
+  expect_no_error(ggplot2::ggplot_build(ggplot2::autoplot(cp)))
+  expect_error(coverage(fc, level = 90), "no interval forecasts")
+  expect_error(width(fc, level = 90), "no interval forecasts")
+})

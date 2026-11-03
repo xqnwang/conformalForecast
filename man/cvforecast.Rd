@@ -28,13 +28,18 @@ argument \code{h} for the forecast horizon and an argument \code{level}
 for the confidence level for prediction intervals. If exogenous
 predictors are used, then it must also have \code{xreg} and
 \code{newxreg} arguments corresponding to the training and the test
-periods, respectively.}
+periods, respectively. When \code{level = NULL}, a list containing only
+\code{mean} (a vector of length \code{h}) is sufficient. Otherwise,
+\code{lower} and \code{upper} matrices with one row per horizon and
+columns named by percentage (e.g., \code{"90\%"}) are required.}
 
 \item{h}{Forecast horizon. Defaults to \code{1}.}
 
 \item{level}{Confidence level for prediction intervals, as a numeric vector
-of percentages. It must not be \code{NULL}, since the conformal methods
-need at least one interval to start from. Defaults to \code{c(80, 95)}.}
+of percentages. Set to \code{NULL} to collect only point forecasts and
+errors, without requiring base prediction intervals. In that case,
+supply \code{alpha} explicitly to the subsequent conformal method.
+Defaults to \code{c(80, 95)}.}
 
 \item{forward}{If \code{TRUE}, the final forecast origin for forecasting is
 \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.
@@ -75,14 +80,16 @@ time series with the same dimensional characteristics as \code{MEAN}.}
 each \code{level}. Each element within the list will be a multivariate
 time series with the same dimensional characteristics as \code{MEAN}.}
 \item{level}{The confidence values associated with the prediction
-intervals.}
+intervals, or \code{NULL} for point forecasts only. In that case,
+\code{LOWER} and \code{UPPER} are empty lists.}
 \item{call}{The matched call.}
 \item{forward}{Whether \code{forward} is applied.}
 If \code{forward} is \code{TRUE}, the components \code{mean},
 \code{lower}, \code{upper}, and \code{model} will also be returned,
 showing the information about the final fitted model and the forecasts
 using all available observations, see e.g.
-\code{\link[forecast]{forecast.ets}} for more details.
+\code{\link[forecast]{forecast.ets}} for more details. With
+\code{level = NULL}, \code{lower} and \code{upper} are omitted.
 }
 \description{
 Compute forecasts and other information by applying \code{forecastfun} to

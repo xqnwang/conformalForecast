@@ -30,7 +30,9 @@ errors on the validation set. See the results of a call to
 
 \item{alpha}{A numeric vector of significance levels to achieve a desired
 coverage level \eqn{1-\alpha}. Defaults to
-\code{1 - 0.01 * object$level}, the levels used in \code{object}.}
+\code{1 - 0.01 * object$level}, the levels used in \code{object}.
+Must be supplied explicitly if \code{object} was created with
+\code{level = NULL}; base prediction intervals are not required.}
 
 \item{ncal}{Length of the burn-in period for training the scorecaster.
 If \code{rolling = TRUE}, it is also used as the length of the trailing

@@ -27,11 +27,16 @@
 #'   for the confidence level for prediction intervals. If exogenous
 #'   predictors are used, then it must also have \code{xreg} and
 #'   \code{newxreg} arguments corresponding to the training and the test
-#'   periods, respectively.
+#'   periods, respectively. When \code{level = NULL}, a list containing only
+#'   \code{mean} (a vector of length \code{h}) is sufficient. Otherwise,
+#'   \code{lower} and \code{upper} matrices with one row per horizon and
+#'   columns named by percentage (e.g., \code{"90\%"}) are required.
 #' @param h Forecast horizon. Defaults to \code{1}.
 #' @param level Confidence level for prediction intervals, as a numeric vector
-#'   of percentages. It must not be \code{NULL}, since the conformal methods
-#'   need at least one interval to start from. Defaults to \code{c(80, 95)}.
+#'   of percentages. Set to \code{NULL} to collect only point forecasts and
+#'   errors, without requiring base prediction intervals. In that case,
+#'   supply \code{alpha} explicitly to the subsequent conformal method.
+#'   Defaults to \code{c(80, 95)}.
 #' @param forward If \code{TRUE}, the final forecast origin for forecasting is
 #'   \eqn{y_T}. Otherwise, the final forecast origin is \eqn{y_{T-1}}.
 #'   Defaults to \code{TRUE}.
@@ -66,14 +71,16 @@
 #'     each \code{level}. Each element within the list will be a multivariate
 #'     time series with the same dimensional characteristics as \code{MEAN}.}
 #'   \item{level}{The confidence values associated with the prediction
-#'     intervals.}
+#'     intervals, or \code{NULL} for point forecasts only. In that case,
+#'     \code{LOWER} and \code{UPPER} are empty lists.}
 #'   \item{call}{The matched call.}
 #'   \item{forward}{Whether \code{forward} is applied.}
 #'   If \code{forward} is \code{TRUE}, the components \code{mean},
 #'   \code{lower}, \code{upper}, and \code{model} will also be returned,
 #'   showing the information about the final fitted model and the forecasts
 #'   using all available observations, see e.g.
-#'   \code{\link[forecast]{forecast.ets}} for more details.
+#'   \code{\link[forecast]{forecast.ets}} for more details. With
+#'   \code{level = NULL}, \code{lower} and \code{upper} are omitted.
 #'
 #' @seealso \code{\link{conformal}} and the conformal methods
 #'   \code{\link{scp}}, \code{\link{acp}}, \code{\link{pid}} and
@@ -146,14 +153,15 @@ cvforecast <- function(
 
   # Check confidence level
   if (!is.null(level)) {
+    if (!is.numeric(level) || !length(level) || any(!is.finite(level))) {
+      stop("`level` must be NULL or a non-empty finite numeric vector")
+    }
     if (min(level) > 0 && max(level) < 1) {
       level <- 100 * level
     } else if (min(level) < 0 || max(level) > 99.99) {
       stop("confidence limit out of range")
     }
     level <- sort(level)
-  } else {
-    stop("`level` must not be NULL; supply at least one confidence level")
   }
 
   # Check other inputs
@@ -227,12 +235,17 @@ cvforecast <- function(
 
   lower <- upper <- `names<-`(
     rep(list(pf), length(level)),
-    paste0(level, "%")
+    if (is.null(level)) character(0) else paste0(level, "%")
   )
 
   out <- list(
     x = y
   )
+
+  valid_bounds <- function(bounds) {
+    is.matrix(bounds) && is.numeric(bounds) && nrow(bounds) == h &&
+      all(paste0(level, "%") %in% colnames(bounds))
+  }
 
   for (i in indx) {
     y_subset <- subset(
@@ -263,6 +276,15 @@ cvforecast <- function(
     )
 
     if (!is.element("try-error", class(fc))) {
+      if (!is.null(level) &&
+          (!valid_bounds(fc$lower) || !valid_bounds(fc$upper))) {
+        stop(
+          "`forecastfun` must return `lower` and `upper` matrices with ",
+          "h rows and columns for each requested level; ",
+          "use `level = NULL` for point forecasts only",
+          call. = FALSE
+        )
+      }
       pf[i, ] <- fc$mean
       err[i, ] <- y[i + 1:h] - fc$mean
       for (l in level) {
@@ -290,7 +312,7 @@ cvforecast <- function(
     lagmatrix(up, 1:h) |>
       window(start = time(up)[nfirst + 1L])
   })
-  out$level <- level
+  out["level"] <- list(level)
   out$call <- match.call()
   out$forward <- forward
   # Resolved argument values. `call` records what the user typed and is meant
@@ -314,8 +336,14 @@ cvforecast <- function(
       )
     } else {
       out$mean <- fc$mean
-      out$lower <- fc$lower
-      out$upper <- fc$upper
+      if (!is.ts(out$mean)) {
+        out$mean <- ts(out$mean, start = tsp(y)[2] + 1 / frequency(y),
+                       frequency = frequency(y))
+      }
+      if (!is.null(level)) {
+        out$lower <- fc$lower
+        out$upper <- fc$upper
+      }
       out$model <- fc$model
     }
   }
@@ -338,11 +366,11 @@ print.cvforecast <- function(x, ...) {
     "",
     "fit_times =",
     x$fit_times,
-    ifelse("model" %in% names(x), "(the forward step included)", ""),
+    ifelse("mean" %in% names(x), "(the forward step included)", ""),
     "\n"
   ))
 
-  if ("model" %in% names(x)) {
+  if ("mean" %in% names(x)) {
     cat(paste("\nForecasts of the forward step:\n"))
     NextMethod()
   }
@@ -361,7 +389,11 @@ print.summary.cvforecast <- function(x, ...) {
   print(round(
     accuracy(
       x,
-      measures = c(point_measures, interval_measures),
+      measures = if (length(x$level)) {
+        c(point_measures, interval_measures)
+      } else {
+        point_measures
+      },
       byhorizon = FALSE
     ),
     digits = 3

@@ -45,7 +45,6 @@ observations to stand in for data that arrives later:
 
 ``` r
 library(conformalForecast)
-#> Loading required package: forecast
 set.seed(0)
 series_all <- arima.sim(n = 1005, list(ar = c(0.8, -0.5)), sd = 1)
 series <- head(series_all, 1000)
@@ -65,6 +64,10 @@ far2 <- function(x, h, level) {
 fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
                  forward = TRUE, initial = 1, window = 100)
 ```
+
+For a base model that returns only point forecasts, use `level = NULL`
+in `cvforecast()` and supply `alpha` explicitly when calibrating (for
+example, `alpha = 0.1` for 90% conformal intervals).
 
 Now calibrate intervals with split conformal prediction, on a rolling
 window of 100 calibration scores:
@@ -86,24 +89,24 @@ Finally, evaluate the intervals by forecast horizon:
 # Interval forecast accuracy
 accuracy(scpfc_updated, byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
-#> CV h=1   5.002887 4.830049
-#> CV h=2   6.523012 6.297515
-#> CV h=3   6.630259 6.397788
+#> CV h=1   5.024650 4.850147
+#> CV h=2   6.442104 6.218875
+#> CV h=3   6.568085 6.335622
 
 # Mean coverage
 coverage(scpfc_updated, level = 95)
-#>       h=1       h=2       h=3 
-#> 0.9503106 0.9476961 0.9400749
+#>       h=1       h=2       h=3
+#> 0.9577640 0.9613948 0.9488140
 
 # Mean and median interval width
 width(scpfc_updated, level = 95, includemedian = TRUE)
 #> Mean width:
-#>      h=1      h=2      h=3 
-#> 4.119936 5.371825 5.406426 
-#> 
+#>      h=1      h=2      h=3
+#> 4.289693 5.570434 5.607451
+#>
 #> Median width:
-#>      h=1      h=2      h=3 
-#> 4.074733 5.334842 5.326651
+#>      h=1      h=2      h=3
+#> 4.154276 5.619012 5.404932
 ```
 
 ## Learn more

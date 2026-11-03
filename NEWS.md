@@ -1,3 +1,11 @@
+# conformalForecast 0.2.0.9000
+
+* Restored `cvforecast(level = NULL)` for point-only forecasts; supply `alpha`
+  explicitly for conformal calibration.
+* Fixed updating, printing, plotting and point accuracy evaluation for these
+  forecasts, and improved errors for missing base intervals.
+* Corrected `accuracy()` aggregation for RMSE and RMSSE.
+
 # conformalForecast 0.2.0
 
 * Settings previously stored as `model$alpha`, `model$symmetric`,

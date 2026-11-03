@@ -67,6 +67,10 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = c(80, 95),
                  forward = TRUE, initial = 1, window = 100)
 ```
 
+For a base model that returns only point forecasts, use `level = NULL` in
+`cvforecast()` and supply `alpha` explicitly when calibrating (for example,
+`alpha = 0.1` for 90% conformal intervals).
+
 Now calibrate intervals with split conformal prediction, on a rolling window of
 100 calibration scores:
 

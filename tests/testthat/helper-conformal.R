@@ -13,6 +13,12 @@ naive_fun <- function(x, h, level) {
   forecast::naive(x, h = h, level = level)
 }
 
+# Point-only base models do not need to compute their own prediction intervals.
+point_fun <- function(x, h, level) {
+  stopifnot(is.null(level))
+  list(mean = rep(as.numeric(tail(x, 1)), h))
+}
+
 scorecast_fun <- function(x, h) {
   forecast::naive(x, h = h)
 }

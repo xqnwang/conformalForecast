@@ -18,7 +18,10 @@ argument \code{h} for the forecast horizon and an argument \code{level}
 for the confidence level for prediction intervals. If exogenous
 predictors are used, then it must also have \code{xreg} and
 \code{newxreg} arguments corresponding to the training and the test
-periods, respectively.}
+periods, respectively. When \code{level = NULL}, a list containing only
+\code{mean} (a vector of length \code{h}) is sufficient. Otherwise,
+\code{lower} and \code{upper} matrices with one row per horizon and
+columns named by percentage (e.g., \code{"90\%"}) are required.}
 
 \item{new_xreg}{Newly available exogenous predictor variables passed to
 \code{forecastfun} if required. The number of rows should match the

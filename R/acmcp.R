@@ -126,6 +126,9 @@ acmcp <- function(
 ) {
   # Check inputs
   ma_method <- match.arg(ma_method)
+  if (!length(alpha)) {
+    stop("supply `alpha` explicitly when `object` has no confidence levels")
+  }
   if (any(alpha >= 1 | alpha <= 0)) {
     stop("alpha should be in (0, 1)")
   }

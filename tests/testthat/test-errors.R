@@ -137,3 +137,28 @@ test_that("accuracy() rejects a period that contradicts the series", {
     "does not match"
   )
 })
+
+test_that("CV root mean square scores aggregate before taking the root", {
+  # At horizon one the errors are 2, 4, 8, 16: MAE = 7.5, RMSE = sqrt(85).
+  f <- function(x, h, level) list(mean = rep(0, h))
+  y <- ts(c(1, 2, 4, 8, 16))
+  for (h in c(1, 3)) {
+    fc <- cvforecast(y, f, h = h, level = NULL)
+    result <- accuracy(fc, measures = point_measures, byhorizon = TRUE)
+    for (j in seq_len(h)) {
+      e <- as.numeric(fc$ERROR[, j])
+      expect_equal(unname(result[j, "RMSE"]), sqrt(mean(e^2, na.rm = TRUE)))
+      # Scaling uses only observations available at that forecast origin.
+      origins <- seq_len(length(y) - j)
+      scale <- vapply(origins, function(t) mean(diff(y[seq_len(t)])^2), 0.0)
+      expected <- sqrt(mean(as.numeric(y[origins + j])^2 / scale, na.rm = TRUE))
+      expect_equal(unname(result[j, "RMSSE"]), expected)
+    }
+    pooled <- accuracy(fc, measures = point_measures)
+    expect_equal(unname(pooled[1, "RMSE"]), sqrt(unname(pooled[1, "MSE"])))
+    single <- accuracy(fc, measures = list(custom_name = RMSE))
+    expect_equal(unname(single[1, 1]), unname(pooled[1, "RMSE"]))
+    test <- accuracy(fc, x = seq_len(h), CV = FALSE, measures = point_measures)
+    expect_equal(unname(test[1, "RMSE"]), sqrt(mean(seq_len(h)^2)))
+  }
+})

@@ -55,7 +55,6 @@ update.cpforecast <- function(
   new_xreg = NULL,
   ...
 ) {
-  level <- object$level
   h <- dim(object$MEAN)[2]
 
   cvargs <- object$model$cvforecast$args
@@ -68,6 +67,7 @@ update.cpforecast <- function(
   }
   forward <- cvargs$forward
   window <- cvargs$window
+  level <- cvargs$level
 
   # Append new data
   if (!is.numeric(new_data) || !is.null(dim(new_data)) || !length(new_data)) {
@@ -196,6 +196,10 @@ update.cpforecast <- function(
       )
     } else {
       object$mean <- fc$mean
+      if (!is.ts(object$mean)) {
+        object$mean <- ts(object$mean, start = tsp(x)[2] + 1 / frequency(x),
+                          frequency = frequency(x))
+      }
     }
   }
   object$MEAN <- MEAN

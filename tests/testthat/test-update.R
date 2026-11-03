@@ -250,3 +250,93 @@ test_that("update() rejects mismatched new data", {
   expect_error(update(cp, forecastfun = naive_fun))
   expect_error(update(cp, new_data = numeric(0), forecastfun = naive_fun))
 })
+
+test_that("all conformal methods calibrate and update point-only forecasts", {
+  y <- test_series(85)
+  for (forward in c(TRUE, FALSE)) {
+    short <- cvforecast(head(y, 80), point_fun, h = 3, level = NULL,
+                        initial = 10, forward = forward)
+    full <- cvforecast(y, point_fun, h = 3, level = NULL,
+                       initial = 10, forward = forward)
+    base <- cvforecast(y, naive_fun, h = 3, level = c(80, 90),
+                       initial = 10, forward = forward)
+    for (method in c("scp", "acp", "pid", "acmcp")) {
+      expect_error(conformal(full, method = method), "supply `alpha` explicitly")
+      for (symmetric in if (method == "acmcp") FALSE else c(TRUE, FALSE)) {
+        args <- list(method = method, alpha = c(0.2, 0.1),
+                     ncal = 20, rolling = TRUE)
+        if (method != "acmcp") args$symmetric <- symmetric
+        if (method %in% c("pid", "acmcp")) {
+          args$Csat <- 0.4
+          args$KI <- 2
+        }
+        if (method == "pid") args$scorecastfun <- scorecast_fun
+        cp <- do.call(conformal, c(list(object = full), args))
+        reference <- do.call(conformal, c(list(object = base), args))
+        expect_equal(cp$level, c(80, 90))
+        expect_equal(cp$LOWER, reference$LOWER)
+        expect_equal(cp$UPPER, reference$UPPER)
+        expect_true(any(is.finite(cp$LOWER[["90%"]])))
+        expect_valid_intervals(cp, level = "90%")
+        expect_equal(coverage(cp, level = 90), coverage(reference, level = 90))
+        expect_equal(width(cp, level = 90), width(reference, level = 90))
+        expect_equal(accuracy(cp), accuracy(reference))
+        expect_output(print(summary(cp)), "error measures")
+        before <- do.call(conformal, c(list(object = short), args))
+        updated <- update(before, new_data = as.numeric(tail(y, 5)),
+                          forecastfun = point_fun)
+        expect_equal(updated$MEAN, cp$MEAN)
+        expect_equal(updated$ERROR, cp$ERROR)
+        expect_equal(updated$LOWER, cp$LOWER)
+        expect_equal(updated$UPPER, cp$UPPER)
+        expect_equal(updated$mean, cp$mean)
+        expect_equal(updated$lower, cp$lower)
+        expect_equal(updated$upper, cp$upper)
+        expect_null(updated$model$cvforecast$args$level)
+      }
+    }
+  }
+})
+
+test_that("point-only updates preserve seasonal time and external regressors", {
+  y <- test_series(85, frequency = 12)
+  f <- function(x, h, level, xreg, newxreg) {
+    stopifnot(is.null(level), NROW(xreg) == length(x))
+    list(mean = rep(as.numeric(tail(x, 1)), h) + rowSums(newxreg))
+  }
+  for (forward in c(TRUE, FALSE)) {
+    for (h in c(1, 3)) {
+      xr <- cbind(a = seq_len(85 + h - !forward) / 100, b = 0.1)
+      build <- function(n) {
+        cvforecast(window(y, end = time(y)[n]), f, h = h, level = NULL,
+                   window = 20, forward = forward,
+                   xreg = xr[seq_len(n + h - !forward), , drop = FALSE])
+      }
+      short <- build(80)
+      full <- build(85)
+      for (method in c("scp", "acp", "pid", "acmcp")) {
+        args <- list(method = method, alpha = 0.1, ncal = 20, rolling = TRUE)
+        if (method %in% c("pid", "acmcp")) {
+          args$Csat <- 0.4
+          args$KI <- 2
+        }
+        if (method == "pid") args$scorecastfun <- scorecast_fun
+        updated <- do.call(conformal, c(list(object = short), args))
+        for (rows in list(81:82, 83:85)) {
+          updated <- update(updated, new_data = as.numeric(y[rows]),
+                            forecastfun = f,
+                            new_xreg = xr[rows + h - !forward, , drop = FALSE])
+        }
+        expected <- do.call(conformal, c(list(object = full), args))
+        expect_equal(updated$MEAN, expected$MEAN)
+        expect_equal(updated$ERROR, expected$ERROR)
+        expect_equal(updated$LOWER, expected$LOWER)
+        expect_equal(updated$UPPER, expected$UPPER)
+        expect_equal(updated$mean, expected$mean)
+        expect_equal(updated$lower, expected$lower)
+        expect_equal(updated$upper, expected$upper)
+        expect_equal(updated$xreg, expected$xreg)
+      }
+    }
+  }
+})

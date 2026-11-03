@@ -31,6 +31,8 @@
 #' @param alpha A numeric vector of significance levels to achieve a desired
 #'   coverage level \eqn{1-\alpha}. Defaults to
 #'   \code{1 - 0.01 * object$level}, the levels used in \code{object}.
+#'   Must be supplied explicitly if \code{object} was created with
+#'   \code{level = NULL}; base prediction intervals are not required.
 #' @param symmetric If \code{TRUE}, symmetric nonconformity scores
 #'   (i.e. \eqn{|e_{t+h|t}|}) are used. If \code{FALSE}, asymmetric
 #'   nonconformity scores (i.e. \eqn{e_{t+h|t}}) are used, and then upper
@@ -149,6 +151,9 @@ scp <- function(
   ...
 ) {
   # Check inputs
+  if (!length(alpha)) {
+    stop("supply `alpha` explicitly when `object` has no confidence levels")
+  }
   if (any(alpha >= 1 | alpha <= 0)) {
     stop("`alpha` should be in (0, 1)")
   }

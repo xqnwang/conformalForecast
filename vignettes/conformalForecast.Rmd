@@ -51,7 +51,7 @@ autoplot(series) +
 
 Before we can calibrate any conformal method, we need a record of past forecast errors to calibrate against. We obtain this with `cvforecast()`, which repeatedly fits the AR(2) model on a rolling forecast origin and produces out-of-sample point forecasts and errors at every origin, for every forecast horizon up to `h`.
 
-Two arguments control how the origins are laid out. `forward = TRUE` appends an extra $h$-step forecast made from the final observation, so that the object carries genuinely future forecasts as well as the validation history. `window` sets how many recent observations each refit sees: a number gives a fixed-length rolling estimation window, while `window = NULL` lets the estimation window expand over time. A non-`NULL` `level` is required, since the conformal methods calibrate against the nominal levels stored in the object.
+Two arguments control how the origins are laid out. `forward = TRUE` appends an extra $h$-step forecast made from the final observation, so that the object carries genuinely future forecasts as well as the validation history. `window` sets how many recent observations each refit sees: a number gives a fixed-length rolling estimation window, while `window = NULL` lets the estimation window expand over time. Use `level = NULL` when the base model returns only point forecasts, and supply `alpha` explicitly to the conformal method (for example, `alpha = 0.1` for 90% intervals). Otherwise, the base model must return intervals for each requested `level`.
 
 ```{r cv}
 far2 <- function(x, h, level) {
@@ -80,6 +80,23 @@ fc |>
 The object `fc` stores point forecasts `MEAN` and forecast errors `ERROR` as multivariate time series, in which column $h$ holds the values for forecast horizon $h$. In package notation, the error made forecasting $y_{t+h}$ from origin $t$ is
 $$e_{t+h|t} = y_{t+h} - \hat{y}_{t+h|t}.$$
 Every conformal method below calibrates against this `ERROR` matrix, one column (one horizon) at a time.
+
+For a point-only base model, the same workflow is:
+
+```{r point-only}
+point_fun <- function(x, h, level) {
+  list(mean = rep(tail(x, 1), h))
+}
+fc_point <- cvforecast(series, forecastfun = point_fun, h = 3,
+                       level = NULL, window = 100)
+cp_point <- scp(fc_point, alpha = 0.1, ncal = 100, rolling = TRUE)
+accuracy(fc_point, measures = point_measures, byhorizon = TRUE)
+coverage(cp_point, level = 90)
+```
+
+`fc_point` has no base intervals, so interval accuracy, coverage and width
+are evaluated on `cp_point` after calibration. `update()` also supports this
+workflow and passes the original `level = NULL` to the base forecaster.
 
 ## Conformal prediction
 

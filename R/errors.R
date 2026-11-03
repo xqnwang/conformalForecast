@@ -266,6 +266,12 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #' accuracy. If \code{x} is not given, the function only produces accuracy
 #' measures on the validation set.
 #'
+#' Cross-validation scores are averaged over forecast origins, using the
+#' observations available at each origin to scale the errors. When
+#' \code{byhorizon = FALSE}, each origin first averages over its available
+#' horizons. For the built-in \code{RMSE} and \code{RMSSE} measures, squared
+#' scores are averaged before taking the square root.
+#'
 #' The measures calculated are:
 #' \itemize{
 #'   \item ME: Mean Error
@@ -289,7 +295,8 @@ interval_measures <- list(Winkler = winkler_score, MSIS = MSIS)
 #'   which case it is taken from the frequency of the series.
 #' @param measures A list of accuracy measure functions to compute (such as
 #'   \link{point_measures} or \link{interval_measures}). Defaults to
-#'   \code{interval_measures}.
+#'   \code{interval_measures}. Use \code{point_measures} for a
+#'   \code{cvforecast} object created with \code{level = NULL}.
 #' @param byhorizon If \code{TRUE}, accuracy measures will be calculated for
 #'   each individual forecast horizon \code{h} separately. Defaults to
 #'   \code{FALSE}.
@@ -340,18 +347,33 @@ accuracy.cvforecast <- function(
   byhorizon = FALSE,
   ...
 ) {
-  if (!is.list(measures)) {
-    stop("the `measures` argument must contain a list of accuracy measures")
+  if (!is.list(measures) || !length(measures) ||
+      !all(vapply(measures, is.function, logical(1)))) {
+    stop("the `measures` argument must contain a non-empty list of accuracy functions")
   }
+  root_measures <- vapply(measures, function(f) {
+    identical(f, RMSE) || identical(f, RMSSE)
+  }, logical(1))
 
   # Confidence level for interval measures
+  needs_intervals <- any(vapply(measures, function(f) {
+    any(c("lower", "upper", "level") %in% names(formals(f)))
+  }, logical(1)))
   dots <- rlang::dots_list(...)
-  level <- ifelse(
-    "level" %in% names(dots),
-    ifelse(dots$level > 0 && dots$level < 1, 100 * dots$level, dots$level),
-    ifelse(95 %in% object$level, 95, object$level[1])
-  )
-  if (!(level %in% object$level)) {
+  level <- if ("level" %in% names(dots)) {
+    if (dots$level > 0 && dots$level < 1) 100 * dots$level else dots$level
+  } else if (95 %in% object$level) {
+    95
+  } else {
+    object$level[1]
+  }
+  if (needs_intervals && !length(object$level)) {
+    stop(
+      "base prediction intervals are unavailable; use `point_measures` ",
+      "or apply a conformal method first"
+    )
+  }
+  if (needs_intervals && !(level %in% object$level)) {
     stop("the `level` argument should exist in object$level")
   }
   # Change name for interval measures to include level
@@ -392,8 +414,11 @@ accuracy.cvforecast <- function(
     x <- object$x
     e <- object$ERROR
 
-    lb <- object$LOWER[[paste0(level, "%")]]
-    ub <- object$UPPER[[paste0(level, "%")]]
+    lb <- ub <- e * NA_real_
+    if (needs_intervals) {
+      lb <- object$LOWER[[paste0(level, "%")]]
+      ub <- object$UPPER[[paste0(level, "%")]]
+    }
 
     horizon <- ncol(e)
 
@@ -438,7 +463,7 @@ accuracy.cvforecast <- function(
           level = level,
           ...
         )
-        sapply(measures, function(f) {
+        scores <- sapply(measures, function(f) {
           f_args <- all_args[intersect(names(formals(f)), names(all_args))]
           tryCatch(
             {
@@ -447,9 +472,13 @@ accuracy.cvforecast <- function(
             error = function(e) return(NA_real_)
           )
         })
+        scores[root_measures] <- scores[root_measures]^2
+        scores
       })
       out_h <- do.call(rbind, out_h)
-      apply(out_h, 2, mean, na.rm = TRUE)
+      scores <- apply(out_h, 2, mean, na.rm = TRUE)
+      scores[root_measures] <- sqrt(scores[root_measures])
+      scores
     })
     cvout <- do.call(rbind, cvout)
     rownames(cvout) <- cvrnames
@@ -466,8 +495,11 @@ accuracy.cvforecast <- function(
     horizon <- length(xx)
     ee <- xx - ff
 
-    lt <- object$lower[, paste0(level, "%")]
-    ut <- object$upper[, paste0(level, "%")]
+    lt <- ut <- rep(NA_real_, horizon)
+    if (needs_intervals) {
+      lt <- object$lower[, paste0(level, "%")]
+      ut <- object$upper[, paste0(level, "%")]
+    }
 
     if (byhorizon) {
       input <- 1:horizon

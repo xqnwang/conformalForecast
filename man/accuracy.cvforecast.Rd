@@ -33,7 +33,8 @@ which case it is taken from the frequency of the series.}
 
 \item{measures}{A list of accuracy measure functions to compute (such as
 \link{point_measures} or \link{interval_measures}). Defaults to
-\code{interval_measures}.}
+\code{interval_measures}. Use \code{point_measures} for a
+\code{cvforecast} object created with \code{level = NULL}.}
 
 \item{byhorizon}{If \code{TRUE}, accuracy measures will be calculated for
 each individual forecast horizon \code{h} separately. Defaults to
@@ -51,6 +52,12 @@ accuracy. If \code{x} is not given, the function only produces accuracy
 measures on the validation set.
 }
 \details{
+Cross-validation scores are averaged over forecast origins, using the
+observations available at each origin to scale the errors. When
+\code{byhorizon = FALSE}, each origin first averages over its available
+horizons. For the built-in \code{RMSE} and \code{RMSSE} measures, squared
+scores are averaged before taking the square root.
+
 The measures calculated are:
 \itemize{
 \item ME: Mean Error
