@@ -1,5 +1,15 @@
 # Changelog
 
+## conformalForecast 0.2.0.9000
+
+- Restored `cvforecast(level = NULL)` for point-only forecasts; supply
+  `alpha` explicitly for conformal calibration.
+- Fixed updating, printing, plotting and point accuracy evaluation for
+  these forecasts, and improved errors for missing base intervals.
+- Corrected
+  [`accuracy()`](https://generics.r-lib.org/reference/accuracy.html)
+  aggregation for RMSE and RMSSE.
+
 ## conformalForecast 0.2.0
 
 CRAN release: 2026-10-15

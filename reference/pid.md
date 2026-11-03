@@ -39,7 +39,8 @@ pid(
 
   A numeric vector of significance levels to achieve a desired coverage
   level \\1-\alpha\\. Defaults to `1 - 0.01 * object$level`, the levels
-  used in `object`.
+  used in `object`. Must be supplied explicitly if `object` was created
+  with `level = NULL`; base prediction intervals are not required.
 
 - symmetric:
 
@@ -292,8 +293,8 @@ summary(pidfc_nsf)
 #> 203      0.4935805 -2.173248 3.218838
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.339    6.82
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.189 -3.933 269.763 0.992 0.995      6.339    6.82
 
 # PID with a Naive model for the scorecaster
 naivefun <- function(x, h) {

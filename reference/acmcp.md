@@ -40,7 +40,8 @@ acmcp(
 
   A numeric vector of significance levels to achieve a desired coverage
   level \\1-\alpha\\. Defaults to `1 - 0.01 * object$level`, the levels
-  used in `object`.
+  used in `object`. Must be supplied explicitly if `object` was created
+  with `level = NULL`; base prediction intervals are not required.
 
 - ncal:
 
@@ -279,8 +280,8 @@ summary(acmcpfc)
 #> 203      0.4935805 -2.055964 3.526965
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.618   7.132
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.189 -3.933 269.763 0.992 0.995      6.618   7.132
 acmcpfc$scorecast_times
 #> [1] 101 100  98
 ```

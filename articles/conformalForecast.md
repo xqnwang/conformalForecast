@@ -71,9 +71,11 @@ appends an extra \\h\\-step forecast made from the final observation, so
 that the object carries genuinely future forecasts as well as the
 validation history. `window` sets how many recent observations each
 refit sees: a number gives a fixed-length rolling estimation window,
-while `window = NULL` lets the estimation window expand over time. A
-non-`NULL` `level` is required, since the conformal methods calibrate
-against the nominal levels stored in the object.
+while `window = NULL` lets the estimation window expand over time. Use
+`level = NULL` when the base model returns only point forecasts, and
+supply `alpha` explicitly to the conformal method (for example,
+`alpha = 0.1` for 90% intervals). Otherwise, the base model must return
+intervals for each requested `level`.
 
 ``` r
 
@@ -99,7 +101,7 @@ summary(fc)
 #> 
 #> Cross-validation error measures:
 #>        ME   MAE   MSE  RMSE    MPE   MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV -0.018 0.972 1.506 1.102 36.202 218.01 0.947 0.866      5.765   5.616
+#> CV -0.018 0.972 1.506 1.227 36.202 218.01 0.947 0.964      5.765   5.616
 ```
 
 ``` r
@@ -140,6 +142,35 @@ values for forecast horizon \\h\\. In package notation, the error made
 forecasting \\y\_{t+h}\\ from origin \\t\\ is \\e\_{t+h\|t} = y\_{t+h} -
 \hat{y}\_{t+h\|t}.\\ Every conformal method below calibrates against
 this `ERROR` matrix, one column (one horizon) at a time.
+
+For a point-only base model, the same workflow is:
+
+``` r
+
+point_fun <- function(x, h, level) {
+  list(mean = rep(tail(x, 1), h))
+}
+fc_point <- cvforecast(series, forecastfun = point_fun, h = 3,
+                       level = NULL, window = 100)
+cp_point <- scp(fc_point, alpha = 0.1, ncal = 100, rolling = TRUE)
+accuracy(fc_point, measures = point_measures, byhorizon = TRUE)
+#>                   ME      MAE      MSE     RMSE       MPE     MAPE     MASE
+#> CV h=1 -5.978041e-05 1.063747 1.743779 1.320522 -12.96856 427.9472 1.036163
+#> CV h=2  1.054123e-04 1.592855 3.974697 1.993664 145.37276 436.7248 1.551243
+#> CV h=3  1.882337e-04 1.769486 4.931805 2.220767 284.91662 500.7257 1.723278
+#>           RMSSE
+#> CV h=1 1.037875
+#> CV h=2 1.566562
+#> CV h=3 1.743141
+coverage(cp_point, level = 90)
+#>       h=1       h=2       h=3 
+#> 0.8950000 0.8972431 0.8856784
+```
+
+`fc_point` has no base intervals, so interval accuracy, coverage and
+width are evaluated on `cp_point` after calibration.
+[`update()`](https://rdrr.io/r/stats/update.html) also supports this
+workflow and passes the original `level = NULL` to the base forecaster.
 
 ## Conformal prediction
 

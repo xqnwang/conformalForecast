@@ -88,8 +88,8 @@ summary(scpfc)
 #> 203      0.4935805 -2.027163 3.691253
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      6.335    6.78
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.189 -3.933 269.763 0.992 0.995      6.335    6.78
 
 # ACP with asymmetric nonconformity scores and rolling calibration sets
 acpfc <- conformal(fc, method = "acp", gamma = 0.005,
@@ -109,6 +109,6 @@ summary(acpfc)
 #> 203      0.4935805 -2.027163 3.691253
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882        Inf     Inf
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.189 -3.933 269.763 0.992 0.995        Inf     Inf
 ```

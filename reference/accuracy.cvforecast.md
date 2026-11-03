@@ -50,7 +50,8 @@ accuracy(object, ...)
   [point_measures](https://xqnwang.github.io/conformalForecast/reference/point_measures.md)
   or
   [interval_measures](https://xqnwang.github.io/conformalForecast/reference/interval_measures.md)).
-  Defaults to `interval_measures`.
+  Defaults to `interval_measures`. Use `point_measures` for a
+  `cvforecast` object created with `level = NULL`.
 
 - byhorizon:
 
@@ -66,6 +67,12 @@ accuracy(object, ...)
 A matrix giving mean out-of-sample forecast accuracy measures.
 
 ## Details
+
+Cross-validation scores are averaged over forecast origins, using the
+observations available at each origin to scale the errors. When
+`byhorizon = FALSE`, each origin first averages over its available
+horizons. For the built-in `RMSE` and `RMSSE` measures, squared scores
+are averaged before taking the square root.
 
 The measures calculated are:
 
@@ -117,14 +124,14 @@ fc <- cvforecast(series, forecastfun = far2, h = 3, level = 95, window = 50)
 
 # Out-of-sample forecast accuracy on validation set
 accuracy(fc, measures = point_measures, byhorizon = TRUE)
-#>                 ME       MAE      MSE      RMSE       MPE     MAPE     MASE
-#> CV h=1  0.02185523 0.8052604 1.017906 0.8052604  35.66722 221.8293 0.844289
-#> CV h=2  0.01698001 1.0245970 1.632225 1.0245970 -32.41324 319.0622 1.075412
-#> CV h=3 -0.01246597 1.0183022 1.622138 1.0183022 -17.90026 271.4276 1.067876
+#>                 ME       MAE      MSE     RMSE       MPE     MAPE     MASE
+#> CV h=1  0.02185523 0.8052604 1.017906 1.008913  35.66722 221.8293 0.844289
+#> CV h=2  0.01698001 1.0245970 1.632225 1.277586 -32.41324 319.0622 1.075412
+#> CV h=3 -0.01246597 1.0183022 1.622138 1.273632 -17.90026 271.4276 1.067876
 #>            RMSSE
-#> CV h=1 0.6697150
-#> CV h=2 0.8532125
-#> CV h=3 0.8477134
+#> CV h=1 0.8442234
+#> CV h=2 1.0687679
+#> CV h=3 1.0640567
 accuracy(fc, measures = interval_measures, level = 95, byhorizon = TRUE)
 #>        Winkler_95  MSIS_95
 #> CV h=1   5.012254 5.296003

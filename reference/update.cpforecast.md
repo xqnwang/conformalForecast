@@ -30,7 +30,10 @@ update(object, new_data, forecastfun, new_xreg = NULL, ...)
   the forecast horizon and an argument `level` for the confidence level
   for prediction intervals. If exogenous predictors are used, then it
   must also have `xreg` and `newxreg` arguments corresponding to the
-  training and the test periods, respectively.
+  training and the test periods, respectively. When `level = NULL`, a
+  list containing only `mean` (a vector of length `h`) is sufficient.
+  Otherwise, `lower` and `upper` matrices with one row per horizon and
+  columns named by percentage (e.g., `"90%"`) are required.
 
 - new_xreg:
 
@@ -112,5 +115,5 @@ summary(scpfc_update)
 #> 
 #> Cross-validation error measures:
 #>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.037 0.957 1.448 1.072 -3.518 265.271 1.002  0.89      6.326   6.757
+#> CV 0.037 0.957 1.448 1.203 -3.518 265.271 1.002 1.004      6.326   6.757
 ```

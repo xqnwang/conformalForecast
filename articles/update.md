@@ -147,11 +147,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_update, 3)
 #>           scp   acp   pid acmcp
-#> batch 1 0.143 0.145 0.217 0.470
-#> batch 2 0.142 0.145 0.217 0.480
-#> batch 3 0.140 0.142 0.214 0.460
-#> batch 4 0.142 0.144 0.215 0.587
-#> batch 5 0.145 0.151 0.218 0.474
+#> batch 1 0.142 0.146 0.219 0.471
+#> batch 2 0.141 0.146 0.216 0.484
+#> batch 3 0.140 0.143 0.214 0.464
+#> batch 4 0.143 0.144 0.216 0.593
+#> batch 5 0.144 0.146 0.217 0.470
 ```
 
 That is the whole streaming loop: five calls to
@@ -201,11 +201,11 @@ for (b in seq_len(n_batches)) {
 }
 round(timings_full, 3)
 #>         cvforecast   scp   acp   pid acmcp
-#> batch 1      0.967 0.176 0.193 0.717 2.413
-#> batch 2      1.074 0.203 0.218 0.800 2.785
-#> batch 3      1.173 0.231 0.249 0.899 3.256
-#> batch 4      1.282 0.259 0.290 1.016 3.549
-#> batch 5      1.413 0.289 0.306 1.111 3.976
+#> batch 1      0.984 0.177 0.191 0.705 2.419
+#> batch 2      1.091 0.204 0.224 0.812 2.786
+#> batch 3      1.196 0.230 0.252 0.916 3.264
+#> batch 4      1.317 0.263 0.281 1.022 3.519
+#> batch 5      1.435 0.287 0.310 1.134 3.984
 ```
 
 The cost of the
@@ -219,7 +219,7 @@ observations that have just arrived.
 
 ## What `update()` expects
 
-Three points are worth keeping in mind when calling
+Keep the following points in mind when calling
 [`update()`](https://rdrr.io/r/stats/update.html).
 
 `forecastfun` has to be supplied again at every call. It is not stored
@@ -227,6 +227,11 @@ on the object, and it should be the same function used to build the
 original
 [`cvforecast()`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
 object, since it is used to fit the model at the newly added origins.
+
+[`update()`](https://rdrr.io/r/stats/update.html) also preserves the
+original base forecast `level`, including `NULL`. For a point-only base
+model, supply `alpha` explicitly when first calibrating the object;
+subsequent updates retain that calibration level.
 
 The object being updated has to come from one of the conformal methods
 in the package. [`update()`](https://rdrr.io/r/stats/update.html) reads
@@ -286,14 +291,12 @@ cp_x_upd <- update(cp_x, new_data = new_y, forecastfun = lm_fun, new_xreg = new_
 
 ## The `forward` forecast
 
-When the original
-[`cvforecast()`](https://xqnwang.github.io/conformalForecast/reference/cvforecast.md)
-object was built with `forward = TRUE`, which is the default, it carries
-`mean`, `lower` and `upper` components holding the out-of-sample
-forecast from the most recent origin. After the new data have been
-appended, [`update()`](https://rdrr.io/r/stats/update.html) refits the
-model at the new final origin, so that these components describe a
-forecast made from all the data now available.
+When the conformal fit was built with `forward = TRUE`, which is the
+default, it carries `mean`, `lower` and `upper` components holding the
+out-of-sample forecast from the most recent origin. After the new data
+have been appended, [`update()`](https://rdrr.io/r/stats/update.html)
+refits the model at the new final origin, so that these components
+describe a forecast made from all the data now available.
 
 ``` r
 

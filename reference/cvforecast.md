@@ -32,7 +32,10 @@ cvforecast(
   the forecast horizon and an argument `level` for the confidence level
   for prediction intervals. If exogenous predictors are used, then it
   must also have `xreg` and `newxreg` arguments corresponding to the
-  training and the test periods, respectively.
+  training and the test periods, respectively. When `level = NULL`, a
+  list containing only `mean` (a vector of length `h`) is sufficient.
+  Otherwise, `lower` and `upper` matrices with one row per horizon and
+  columns named by percentage (e.g., `"90%"`) are required.
 
 - h:
 
@@ -41,8 +44,10 @@ cvforecast(
 - level:
 
   Confidence level for prediction intervals, as a numeric vector of
-  percentages. It must not be `NULL`, since the conformal methods need
-  at least one interval to start from. Defaults to `c(80, 95)`.
+  percentages. Set to `NULL` to collect only point forecasts and errors,
+  without requiring base prediction intervals. In that case, supply
+  `alpha` explicitly to the subsequent conformal method. Defaults to
+  `c(80, 95)`.
 
 - forward:
 
@@ -118,7 +123,9 @@ A list of class `c("cvforecast", "forecast")` with components:
 
 - level:
 
-  The confidence values associated with the prediction intervals.
+  The confidence values associated with the prediction intervals, or
+  `NULL` for point forecasts only. In that case, `LOWER` and `UPPER` are
+  empty lists.
 
 - call:
 
@@ -133,7 +140,7 @@ If `forward` is `TRUE`, the components `mean`, `lower`, `upper`, and
 fitted model and the forecasts using all available observations, see
 e.g.
 [`forecast.ets`](https://pkg.robjhyndman.com/forecast/reference/forecast.ets.html)
-for more details.
+for more details. With `level = NULL`, `lower` and `upper` are omitted.
 
 ## Details
 
@@ -208,8 +215,8 @@ summary(fc)
 #> 203      0.4935805 -2.031823 3.018984
 #> 
 #> Cross-validation error measures:
-#>       ME   MAE   MSE RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
-#> CV 0.007 0.946 1.415 1.06 -3.933 269.763 0.992 0.882      5.875   6.194
+#>       ME   MAE   MSE  RMSE    MPE    MAPE  MASE RMSSE Winkler_95 MSIS_95
+#> CV 0.007 0.946 1.415 1.189 -3.933 269.763 0.992 0.995      5.875   6.194
 
 # Example with exogenous predictors
 far2_xreg <- function(x, h, level, xreg, newxreg) {
