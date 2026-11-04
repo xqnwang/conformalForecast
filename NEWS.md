@@ -1,4 +1,4 @@
-# conformalForecast 0.2.0.9000
+# conformalForecast 0.2.1
 
 * Restored `cvforecast(level = NULL)` for point-only forecasts; supply `alpha`
   explicitly for conformal calibration.
