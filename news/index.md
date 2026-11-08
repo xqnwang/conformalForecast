@@ -1,6 +1,10 @@
 # Changelog
 
+## conformalForecast 0.2.1.9000
+
 ## conformalForecast 0.2.1
+
+CRAN release: 2026-11-07
 
 - Restored `cvforecast(level = NULL)` for point-only forecasts; supply
   `alpha` explicitly for conformal calibration.
